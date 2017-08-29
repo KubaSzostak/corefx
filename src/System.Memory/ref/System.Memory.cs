@@ -52,6 +52,7 @@ namespace System
         public void Clear() { }
         public void Fill(T value) { }
         public void CopyTo(Span<T> destination) { }
+        public void CopyFrom(T[] sourceArray) { }
         public static Span<T> DangerousCreate(object obj, ref T objectData, int length) { throw null; }
         public ref T DangerousGetPinnableReference() { throw null; }
         [System.ObsoleteAttribute("Equals() on Span will always throw an exception. Use == instead.")]

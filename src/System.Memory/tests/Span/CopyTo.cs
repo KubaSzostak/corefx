@@ -22,6 +22,18 @@ namespace System.SpanTests
         }
 
         [Fact]
+        public static void TryCopyFrom()
+        {
+            int[] src = { 1, 2, 3 };
+            int[] dst = { 99, 100, 101 };
+
+            Span<int> dstSpan = new Span<int>(dst);
+            bool success = dstSpan.CopyFrom(src);
+            Assert.True(success);
+            Assert.Equal<int>(src, dstSpan.ToArray());
+        }
+
+        [Fact]
         public static void TryCopyToSingle()
         {
             int[] src = { 1 };

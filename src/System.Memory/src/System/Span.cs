@@ -308,6 +308,18 @@ namespace System
         /// and destinations overlap, this method behaves as if the original values in
         /// a temporary location before the destination is overwritten.
         ///
+        /// <param name="sourceArray">The span to copy items into.</param>
+        /// </summary>
+        public void CopyFrom(T[] sourceArray)
+        {
+            new ReadOnlySpan<T>(sourceArray).CopyTo(this);
+        }
+
+        /// <summary>
+        /// Copies the contents of this span into destination span. If the source
+        /// and destinations overlap, this method behaves as if the original values in
+        /// a temporary location before the destination is overwritten.
+        ///
         /// <returns>If the destination span is shorter than the source span, this method
         /// return false and no data is written to the destination.</returns>
         /// </summary>

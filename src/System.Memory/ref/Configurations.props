@@ -7,8 +7,6 @@
     </PackageConfigurations>
     <BuildConfigurations>
       $(PackageConfigurations);
-      netcoreapp;
-      uap;
     </BuildConfigurations>
   </PropertyGroup>
 </Project>
