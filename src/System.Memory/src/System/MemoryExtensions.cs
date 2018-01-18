@@ -122,7 +122,25 @@ namespace System
         /// <summary>
         /// Reverses the sequence of the elements in the entire span.
         /// </summary>
-        public static unsafe void Reverse<T>(this Span<T> span)
+        public static void Reverse1<T>(this Span<T> span)
+        {
+            ref T p = ref MemoryMarshal.GetReference(span);
+            int i = 0;
+            int j = span.Length - 1;
+            while (i < j)
+            {
+                T temp = Unsafe.Add(ref p, i);
+                Unsafe.Add(ref p, i) = Unsafe.Add(ref p, j);
+                Unsafe.Add(ref p, j) = temp;
+                i++;
+                j--;
+            }
+        }
+
+        /// <summary>
+        /// Reverses the sequence of the elements in the entire span.
+        /// </summary>
+        public static unsafe void Reverse2<T>(this Span<T> span)
         {
             if (span.Length > 1)
             {
@@ -139,6 +157,56 @@ namespace System
                     i += 1;
                     j -= 1;
                 } while (i.ToPointer() < j.ToPointer());
+            }
+        }
+
+        /// <summary>
+        /// Reverses the sequence of the elements in the entire span.
+        /// </summary>
+        public static void Reverse3<T>(this Span<T> span)
+        {
+            if (span.Length > 1)
+            {
+                ref T p = ref MemoryMarshal.GetReference(span);
+                ulong i = 0;
+                ulong j = (ulong)span.Length - 1;
+
+                do
+                {
+                    var temp1 = Unsafe.Add(ref p, (IntPtr)i);
+                    var temp2 = Unsafe.Add(ref p, (IntPtr)j);
+
+                    Unsafe.Add(ref p, (IntPtr)i) = temp2;
+                    Unsafe.Add(ref p, (IntPtr)j) = temp1;
+
+                    i += 1;
+                    j -= 1;
+                } while (i < j);
+            }
+        }
+
+        /// <summary>
+        /// Reverses the sequence of the elements in the entire span.
+        /// </summary>
+        public static void Reverse4<T>(this Span<T> span)
+        {
+            if (span.Length > 1)
+            {
+                ref T p = ref MemoryMarshal.GetReference(span);
+                int i = 0;
+                int j = span.Length - 1;
+
+                do
+                {
+                    var temp1 = Unsafe.Add(ref p, i);
+                    var temp2 = Unsafe.Add(ref p, j);
+
+                    Unsafe.Add(ref p, i) = temp2;
+                    Unsafe.Add(ref p, j) = temp1;
+
+                    i += 1;
+                    j -= 1;
+                } while (i < j);
             }
         }
 
