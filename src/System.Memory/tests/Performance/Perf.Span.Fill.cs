@@ -167,7 +167,7 @@ namespace System.Memory.Tests
         }
 
 
-        [Benchmark]
+        //[Benchmark]
         [InlineData(0)]
         [InlineData(1)]
         [InlineData(2)]
@@ -206,7 +206,7 @@ namespace System.Memory.Tests
         }
 
 
-        [Benchmark]
+        //[Benchmark]
         [InlineData(0)]
         [InlineData(1)]
         [InlineData(2)]
@@ -244,7 +244,7 @@ namespace System.Memory.Tests
             }
         }
 
-        [Benchmark]
+        //[Benchmark]
         [InlineData(0)]
         [InlineData(1)]
         [InlineData(2)]
@@ -282,7 +282,7 @@ namespace System.Memory.Tests
             }
         }
 
-        [Benchmark]
+        //[Benchmark]
         [InlineData(0)]
         [InlineData(1)]
         [InlineData(2)]

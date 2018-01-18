@@ -122,27 +122,24 @@ namespace System
         /// <summary>
         /// Reverses the sequence of the elements in the entire span.
         /// </summary>
-        public static void Reverse<T>(this Span<T> span)
+        public static unsafe void Reverse<T>(this Span<T> span)
         {
             if (span.Length > 1)
             {
                 ref T p = ref MemoryMarshal.GetReference(span);
-                ulong i = 0;
-                ulong j = (ulong)span.Length - 1;
+                IntPtr i = IntPtr.Zero;
+                IntPtr j = (IntPtr)span.Length - 1;
 
                 do
                 {
-                    var temp1 = Unsafe.Add(ref p, (IntPtr)i);
-                    var temp2 = Unsafe.Add(ref p, (IntPtr)j);
-
-                    Unsafe.Add(ref p, (IntPtr)i) = temp2;
-                    Unsafe.Add(ref p, (IntPtr)j) = temp1;
+                    T temp = Unsafe.Add(ref p, i);
+                    Unsafe.Add(ref p, i) = Unsafe.Add(ref p, j);
+                    Unsafe.Add(ref p, j) = temp;
 
                     i += 1;
                     j -= 1;
-                } while (i < j);
+                } while (i.ToPointer() < j.ToPointer());
             }
-
         }
 
         /// <summary>
