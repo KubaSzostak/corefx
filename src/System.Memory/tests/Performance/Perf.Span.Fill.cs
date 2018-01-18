@@ -32,8 +32,47 @@ namespace System.Memory.Tests
         [InlineData(100)]
         [InlineData(1000)]
         [InlineData(10000)]
-        [InlineData(100000)]
-        public void Int(int size)
+        public void ByteSpan(int size)
+        {
+            var a = new byte[size];
+            var span = new Span<byte>(a);
+            foreach (BenchmarkIteration iteration in Benchmark.Iterations)
+            {
+                using (iteration.StartMeasurement())
+                {
+                    for (int i = 0; i < 10000; i++)
+                    {
+                        span.Reverse();
+                    }
+                }
+            }
+        }
+
+
+        [Benchmark]
+        [InlineData(0)]
+        [InlineData(1)]
+        [InlineData(2)]
+        [InlineData(3)]
+        [InlineData(4)]
+        [InlineData(5)]
+        [InlineData(6)]
+        [InlineData(7)]
+        [InlineData(8)]
+        [InlineData(9)]
+        [InlineData(10)]
+        [InlineData(11)]
+        [InlineData(12)]
+        [InlineData(13)]
+        [InlineData(14)]
+        [InlineData(15)]
+        [InlineData(16)]
+        [InlineData(32)]
+        [InlineData(64)]
+        [InlineData(100)]
+        [InlineData(1000)]
+        [InlineData(10000)]
+        public void IntSpan(int size)
         {
             var a = new int[size];
             var span = new Span<int>(a);
@@ -43,7 +82,239 @@ namespace System.Memory.Tests
                 {
                     for (int i = 0; i < 10000; i++)
                     {
-                        span.Fill(42);
+                        span.Reverse();
+                    }
+                }
+            }
+        }
+
+        [Benchmark]
+        [InlineData(0)]
+        [InlineData(1)]
+        [InlineData(2)]
+        [InlineData(3)]
+        [InlineData(4)]
+        [InlineData(5)]
+        [InlineData(6)]
+        [InlineData(7)]
+        [InlineData(8)]
+        [InlineData(9)]
+        [InlineData(10)]
+        [InlineData(11)]
+        [InlineData(12)]
+        [InlineData(13)]
+        [InlineData(14)]
+        [InlineData(15)]
+        [InlineData(16)]
+        [InlineData(32)]
+        [InlineData(64)]
+        [InlineData(100)]
+        [InlineData(1000)]
+        [InlineData(10000)]
+        public void GuidSpan(int size)
+        {
+            var a = new Guid[size];
+            var span = new Span<Guid>(a);
+            foreach (BenchmarkIteration iteration in Benchmark.Iterations)
+            {
+                using (iteration.StartMeasurement())
+                {
+                    for (int i = 0; i < 10000; i++)
+                    {
+                        span.Reverse();
+                    }
+                }
+            }
+        }
+
+        [Benchmark]
+        [InlineData(0)]
+        [InlineData(1)]
+        [InlineData(2)]
+        [InlineData(3)]
+        [InlineData(4)]
+        [InlineData(5)]
+        [InlineData(6)]
+        [InlineData(7)]
+        [InlineData(8)]
+        [InlineData(9)]
+        [InlineData(10)]
+        [InlineData(11)]
+        [InlineData(12)]
+        [InlineData(13)]
+        [InlineData(14)]
+        [InlineData(15)]
+        [InlineData(16)]
+        [InlineData(32)]
+        [InlineData(64)]
+        [InlineData(100)]
+        [InlineData(1000)]
+        [InlineData(10000)]
+        public void StringSpan(int size)
+        {
+            var a = new string[size];
+            var span = new Span<string>(a);
+            foreach (BenchmarkIteration iteration in Benchmark.Iterations)
+            {
+                using (iteration.StartMeasurement())
+                {
+                    for (int i = 0; i < 10000; i++)
+                    {
+                        span.Reverse();
+                    }
+                }
+            }
+        }
+
+
+        [Benchmark]
+        [InlineData(0)]
+        [InlineData(1)]
+        [InlineData(2)]
+        [InlineData(3)]
+        [InlineData(4)]
+        [InlineData(5)]
+        [InlineData(6)]
+        [InlineData(7)]
+        [InlineData(8)]
+        [InlineData(9)]
+        [InlineData(10)]
+        [InlineData(11)]
+        [InlineData(12)]
+        [InlineData(13)]
+        [InlineData(14)]
+        [InlineData(15)]
+        [InlineData(16)]
+        [InlineData(32)]
+        [InlineData(64)]
+        [InlineData(100)]
+        [InlineData(1000)]
+        [InlineData(10000)]
+        public void ByteArray(int size)
+        {
+            var a = new byte[size];
+            foreach (BenchmarkIteration iteration in Benchmark.Iterations)
+            {
+                using (iteration.StartMeasurement())
+                {
+                    for (int i = 0; i < 10000; i++)
+                    {
+                        Array.Reverse(a);
+                    }
+                }
+            }
+        }
+
+
+        [Benchmark]
+        [InlineData(0)]
+        [InlineData(1)]
+        [InlineData(2)]
+        [InlineData(3)]
+        [InlineData(4)]
+        [InlineData(5)]
+        [InlineData(6)]
+        [InlineData(7)]
+        [InlineData(8)]
+        [InlineData(9)]
+        [InlineData(10)]
+        [InlineData(11)]
+        [InlineData(12)]
+        [InlineData(13)]
+        [InlineData(14)]
+        [InlineData(15)]
+        [InlineData(16)]
+        [InlineData(32)]
+        [InlineData(64)]
+        [InlineData(100)]
+        [InlineData(1000)]
+        [InlineData(10000)]
+        public void IntArray(int size)
+        {
+            var a = new int[size];
+            foreach (BenchmarkIteration iteration in Benchmark.Iterations)
+            {
+                using (iteration.StartMeasurement())
+                {
+                    for (int i = 0; i < 10000; i++)
+                    {
+                        Array.Reverse(a);
+                    }
+                }
+            }
+        }
+
+        [Benchmark]
+        [InlineData(0)]
+        [InlineData(1)]
+        [InlineData(2)]
+        [InlineData(3)]
+        [InlineData(4)]
+        [InlineData(5)]
+        [InlineData(6)]
+        [InlineData(7)]
+        [InlineData(8)]
+        [InlineData(9)]
+        [InlineData(10)]
+        [InlineData(11)]
+        [InlineData(12)]
+        [InlineData(13)]
+        [InlineData(14)]
+        [InlineData(15)]
+        [InlineData(16)]
+        [InlineData(32)]
+        [InlineData(64)]
+        [InlineData(100)]
+        [InlineData(1000)]
+        [InlineData(10000)]
+        public void GuidArray(int size)
+        {
+            var a = new Guid[size];
+            foreach (BenchmarkIteration iteration in Benchmark.Iterations)
+            {
+                using (iteration.StartMeasurement())
+                {
+                    for (int i = 0; i < 10000; i++)
+                    {
+                        Array.Reverse(a);
+                    }
+                }
+            }
+        }
+
+        [Benchmark]
+        [InlineData(0)]
+        [InlineData(1)]
+        [InlineData(2)]
+        [InlineData(3)]
+        [InlineData(4)]
+        [InlineData(5)]
+        [InlineData(6)]
+        [InlineData(7)]
+        [InlineData(8)]
+        [InlineData(9)]
+        [InlineData(10)]
+        [InlineData(11)]
+        [InlineData(12)]
+        [InlineData(13)]
+        [InlineData(14)]
+        [InlineData(15)]
+        [InlineData(16)]
+        [InlineData(32)]
+        [InlineData(64)]
+        [InlineData(100)]
+        [InlineData(1000)]
+        [InlineData(10000)]
+        public void StringArray(int size)
+        {
+            var a = new string[size];
+            foreach (BenchmarkIteration iteration in Benchmark.Iterations)
+            {
+                using (iteration.StartMeasurement())
+                {
+                    for (int i = 0; i < 10000; i++)
+                    {
+                        Array.Reverse(a);
                     }
                 }
             }

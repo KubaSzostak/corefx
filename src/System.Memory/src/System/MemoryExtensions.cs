@@ -124,17 +124,25 @@ namespace System
         /// </summary>
         public static void Reverse<T>(this Span<T> span)
         {
-            ref T p = ref MemoryMarshal.GetReference(span);
-            int i = 0;
-            int j = span.Length - 1;
-            while (i < j)
+            if (span.Length > 1)
             {
-                T temp = Unsafe.Add(ref p, i);
-                Unsafe.Add(ref p, i) = Unsafe.Add(ref p, j);
-                Unsafe.Add(ref p, j) = temp;
-                i++;
-                j--;
+                ref T p = ref MemoryMarshal.GetReference(span);
+                ulong i = 0;
+                ulong j = (ulong)span.Length - 1;
+
+                do
+                {
+                    var temp1 = Unsafe.Add(ref p, (IntPtr)i);
+                    var temp2 = Unsafe.Add(ref p, (IntPtr)j);
+
+                    Unsafe.Add(ref p, (IntPtr)i) = temp2;
+                    Unsafe.Add(ref p, (IntPtr)j) = temp1;
+
+                    i += 1;
+                    j -= 1;
+                } while (i < j);
             }
+
         }
 
         /// <summary>
