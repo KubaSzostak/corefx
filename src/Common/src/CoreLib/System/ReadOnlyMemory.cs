@@ -293,6 +293,16 @@ namespace System
         /// </summary>
         public bool Equals(ReadOnlyMemory<T> other)
         {
+            if (typeof(T) == typeof(char) && _object is string str && other._object is string otherStr)
+            {
+                Console.WriteLine("A:" + str + " : " + _index + " : " + _length);
+                Console.WriteLine("B:" + otherStr + " : " + other._index + " : " + other._length);
+
+                return str.AsSpan(_index, _length).SequenceEqual(otherStr.AsSpan(other._index, other._length));
+
+                //return str.Substring(_index, _length).Equals(otherStr.Substring(other._index, other._length));
+            }
+
             return
                 _object == other._object &&
                 _index == other._index &&
@@ -303,7 +313,18 @@ namespace System
         [EditorBrowsable(EditorBrowsableState.Never)]
         public override int GetHashCode()
         {
-            return _object != null ? CombineHashCodes(_object.GetHashCode(), _index.GetHashCode(), _length.GetHashCode()) : 0;
+            if (_object == null) return 0;
+
+            if (typeof(T) == typeof(char) && _object is string s)
+            {
+                Console.WriteLine("X:" + s + " : " + _index + " : " + _length);
+
+                return s.Substring(_index, _length).GetHashCode();
+                //return s.GetHashCode();
+                //return CombineHashCodes(s.GetHashCode(), _index.GetHashCode(), _length.GetHashCode());
+            }
+
+            return CombineHashCodes(_object.GetHashCode(), _index.GetHashCode(), _length.GetHashCode());
         }
 
         private static int CombineHashCodes(int left, int right)
