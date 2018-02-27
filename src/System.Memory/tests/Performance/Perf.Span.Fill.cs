@@ -87,7 +87,7 @@ namespace System.Memory.Tests
                 TryJoinA(temp1, temp2, dest, out int charsw);
                 dest = dest.Slice(0, charsw);
 
-                Console.WriteLine(temp1 + "|" + temp2 + "|" +  new string(dest));
+                //Console.WriteLine(temp1 + "|" + temp2 + "|" +  new string(dest));
             }
 
             foreach (BenchmarkIteration iteration in Benchmark.Iterations)
@@ -144,7 +144,7 @@ namespace System.Memory.Tests
                 TryJoinA(temp1, temp2, dest, out int charsw);
                 dest = dest.Slice(0, charsw);
 
-                Console.WriteLine(temp1 + "|" + temp2 + "|" +  new string(dest));
+                //Console.WriteLine(temp1 + "|" + temp2 + "|" +  new string(dest));
             }
             
             foreach (BenchmarkIteration iteration in Benchmark.Iterations)
@@ -336,6 +336,7 @@ namespace System.Memory.Tests
             }
 
             bool needsSeparator = !(EndsInDirectorySeparator(path1) || StartsWithDirectorySeparator(path2));
+            //bool needsSeparator = !(IsDirectorySeparator(path1[path1.Length - 1]) || IsDirectorySeparator(path[0]));
             int charsNeeded = path1.Length + path2.Length + (needsSeparator ? 1 : 0);
             if (destination.Length < charsNeeded)
                 return false;
