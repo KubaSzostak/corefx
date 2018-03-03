@@ -49,6 +49,7 @@
     <Reference Include="System.Memory" />
     <Reference Include="System.Resources.ResourceManager" />
     <Reference Include="System.Runtime" />
+    <Reference Include="System.Runtime.CompilerServices.Unsafe" Condition="'$(TargetGroup)' == 'netstandard1.3'"/>
     <Reference Include="System.Runtime.Extensions" />
     <Reference Include="System.Threading" />
     <Reference Include="System.Threading.Tasks" Condition="'$(TargetGroup)' == 'netstandard1.3'" />

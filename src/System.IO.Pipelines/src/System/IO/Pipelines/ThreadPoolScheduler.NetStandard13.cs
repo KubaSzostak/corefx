@@ -4,6 +4,7 @@
 
 using System.Threading;
 using System.Threading.Tasks;
+using System.Runtime.CompilerServices;
 
 namespace System.IO.Pipelines
 {
@@ -11,7 +12,7 @@ namespace System.IO.Pipelines
     {
         public override void Schedule<TState>(Action<TState> action, TState state)
         {
-            Task.Factory.StartNew<TState>(action, state, CancellationToken.None, TaskCreationOptions.DenyChildAttach, TaskScheduler.Default);
+            Task.Factory.StartNew(Unsafe.As<Action<object>>(action), state, CancellationToken.None, TaskCreationOptions.DenyChildAttach, TaskScheduler.Default);
         }
     }
 }
