@@ -14,7 +14,7 @@ namespace System.Buffers.Text.Tests
         public static string s_characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
         // Pre-computing this table using a custom string(s_characters) and GenerateEncodingMapAndVerify (found in tests)
-        public static readonly byte[] s_encodingMap = {
+        public static ReadOnlySpan<byte> s_encodingMap => new byte[] {
             65, 66, 67, 68, 69, 70, 71, 72,         //A..H
             73, 74, 75, 76, 77, 78, 79, 80,         //I..P
             81, 82, 83, 84, 85, 86, 87, 88,         //Q..X
@@ -26,7 +26,7 @@ namespace System.Buffers.Text.Tests
         };
 
         // Pre-computing this table using a custom string(s_characters) and GenerateDecodingMapAndVerify (found in tests)
-        public static readonly sbyte[] s_decodingMap = {
+        public static ReadOnlySpan<sbyte> s_decodingMap => new sbyte[] {
             -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
             -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
             -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 62, -1, -1, -1, 63,         //62 is placed at index 43 (for +), 63 at index 47 (for /)
@@ -53,7 +53,7 @@ namespace System.Buffers.Text.Tests
         {
             get
             {
-                int[] indices = s_decodingMap.FindAllIndexOf(s_invalidByte);
+                int[] indices = s_decodingMap.ToArray().FindAllIndexOf(s_invalidByte);
                 // Workaroudn for indices.Cast<byte>().ToArray() since it throws
                 // InvalidCastException: Unable to cast object of type 'System.Int32' to type 'System.Byte'
                 byte[] bytes = new byte[indices.Length];
@@ -92,7 +92,7 @@ namespace System.Buffers.Text.Tests
             {
                 data[i] = (byte)s_characters[i];
             }
-            Assert.True(s_encodingMap.AsSpan().SequenceEqual(data));
+            Assert.True(s_encodingMap.SequenceEqual(data));
         }
 
         [Fact]
@@ -107,7 +107,7 @@ namespace System.Buffers.Text.Tests
             {
                 data[s_characters[i]] = (sbyte)i;
             }
-            Assert.True(s_decodingMap.AsSpan().SequenceEqual(data));
+            Assert.True(s_decodingMap.SequenceEqual(data));
         }
 
         public static int[] FindAllIndexOf<T>(this IEnumerable<T> values, T valueToFind)
