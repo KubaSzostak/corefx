@@ -24,7 +24,7 @@ namespace System
         [MethodImpl(MethodImplOptions.NoInlining)]
         private static string GetArgumentName(ExceptionArgument argument)
         {
-#if netstandard11
+#if netstandard13
             ReadOnlySpan<char> span = "The enum value is not defined".AsSpan();
             Debug.Assert(Enum.IsDefined(typeof(ExceptionArgument), argument),
                 $"The enum value is not defined, please check the {nameof(ExceptionArgument)} enum." + span.ToString());

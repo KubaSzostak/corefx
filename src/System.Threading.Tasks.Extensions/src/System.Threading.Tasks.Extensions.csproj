@@ -5,9 +5,9 @@
     <ProjectGuid>{DE90AD0B-649D-4062-B8D9-9658DE140532}</ProjectGuid>
     <DocumentationFile>$(OutputPath)$(MSBuildProjectName).xml</DocumentationFile>
     <PackageTargetFramework Condition="'$(TargetGroup)' == 'netstandard1.0'">netstandard1.0;portable-net45+win8+wp8+wpa81</PackageTargetFramework>
-    <IsPartialFacadeAssembly Condition="'$(TargetGroup)' != 'netstandard' and '$(TargetGroup)' != 'netstandard1.0' and '$(TargetGroup)' != 'netstandard1.1'">true</IsPartialFacadeAssembly>
+    <IsPartialFacadeAssembly Condition="'$(TargetGroup)' != 'netstandard' and '$(TargetGroup)' != 'netstandard1.0' and '$(TargetGroup)' != 'netstandard1.3'">true</IsPartialFacadeAssembly>
     <DefineConstants Condition="'$(IsPartialFacadeAssembly)' != 'true'">$(DefineConstants);netstandard</DefineConstants>
-    <DefineConstants Condition="'$(TargetGroup)' == 'netstandard1.1'">$(DefineConstants);netstandard11</DefineConstants>
+    <DefineConstants Condition="'$(TargetGroup)' == 'netstandard1.3'">$(DefineConstants);netstandard13</DefineConstants>
     <ExcludeResourcesImport Condition="'$(IsPartialFacadeAssembly)'=='true'">true</ExcludeResourcesImport>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'netcoreapp-Unix-Debug|AnyCPU'" />
@@ -18,8 +18,8 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'netstandard-Release|AnyCPU'" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'netstandard1.0-Debug|AnyCPU'" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'netstandard1.0-Release|AnyCPU'" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'netstandard1.1-Debug|AnyCPU'" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'netstandard1.1-Release|AnyCPU'" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'netstandard1.3-Debug|AnyCPU'" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'netstandard1.3-Release|AnyCPU'" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'uap-Windows_NT-Debug|AnyCPU'" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'uap-Windows_NT-Release|AnyCPU'" />
   <ItemGroup Condition="'$(IsPartialFacadeAssembly)' == 'true'">
@@ -55,7 +55,7 @@
     <Reference Include="System.Runtime.CompilerServices.Unsafe" />
     <Reference Include="System.Threading.Tasks" />
   </ItemGroup>
-  <ItemGroup Condition="'$(TargetGroup)' == 'netstandard1.1'">
+  <ItemGroup Condition="'$(TargetGroup)' == 'netstandard1.3'">
     <Reference Include="System.Memory" />
   </ItemGroup>
   <Import Project="$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), dir.targets))\dir.targets" />
