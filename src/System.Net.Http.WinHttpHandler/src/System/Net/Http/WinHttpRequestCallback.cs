@@ -214,6 +214,10 @@ namespace System.Net.Http
             {
                 state.ServerCredentials = null;
             }
+
+            // Similarly, we need to clear any Auth headers that were added to the request manually or
+            // through the default headers.
+            ResetAuthRequestHeaders(state);
         }
         
         private static void OnRequestSendingRequest(WinHttpRequestState state)
@@ -317,10 +321,6 @@ namespace System.Net.Http
             
             Debug.Assert(state != null, "OnRequestError: state is null");
 
-            Debug.Assert((unchecked((int)asyncResult.dwError) != Interop.WinHttp.ERROR_INSUFFICIENT_BUFFER &&
-                unchecked((int)asyncResult.dwError) != unchecked((int)0x80090321)), // SEC_E_BUFFER_TOO_SMALL
-                $"Unexpected async error in WinHttpRequestCallback: {unchecked((int)asyncResult.dwError)}, WinHttp API: {unchecked((uint)asyncResult.dwResult.ToInt32())}");
-
             Exception innerException = WinHttpException.CreateExceptionUsingError(unchecked((int)asyncResult.dwError));
 
             switch (unchecked((uint)asyncResult.dwResult.ToInt32()))
@@ -406,6 +406,26 @@ namespace System.Net.Http
                         "OnRequestError: Result (" + asyncResult.dwResult + ") is not expected.",
                         "Error code: " + asyncResult.dwError + " (" + innerException.Message + ")");
                     break;
+            }
+        }
+
+        private static void ResetAuthRequestHeaders(WinHttpRequestState state)
+        {
+            const string AuthHeaderNameWithColon = "Authorization:";
+            SafeWinHttpHandle requestHandle = state.RequestHandle;
+            
+            // Clear auth headers.
+            if (!Interop.WinHttp.WinHttpAddRequestHeaders(
+                requestHandle,
+                AuthHeaderNameWithColon,
+                (uint)AuthHeaderNameWithColon.Length,
+                Interop.WinHttp.WINHTTP_ADDREQ_FLAG_REPLACE))
+            {
+                int lastError = Marshal.GetLastWin32Error();
+                if (lastError != Interop.WinHttp.ERROR_WINHTTP_HEADER_NOT_FOUND)
+                {
+                    throw WinHttpException.CreateExceptionUsingError(lastError);
+                }
             }
         }
     }

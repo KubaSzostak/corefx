@@ -445,8 +445,9 @@ namespace System.Diagnostics
             //    * CreateProcess allows you to redirect all or none of the standard IO handles, so we use
             //      GetStdHandle for the handles that are not being redirected
 
-            StringBuilder commandLine = BuildCommandLine(startInfo.FileName, startInfo.Arguments);
-
+            StringBuilder commandLine = BuildCommandLine(startInfo.FileName, StartInfo.Arguments);
+            Process.AppendArguments(commandLine, StartInfo.ArgumentList);
+            
             Interop.Kernel32.STARTUPINFO startupInfo = new Interop.Kernel32.STARTUPINFO();
             Interop.Kernel32.PROCESS_INFORMATION processInfo = new Interop.Kernel32.PROCESS_INFORMATION();
             Interop.Kernel32.SECURITY_ATTRIBUTES unused_SecAttrs = new Interop.Kernel32.SECURITY_ATTRIBUTES();
@@ -633,7 +634,7 @@ namespace System.Diagnostics
 
             if (startInfo.RedirectStandardInput)
             {
-                Encoding enc = GetEncoding((int)Interop.Kernel32.GetConsoleCP());
+                Encoding enc = startInfo.StandardInputEncoding ?? GetEncoding((int)Interop.Kernel32.GetConsoleCP());
                 _standardInput = new StreamWriter(new FileStream(standardInputWritePipeHandle, FileAccess.Write, 4096, false), enc, 4096);
                 _standardInput.AutoFlush = true;
             }

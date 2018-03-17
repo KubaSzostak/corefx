@@ -1,4 +1,3 @@
-
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
@@ -1414,7 +1413,7 @@ namespace System.Xml.Tests
         {
             try
             {
-                LoadXSL("\\\\", InputType.URI, readerType);
+                LoadXSL("     ", InputType.URI, readerType);
             }
             catch (System.ArgumentException)
             {
@@ -2523,7 +2522,7 @@ namespace System.Xml.Tests
 
             if (LoadXSL("showParam.xsl", inputType, readerType) == 1)
             {
-                Assert.Throws<System.ArgumentException>(() => xslt.Transform(szFullFilename, "\\\\"));
+                Assert.Throws<System.ArgumentException>(() => xslt.Transform(szFullFilename, "    "));
                 return;
             }
 
