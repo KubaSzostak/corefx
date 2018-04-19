@@ -153,7 +153,7 @@ namespace System.Buffers
             if (type == SequenceType.MultiSegment && startObject != endObject)
             {
                 Debug.Assert(startObject is ReadOnlySequenceSegment<T>);
-                var startSegment = Unsafe.As<ReadOnlySequenceSegment<T>>(startObject);
+                var startSegment = (ReadOnlySequenceSegment<T>)startObject;
 
                 int currentLength = startSegment.Memory.Length - startIndex;
 
@@ -237,8 +237,8 @@ namespace System.Buffers
                 Debug.Assert(endObject != null);
                 Debug.Assert(endObject is ReadOnlySequenceSegment<T>);
 
-                var startSegment = Unsafe.As<ReadOnlySequenceSegment<T>>(startObject);
-                var endSegment = Unsafe.As<ReadOnlySequenceSegment<T>>(endObject);
+                var startSegment = (ReadOnlySequenceSegment<T>)startObject;
+                var endSegment = (ReadOnlySequenceSegment<T>)endObject;
                 // (end.RunningIndex + endIndex) - (start.RunningIndex + startIndex) // (End offset) - (start offset)
                 return endSegment.RunningIndex - startSegment.RunningIndex - startIndex + endIndex; // Rearranged to avoid overflow
             }
@@ -294,8 +294,8 @@ namespace System.Buffers
             Debug.Assert(End.GetObject() != null);
             Debug.Assert(End.GetObject() is ReadOnlySequenceSegment<T>);
 
-            startSegment = Unsafe.As<ReadOnlySequenceSegment<T>>(Start.GetObject());
-            endSegment = Unsafe.As<ReadOnlySequenceSegment<T>>(End.GetObject());
+            startSegment = (ReadOnlySequenceSegment<T>)(Start.GetObject());
+            endSegment = (ReadOnlySequenceSegment<T>)(End.GetObject());
             return true;
         }
 
@@ -312,7 +312,7 @@ namespace System.Buffers
             Debug.Assert(Start.GetObject() != null);
             Debug.Assert(Start.GetObject() is T[]);
 
-            segment = new ArraySegment<T>(Unsafe.As<T[]>(Start.GetObject()), startIndex, endIndex - startIndex);
+            segment = new ArraySegment<T>((T[])(Start.GetObject()), startIndex, endIndex - startIndex);
             return true;
         }
 
@@ -337,26 +337,26 @@ namespace System.Buffers
             {
                 Debug.Assert(startObject is T[]);
 
-                memory = new ReadOnlyMemory<T>(Unsafe.As<T[]>(startObject));
+                memory = new ReadOnlyMemory<T>((T[])(startObject));
             }
             else if (type == SequenceType.MemoryManager)
             {
                 Debug.Assert(startObject is MemoryManager<T>);
 
-                memory = Unsafe.As<MemoryManager<T>>(startObject).Memory;
+                memory = ((MemoryManager<T>)startObject).Memory;
             }
             else if (typeof(T) == typeof(char) && type == SequenceType.String)
             {
                 Debug.Assert(startObject is string);
 
-                var text = Unsafe.As<string>(startObject);
+                var text = (string)(startObject);
                 memory = (ReadOnlyMemory<T>)(object)text.AsMemory();
             }
             else // ReadOnlySequenceSegment
             {
                 Debug.Assert(startObject is ReadOnlySequenceSegment<T>);
 
-                memory = Unsafe.As<ReadOnlySequenceSegment<T>>(startObject).Memory;
+                memory = ((ReadOnlySequenceSegment<T>)startObject).Memory;
             }
 
             memory = memory.Slice(startIndex, length);
