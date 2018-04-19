@@ -92,6 +92,117 @@ namespace System.Memory.Tests
         }
 
         [Fact]
+        public static void SliceMismatchSequencePositions()
+        {
+            var segment1 = new BufferSegment<byte>(new byte[10]);
+            BufferSegment<byte> segment2 = segment1.Append(new byte[10]);
+
+            var buffer1 = new ReadOnlySequence<byte>(segment1, 0, segment1, 10);
+            var buffer2 = new ReadOnlySequence<byte>(segment1, 0, segment2, 10);
+
+            // mismatch of SequencePositions from different buffers is not supported
+            ReadOnlySequence<byte> sliced = buffer2.Slice(10, buffer1.End);
+
+            // This mismatch will happen, what should happen?
+            Assert.Equal(segment2, sliced.Start.GetObject());
+            // This mismatch will happen, what should happen?
+            Assert.Equal(segment1, sliced.End.GetObject());
+
+            // This is valid and passes as expected
+            sliced = buffer1.Slice(10, buffer1.End);
+
+            Assert.Equal(segment1, sliced.Start.GetObject());
+            Assert.Equal(segment1, sliced.End.GetObject());
+
+            // This is valid and passes as expected
+            sliced = buffer2.Slice(10, buffer2.End);
+
+            Assert.Equal(segment2, sliced.Start.GetObject());
+            Assert.Equal(segment2, sliced.End.GetObject());
+        }
+
+        [Fact]
+        public static void SliceSequencePositionComparison()
+        {
+            var segment1 = new BufferSegment<byte>(new byte[0]);
+            BufferSegment<byte> segment2 = segment1.Append(new byte[10]);
+
+            var buffer = new ReadOnlySequence<byte>(segment1, 0, segment2, 10);
+
+            ReadOnlySequence<byte> sliced = buffer.Slice(0, buffer.Start);
+
+            // This fails, sliced.Start.GetObject() == segment2 instead of segment1, currently
+            // This is a known issue related to SequencePosition comparisons
+            Assert.Equal(segment1, sliced.Start.GetObject());
+            Assert.Equal(segment1, sliced.End.GetObject());
+
+            Assert.Equal(0, sliced.Start.GetInteger());
+            Assert.Equal(0, sliced.End.GetInteger());
+        }
+
+        [Fact]
+        public static void SliceAllOperationsAreEqual()
+        {
+            var segment1 = new BufferSegment<byte>(new byte[10]);
+            BufferSegment<byte> segment2 = segment1.Append(new byte[10]);
+
+            var buffer = new ReadOnlySequence<byte>(segment1, 0, segment2, 10);
+
+            for (int n = 0; n < 10; n++)
+            {
+                SequencePosition pos = buffer.GetPosition(n);
+                ReadOnlySequence<byte> s1 = buffer.Slice(pos);
+                ReadOnlySequence<byte> s2 = buffer.Slice(pos, buffer.End);
+                ReadOnlySequence<byte> s3 = buffer.Slice(pos, buffer.Length - n);
+
+                Assert.Equal(segment1, s1.Start.GetObject());
+                Assert.Equal(segment2, s1.End.GetObject());
+
+                Assert.Equal(n, s1.Start.GetInteger());
+                Assert.Equal(10, s1.End.GetInteger());
+
+                Assert.Equal(segment1, s2.Start.GetObject());
+                Assert.Equal(segment2, s2.End.GetObject());
+
+                Assert.Equal(n, s2.Start.GetInteger());
+                Assert.Equal(10, s2.End.GetInteger());
+
+                Assert.Equal(segment1, s3.Start.GetObject());
+                Assert.Equal(segment2, s3.End.GetObject());
+
+                Assert.Equal(n, s3.Start.GetInteger());
+                Assert.Equal(10, s3.End.GetInteger());
+            }
+
+            for (int n = 10; n <= 20; n++)
+            {
+                SequencePosition pos = buffer.GetPosition(n);
+                ReadOnlySequence<byte> s1 = buffer.Slice(pos);
+                ReadOnlySequence<byte> s2 = buffer.Slice(pos, buffer.End);
+                ReadOnlySequence<byte> s3 = buffer.Slice(pos, buffer.Length - n);
+
+                Assert.Equal(segment2, s1.Start.GetObject());
+                Assert.Equal(segment2, s1.End.GetObject());
+
+                Assert.Equal(n - 10, s1.Start.GetInteger());
+                Assert.Equal(10, s1.End.GetInteger());
+
+                Assert.Equal(segment2, s2.Start.GetObject());
+                Assert.Equal(segment2, s2.End.GetObject());
+
+                Assert.Equal(n - 10, s2.Start.GetInteger());
+                Assert.Equal(10, s2.End.GetInteger());
+
+                Assert.Equal(segment2, s3.Start.GetObject());
+                Assert.Equal(segment2, s3.End.GetObject());
+
+                Assert.Equal(n - 10, s3.Start.GetInteger());
+                Assert.Equal(10, s3.End.GetInteger());
+            }
+        }
+
+
+        [Fact]
         public static void SliceStartAndEndPosition()
         {
             var segment1 = new BufferSegment<byte>(new byte[10]);
