@@ -179,7 +179,7 @@ namespace System.Buffers
         {
             if (start < 0)
                 ThrowHelper.ThrowStartOrEndArgumentValidationException(start);
-            BoundsCheck(_sequenceStart, end);
+
             BoundsCheck(end, _sequenceEnd);
 
             SequencePosition begin = Seek(_sequenceStart, end, start);
@@ -200,7 +200,6 @@ namespace System.Buffers
         public ReadOnlySequence<T> Slice(SequencePosition start, long length)
         {
             // Check start before length
-            BoundsCheck(_sequenceStart, start);
             BoundsCheck(start, _sequenceEnd);
             if (length < 0)
                 // Passing value >= 0 means throw exception on length argument
@@ -234,7 +233,7 @@ namespace System.Buffers
         {
             if (start < 0)
                 ThrowHelper.ThrowStartOrEndArgumentValidationException(start);
-            BoundsCheck(_sequenceStart, end);
+
             BoundsCheck(end, _sequenceEnd);
 
             SequencePosition begin = Seek(_sequenceStart, end, start);
@@ -255,7 +254,6 @@ namespace System.Buffers
         public ReadOnlySequence<T> Slice(SequencePosition start, int length)
         {
             // Check start before length
-            BoundsCheck(_sequenceStart, start);
             BoundsCheck(start, _sequenceEnd);
             if (length < 0)
                 // Passing value >= 0 means throw exception on length argument
@@ -272,8 +270,6 @@ namespace System.Buffers
         /// <param name="end">The ending (inclusive) <see cref="SequencePosition"/> of the slice</param>
         public ReadOnlySequence<T> Slice(SequencePosition start, SequencePosition end)
         {
-            BoundsCheck(_sequenceStart, start);
-            BoundsCheck(start, end);
             BoundsCheck(end, _sequenceEnd);
 
             return SliceImpl(start, end);
@@ -285,7 +281,6 @@ namespace System.Buffers
         /// <param name="start">The starting (inclusive) <see cref="SequencePosition"/> at which to begin this slice.</param>
         public ReadOnlySequence<T> Slice(SequencePosition start)
         {
-            BoundsCheck(_sequenceStart, start);
             BoundsCheck(start, _sequenceEnd);
 
             return SliceImpl(start, _sequenceEnd);

@@ -106,7 +106,7 @@ namespace System.Buffers
             if (type == SequenceType.MultiSegment)
             {
                 Debug.Assert(startObject is ReadOnlySequenceSegment<T>);
-                ReadOnlySequenceSegment<T> startSegment = Unsafe.As<ReadOnlySequenceSegment<T>>(startObject);
+                ReadOnlySequenceSegment<T> startSegment = (ReadOnlySequenceSegment<T>)(startObject);
                 memory = startSegment.Memory;
                 if (startObject != endObject)
                 {
@@ -117,19 +117,19 @@ namespace System.Buffers
             {
                 Debug.Assert(startObject is T[]);
 
-                memory = new ReadOnlyMemory<T>(Unsafe.As<T[]>(startObject));
+                memory = new ReadOnlyMemory<T>((T[])startObject);
             }
             else if (type == SequenceType.MemoryManager)
             {
                 Debug.Assert(startObject is MemoryManager<T>);
 
-                memory = (Unsafe.As<MemoryManager<T>>(startObject)).Memory;
+                memory = ((MemoryManager<T>)startObject).Memory;
             }
             else if (typeof(T) == typeof(char) && type == SequenceType.String)
             {
                 Debug.Assert(startObject is string);
 
-                memory = (ReadOnlyMemory<T>)(object)(Unsafe.As<string>(startObject)).AsMemory();
+                memory = (ReadOnlyMemory<T>)(object)(((string)startObject)).AsMemory();
             }
             else
             {
