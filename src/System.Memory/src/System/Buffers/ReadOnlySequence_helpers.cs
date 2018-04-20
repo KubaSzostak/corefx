@@ -251,14 +251,17 @@ namespace System.Buffers
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void BoundsCheck(in SequencePosition start, in SequencePosition end)
         {
-            int startIndex = GetIndex(start);
-            int endIndex = GetIndex(end);
+            GetTypeAndIndices(start.GetInteger(), end.GetInteger(), out SequenceType type, out int startIndex, out int endIndex);
+
             object startObject = start.GetObject();
             object endObject = end.GetObject();
-            if (startObject != endObject)
+            if (type == SequenceType.MultiSegment && startObject != endObject)
             {
                 Debug.Assert(startObject != null);
+                Debug.Assert(startObject is ReadOnlySequenceSegment<T>);
                 Debug.Assert(endObject != null);
+                Debug.Assert(endObject is ReadOnlySequenceSegment<T>);
+
                 var startSegment = (ReadOnlySequenceSegment<T>)startObject;
                 var endSegment = (ReadOnlySequenceSegment<T>)endObject;
 
@@ -271,6 +274,7 @@ namespace System.Buffers
             }
             else if (startIndex <= endIndex)
             {
+                Debug.Assert(startObject == endObject);
                 // Single segment in bounds
                 return;
             }

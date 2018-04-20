@@ -179,7 +179,6 @@ namespace System.Buffers
         {
             if (start < 0)
                 ThrowHelper.ThrowStartOrEndArgumentValidationException(start);
-
             BoundsCheck(end, _sequenceEnd);
 
             SequencePosition begin = Seek(_sequenceStart, end, start);
@@ -199,8 +198,7 @@ namespace System.Buffers
         /// <param name="length">The length of the slice</param>
         public ReadOnlySequence<T> Slice(SequencePosition start, long length)
         {
-            // Check start before length
-            BoundsCheck(start, _sequenceEnd);
+            BoundsCheck(start, _sequenceEnd); // check start before length
             if (length < 0)
                 // Passing value >= 0 means throw exception on length argument
                 ThrowHelper.ThrowStartOrEndArgumentValidationException(0);
@@ -233,7 +231,6 @@ namespace System.Buffers
         {
             if (start < 0)
                 ThrowHelper.ThrowStartOrEndArgumentValidationException(start);
-
             BoundsCheck(end, _sequenceEnd);
 
             SequencePosition begin = Seek(_sequenceStart, end, start);
@@ -253,8 +250,7 @@ namespace System.Buffers
         /// <param name="length">The length of the slice</param>
         public ReadOnlySequence<T> Slice(SequencePosition start, int length)
         {
-            // Check start before length
-            BoundsCheck(start, _sequenceEnd);
+            BoundsCheck(start, _sequenceEnd); // check start before length
             if (length < 0)
                 // Passing value >= 0 means throw exception on length argument
                 ThrowHelper.ThrowStartOrEndArgumentValidationException(0);
@@ -271,6 +267,7 @@ namespace System.Buffers
         public ReadOnlySequence<T> Slice(SequencePosition start, SequencePosition end)
         {
             BoundsCheck(end, _sequenceEnd);
+            BoundsCheck(start, end);
 
             return SliceImpl(start, end);
         }
@@ -374,15 +371,15 @@ namespace System.Buffers
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private ReadOnlySequence<T> SliceImpl(in SequencePosition start, in SequencePosition end)
+        private ReadOnlySequence<T> SliceImpl(in SequencePosition begin, in SequencePosition end)
         {
             // In this method we reset high order bits from indices
             // of positions that were passed in
             // and apply type bits specific for current ReadOnlySequence type
 
             return new ReadOnlySequence<T>(
-                start.GetObject(),
-                start.GetInteger() & ReadOnlySequence.IndexBitMask | (Start.GetInteger() & ReadOnlySequence.FlagBitMask),
+                begin.GetObject(),
+                begin.GetInteger() & ReadOnlySequence.IndexBitMask | (Start.GetInteger() & ReadOnlySequence.FlagBitMask),
                 end.GetObject(),
                 end.GetInteger() & ReadOnlySequence.IndexBitMask | (End.GetInteger() & ReadOnlySequence.FlagBitMask)
             );
