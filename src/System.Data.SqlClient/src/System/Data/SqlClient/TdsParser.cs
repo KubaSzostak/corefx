@@ -4565,9 +4565,9 @@ namespace System.Data.SqlClient
 
         private bool TryReadSqlDateTime(SqlBuffer value, byte tdsType, int length, byte scale, TdsParserStateObject stateObj)
         {
-            byte[] datetimeBuffer = new byte[length];
+            Span<byte> datetimeBuffer = length <= 10 ? stackalloc byte[length] : new byte[length];
 
-            if (!stateObj.TryReadByteArray(datetimeBuffer, 0, length))
+            if (!stateObj.TryReadByteArray(datetimeBuffer, out _))
             {
                 return false;
             }

@@ -1027,7 +1027,7 @@ namespace System.Data.SqlClient
             _isNull = false;
         }
 
-        internal void SetToDate(byte[] bytes)
+        internal void SetToDate(ReadOnlySpan<byte> bytes)
         {
             Debug.Assert(IsEmpty, "setting value a second time?");
 
@@ -1045,7 +1045,7 @@ namespace System.Data.SqlClient
             _isNull = false;
         }
 
-        internal void SetToTime(byte[] bytes, int length, byte scale)
+        internal void SetToTime(ReadOnlySpan<byte> bytes, int length, byte scale)
         {
             Debug.Assert(IsEmpty, "setting value a second time?");
 
@@ -1064,7 +1064,7 @@ namespace System.Data.SqlClient
             _isNull = false;
         }
 
-        internal void SetToDateTime2(byte[] bytes, int length, byte scale)
+        internal void SetToDateTime2(ReadOnlySpan<byte> bytes, int length, byte scale)
         {
             Debug.Assert(IsEmpty, "setting value a second time?");
 
@@ -1085,7 +1085,7 @@ namespace System.Data.SqlClient
             _isNull = false;
         }
 
-        internal void SetToDateTimeOffset(byte[] bytes, int length, byte scale)
+        internal void SetToDateTimeOffset(ReadOnlySpan<byte> bytes, int length, byte scale)
         {
             Debug.Assert(IsEmpty, "setting value a second time?");
 
@@ -1109,7 +1109,7 @@ namespace System.Data.SqlClient
             _isNull = false;
         }
 
-        private static void FillInTimeInfo(ref TimeInfo timeInfo, byte[] timeBytes, int length, byte scale)
+        private static void FillInTimeInfo(ref TimeInfo timeInfo, ReadOnlySpan<byte> timeBytes, int length, byte scale)
         {
             Debug.Assert(3 <= length && length <= 5, "invalid data length for timeInfo: " + length);
             Debug.Assert(0 <= scale && scale <= 7, "invalid scale: " + scale);
@@ -1127,7 +1127,7 @@ namespace System.Data.SqlClient
             timeInfo.scale = scale;
         }
 
-        private static int GetDateFromByteArray(byte[] buf, int offset)
+        private static int GetDateFromByteArray(ReadOnlySpan<byte> buf, int offset)
         {
             return buf[offset] + (buf[offset + 1] << 8) + (buf[offset + 2] << 16);
         }

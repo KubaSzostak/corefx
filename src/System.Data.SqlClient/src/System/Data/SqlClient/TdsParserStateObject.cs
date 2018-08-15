@@ -1214,18 +1214,17 @@ namespace System.Data.SqlClient
 
         // Takes a byte array, an offset, and a len and fills the array from the offset to len number of
         // bytes from the in buffer.
-        public bool TryReadByteArray(byte[] buff, int offset, int len)
+        public bool TryReadByteArray(Span<byte> buff, int offset, int len)
         {
-            int ignored;
-            return TryReadByteArray(buff, offset, len, out ignored);
+            return TryReadByteArray(buff.Slice(offset, len), out _);
         }
 
         // NOTE: This method must be retriable WITHOUT replaying a snapshot
         // Every time you call this method increment the offset and decrease len by the value of totalRead
-        public bool TryReadByteArray(byte[] buff, int offset, int len, out int totalRead)
+        public bool TryReadByteArray(Span<byte> buff, out int totalRead)
         {
             totalRead = 0;
-
+            int len = buff.Length;
 #if DEBUG
             if (_snapshot != null && _snapshot.DoPend())
             {
@@ -1245,7 +1244,7 @@ namespace System.Data.SqlClient
             }
 #endif
 
-            Debug.Assert(buff == null || buff.Length >= len, "Invalid length sent to ReadByteArray()!");
+            Debug.Assert(buff.Length == 0 || buff.Length >= len, "Invalid length sent to ReadByteArray()!");
 
             // loop through and read up to array length
             while (len > 0)
@@ -1260,9 +1259,10 @@ namespace System.Data.SqlClient
 
                 int bytesToRead = Math.Min(len, Math.Min(_inBytesPacket, _inBytesRead - _inBytesUsed));
                 Debug.Assert(bytesToRead > 0, "0 byte read in TryReadByteArray");
-                if (buff != null)
+                if (buff.Length > 0)
                 {
-                    Buffer.BlockCopy(_inBuff, _inBytesUsed, buff, offset + totalRead, bytesToRead);
+                    ReadOnlySpan<byte> inBuffSpan = new ReadOnlySpan<byte>(_inBuff, _inBytesUsed, bytesToRead);
+                    inBuffSpan.CopyTo(buff);
                 }
 
                 totalRead += bytesToRead;
@@ -1457,7 +1457,7 @@ namespace System.Data.SqlClient
                 // then use ReadByteArray since the logic is there to take care of that.
 
                 int bytesRead = 0;
-                if (!TryReadByteArray(_bTmp, _bTmpRead, 8 - _bTmpRead, out bytesRead))
+                if (!TryReadByteArray(_bTmp.AsSpan(_bTmpRead, 8 - _bTmpRead), out bytesRead))
                 {
                     Debug.Assert(_bTmpRead + bytesRead <= 8, "Read more data than required");
                     _bTmpRead += bytesRead;
@@ -1543,7 +1543,7 @@ namespace System.Data.SqlClient
                 // then use ReadByteArray since the logic is there to take care of that.
 
                 int bytesRead = 0;
-                if (!TryReadByteArray(_bTmp, _bTmpRead, 4 - _bTmpRead, out bytesRead))
+                if (!TryReadByteArray(_bTmp.AsSpan(_bTmpRead, 4 - _bTmpRead), out bytesRead))
                 {
                     Debug.Assert(_bTmpRead + bytesRead <= 4, "Read more data than required");
                     _bTmpRead += bytesRead;
@@ -1837,7 +1837,7 @@ namespace System.Data.SqlClient
 
             int value;
             int bytesToRead = (int)Math.Min(_longlenleft, (ulong)len);
-            bool result = TryReadByteArray(buff, offset, bytesToRead, out value);
+            bool result = TryReadByteArray(buff.AsSpan(offset, bytesToRead), out value);
             _longlenleft -= (ulong)bytesToRead;
             if (!result) { throw SQL.SynchronousCallMayNotPend(); }
             return value;
@@ -1913,7 +1913,7 @@ namespace System.Data.SqlClient
                     buff = newbuf;
                 }
 
-                bool result = TryReadByteArray(buff, offset, bytesToRead, out bytesRead);
+                bool result = TryReadByteArray(buff.AsSpan(offset, bytesToRead), out bytesRead);
                 Debug.Assert(bytesRead <= bytesLeft, "Read more bytes than we needed");
                 Debug.Assert((ulong)bytesRead <= _longlenleft, "Read more bytes than is available");
 
