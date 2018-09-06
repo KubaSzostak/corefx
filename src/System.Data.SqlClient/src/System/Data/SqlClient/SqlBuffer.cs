@@ -1032,7 +1032,7 @@ namespace System.Data.SqlClient
             Debug.Assert(IsEmpty, "setting value a second time?");
 
             _type = StorageType.Date;
-            _value._int32 = GetDateFromByteArray(bytes, 0);
+            _value._int32 = GetDateFromByteArray(bytes);
             _isNull = false;
         }
 
@@ -1045,12 +1045,12 @@ namespace System.Data.SqlClient
             _isNull = false;
         }
 
-        internal void SetToTime(ReadOnlySpan<byte> bytes, int length, byte scale)
+        internal void SetToTime(ReadOnlySpan<byte> bytes, byte scale)
         {
             Debug.Assert(IsEmpty, "setting value a second time?");
 
             _type = StorageType.Time;
-            FillInTimeInfo(ref _value._timeInfo, bytes, length, scale);
+            FillInTimeInfo(ref _value._timeInfo, bytes, scale);
             _isNull = false;
         }
 
@@ -1064,13 +1064,13 @@ namespace System.Data.SqlClient
             _isNull = false;
         }
 
-        internal void SetToDateTime2(ReadOnlySpan<byte> bytes, int length, byte scale)
+        internal void SetToDateTime2(ReadOnlySpan<byte> bytes, byte scale)
         {
             Debug.Assert(IsEmpty, "setting value a second time?");
 
             _type = StorageType.DateTime2;
-            FillInTimeInfo(ref _value._dateTime2Info.timeInfo, bytes, length - 3, scale); // remaining 3 bytes is for date
-            _value._dateTime2Info.date = GetDateFromByteArray(bytes, length - 3); // 3 bytes for date
+            FillInTimeInfo(ref _value._dateTime2Info.timeInfo, bytes.Slice(0, bytes.Length - 3), scale); // remaining 3 bytes is for date
+            _value._dateTime2Info.date = GetDateFromByteArray(bytes.Slice(bytes.Length - 3)); // 3 bytes for date
             _isNull = false;
         }
 
@@ -1085,14 +1085,14 @@ namespace System.Data.SqlClient
             _isNull = false;
         }
 
-        internal void SetToDateTimeOffset(ReadOnlySpan<byte> bytes, int length, byte scale)
+        internal void SetToDateTimeOffset(ReadOnlySpan<byte> bytes, byte scale)
         {
             Debug.Assert(IsEmpty, "setting value a second time?");
 
             _type = StorageType.DateTimeOffset;
-            FillInTimeInfo(ref _value._dateTimeOffsetInfo.dateTime2Info.timeInfo, bytes, length - 5, scale); // remaining 5 bytes are for date and offset
-            _value._dateTimeOffsetInfo.dateTime2Info.date = GetDateFromByteArray(bytes, length - 5); // 3 bytes for date
-            _value._dateTimeOffsetInfo.offset = (short)(bytes[length - 2] + (bytes[length - 1] << 8)); // 2 bytes for offset (Int16)
+            FillInTimeInfo(ref _value._dateTimeOffsetInfo.dateTime2Info.timeInfo, bytes.Slice(0, bytes.Length - 5), scale); // remaining 5 bytes are for date and offset
+            _value._dateTimeOffsetInfo.dateTime2Info.date = GetDateFromByteArray(bytes.Slice(bytes.Length - 5)); // 3 bytes for date
+            _value._dateTimeOffsetInfo.offset = (short)(bytes[bytes.Length - 2] + (bytes[bytes.Length - 1] << 8)); // 2 bytes for offset (Int16)
             _isNull = false;
         }
 
@@ -1109,17 +1109,17 @@ namespace System.Data.SqlClient
             _isNull = false;
         }
 
-        private static void FillInTimeInfo(ref TimeInfo timeInfo, ReadOnlySpan<byte> timeBytes, int length, byte scale)
+        private static void FillInTimeInfo(ref TimeInfo timeInfo, ReadOnlySpan<byte> timeBytes, byte scale)
         {
-            Debug.Assert(3 <= length && length <= 5, "invalid data length for timeInfo: " + length);
+            Debug.Assert(3 <= timeBytes.Length && timeBytes.Length <= 5, "invalid data length for timeInfo: " + timeBytes.Length);
             Debug.Assert(0 <= scale && scale <= 7, "invalid scale: " + scale);
 
             long tickUnits = (long)timeBytes[0] + ((long)timeBytes[1] << 8) + ((long)timeBytes[2] << 16);
-            if (length > 3)
+            if (timeBytes.Length > 3)
             {
                 tickUnits += ((long)timeBytes[3] << 24);
             }
-            if (length > 4)
+            if (timeBytes.Length > 4)
             {
                 tickUnits += ((long)timeBytes[4] << 32);
             }
@@ -1127,9 +1127,9 @@ namespace System.Data.SqlClient
             timeInfo.scale = scale;
         }
 
-        private static int GetDateFromByteArray(ReadOnlySpan<byte> buf, int offset)
+        private static int GetDateFromByteArray(ReadOnlySpan<byte> buf)
         {
-            return buf[offset] + (buf[offset + 1] << 8) + (buf[offset + 2] << 16);
+            return buf[0] + (buf[1] << 8) + (buf[2] << 16);
         }
 
         private void ThrowIfNull()
