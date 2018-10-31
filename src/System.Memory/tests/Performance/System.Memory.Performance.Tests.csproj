@@ -7,15 +7,15 @@
   </PropertyGroup>
   <ItemGroup Condition="'$(IncludePartialFacadeTests)' == 'true'">
     <!-- Tests specific to the fast span -->
-    <Compile Include="Perf.Span.Contains.cs" />
+    <!-- <Compile Include="Perf.Span.Contains.cs" /> -->
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Perf.Base64EncodeDecode.cs" />
+    <!-- <Compile Include="Perf.Base64EncodeDecode.cs" />
     <Compile Include="Perf.Memory.Slice.cs" />
     <Compile Include="Perf.Memory.Span.cs" />
-    <Compile Include="Perf.ReadOnlySequence.Enumerator.cs" />
+    <Compile Include="Perf.ReadOnlySequence.Enumerator.cs" /> -->
     <Compile Include="Perf.ReadOnlySequence.First.cs" />
-    <Compile Include="Perf.ReadOnlySequence.GetPosition.cs" />
+    <!-- <Compile Include="Perf.ReadOnlySequence.GetPosition.cs" />
     <Compile Include="Perf.ReadOnlySequence.Slice.cs" />
     <Compile Include="Perf.ReadOnlySequence.TryGet.cs" />
     <Compile Include="Perf.Span.BinaryReadAndWrite.cs" />
@@ -27,7 +27,7 @@
     <Compile Include="Perf.Span.SequenceCompareTo.cs" />
     <Compile Include="Perf.Span.StartsWith.cs" />
     <Compile Include="Perf.Utf8Formatter.cs" />
-    <Compile Include="Perf.Utf8Parser.cs" />
+    <Compile Include="Perf.Utf8Parser.cs" /> -->
     <Compile Include="..\Base64\Base64TestHelper.cs" />
     <Compile Include="..\TestHelpers.cs" />
     <Compile Include="$(CommonTestPath)\System\PerfUtils.cs">
