@@ -24,11 +24,6 @@
     <Compile Include="..\src\System\Text\Json\BitStack.cs" Link="BitStack.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="System.Collections" />
-    <Reference Include="System.Diagnostics.Tools" />
-    <Reference Include="System.Resources.ResourceManager" />
-  </ItemGroup>
-  <ItemGroup>
     <ReferenceFromRuntime Include="Newtonsoft.Json" />
   </ItemGroup>
 </Project>
