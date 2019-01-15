@@ -53,7 +53,8 @@
     <Compile Include="System\Text\Json\Writer\Utf8JsonWriter.WriteValues.UnsignedNumber.cs" />
   </ItemGroup>
   <ItemGroup Condition="'$(TargetGroup)' == 'netstandard'">
-    <Compile Include="System\Text\Json\PortableRune.cs" />
+    <Compile Include="System\Text\Json\PortableRune.Netstandard.cs" />
+    <Compile Include="System\Text\Json\Writer\JsonWriterHelper.Escaping.Netstandard.cs" />
   </ItemGroup>
   <ItemGroup Condition="'$(TargetGroup)' != 'netstandard'">
     <ProjectReference Include="..\..\System.Collections\src\System.Collections.csproj" />
