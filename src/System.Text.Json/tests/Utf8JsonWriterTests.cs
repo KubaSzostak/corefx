@@ -129,7 +129,7 @@ namespace System.Text.Json.Tests
             jsonUtf8 = new Utf8JsonWriter(output, state);
             jsonUtf8.WriteStringValue(guid);
             jsonUtf8.Flush();
-            string actualStr = Encoding.UTF8.GetString(output.Formatted);
+            string actualStr = Encoding.UTF8.GetString(output.Formatted.ToArray());
 
             Assert.Equal(38, output.Formatted.Length);
             Assert.Equal($"\"{guid.ToString()}\"", actualStr);
@@ -161,7 +161,7 @@ namespace System.Text.Json.Tests
             jsonUtf8 = new Utf8JsonWriter(output, state);
             jsonUtf8.WriteStringValue(date);
             jsonUtf8.Flush();
-            string actualStr = Encoding.UTF8.GetString(output.Formatted);
+            string actualStr = Encoding.UTF8.GetString(output.Formatted.ToArray());
 
             Assert.Equal(29, output.Formatted.Length);
             Assert.Equal($"\"{date.ToString("O")}\"", actualStr);
@@ -193,7 +193,7 @@ namespace System.Text.Json.Tests
             jsonUtf8 = new Utf8JsonWriter(output, state);
             jsonUtf8.WriteStringValue(date);
             jsonUtf8.Flush();
-            string actualStr = Encoding.UTF8.GetString(output.Formatted);
+            string actualStr = Encoding.UTF8.GetString(output.Formatted.ToArray());
 
             Assert.Equal(35, output.Formatted.Length);
             Assert.Equal($"\"{date.ToString("O")}\"", actualStr);
@@ -217,10 +217,10 @@ namespace System.Text.Json.Tests
                 jsonUtf8.WriteNumberValue(value);
 
                 jsonUtf8.Flush();
-                string actualStr = Encoding.UTF8.GetString(output.Formatted);
+                string actualStr = Encoding.UTF8.GetString(output.Formatted.ToArray());
 
                 Assert.True(output.Formatted.Length <= 31);
-                Assert.Equal(decimal.Parse(actualStr), value);
+                Assert.Equal(decimal.Parse(actualStr, CultureInfo.InvariantCulture), value);
             }
 
             for (int i = 0; i < 1_000; i++)
@@ -232,10 +232,10 @@ namespace System.Text.Json.Tests
                 jsonUtf8.WriteNumberValue(value);
 
                 jsonUtf8.Flush();
-                string actualStr = Encoding.UTF8.GetString(output.Formatted);
+                string actualStr = Encoding.UTF8.GetString(output.Formatted.ToArray());
 
                 Assert.True(output.Formatted.Length <= 31);
-                Assert.Equal(decimal.Parse(actualStr), value);
+                Assert.Equal(decimal.Parse(actualStr, CultureInfo.InvariantCulture), value);
             }
 
             {
@@ -246,10 +246,10 @@ namespace System.Text.Json.Tests
                 jsonUtf8.WriteNumberValue(value);
 
                 jsonUtf8.Flush();
-                string actualStr = Encoding.UTF8.GetString(output.Formatted);
+                string actualStr = Encoding.UTF8.GetString(output.Formatted.ToArray());
 
                 Assert.Equal(value.ToString().Length, output.Formatted.Length);
-                Assert.Equal(decimal.Parse(actualStr), value);
+                Assert.Equal(decimal.Parse(actualStr, CultureInfo.InvariantCulture), value);
             }
 
             {
@@ -260,10 +260,10 @@ namespace System.Text.Json.Tests
                 jsonUtf8.WriteNumberValue(value);
 
                 jsonUtf8.Flush();
-                string actualStr = Encoding.UTF8.GetString(output.Formatted);
+                string actualStr = Encoding.UTF8.GetString(output.Formatted.ToArray());
 
                 Assert.Equal(value.ToString().Length, output.Formatted.Length);
-                Assert.Equal(decimal.Parse(actualStr), value);
+                Assert.Equal(decimal.Parse(actualStr, CultureInfo.InvariantCulture), value);
             }
 
             {
@@ -284,10 +284,10 @@ namespace System.Text.Json.Tests
                 jsonUtf8.WriteNumberValue(value);
 
                 jsonUtf8.Flush();
-                string actualStr = Encoding.UTF8.GetString(output.Formatted);
+                string actualStr = Encoding.UTF8.GetString(output.Formatted.ToArray());
 
                 Assert.Equal(value.ToString().Length, output.Formatted.Length);
-                Assert.Equal(decimal.Parse(actualStr), value);
+                Assert.Equal(decimal.Parse(actualStr, CultureInfo.InvariantCulture), value);
             }
         }
 
@@ -2490,7 +2490,7 @@ namespace System.Text.Json.Tests
                 var output = new ArrayBufferWriter(1024);
                 var jsonUtf8 = new Utf8JsonWriter(output, state);
 
-                ReadOnlySpan<char> keyUtf16 = keyString;
+                ReadOnlySpan<char> keyUtf16 = keyString.AsSpan();
                 ReadOnlySpan<byte> keyUtf8 = Encoding.UTF8.GetBytes(keyString);
 
                 jsonUtf8.WriteStartObject();
@@ -2652,7 +2652,7 @@ namespace System.Text.Json.Tests
 
             var state = new JsonWriterState(options: new JsonWriterOptions { Indented = formatted, SkipValidation = skipValidation });
 
-            ReadOnlySpan<char> keyUtf16 = keyString;
+            ReadOnlySpan<char> keyUtf16 = keyString.AsSpan();
             ReadOnlySpan<byte> keyUtf8 = Encoding.UTF8.GetBytes(keyString);
 
             for (int i = 0; i < 6; i++)
@@ -2745,7 +2745,7 @@ namespace System.Text.Json.Tests
 
             var state = new JsonWriterState(options: new JsonWriterOptions { Indented = formatted, SkipValidation = skipValidation });
 
-            ReadOnlySpan<char> keyUtf16 = keyString;
+            ReadOnlySpan<char> keyUtf16 = keyString.AsSpan();
             ReadOnlySpan<byte> keyUtf8 = Encoding.UTF8.GetBytes(keyString);
 
             for (int i = 0; i < 6; i++)
@@ -2838,7 +2838,7 @@ namespace System.Text.Json.Tests
 
             var state = new JsonWriterState(options: new JsonWriterOptions { Indented = formatted, SkipValidation = skipValidation });
 
-            ReadOnlySpan<char> keyUtf16 = keyString;
+            ReadOnlySpan<char> keyUtf16 = keyString.AsSpan();
             ReadOnlySpan<byte> keyUtf8 = Encoding.UTF8.GetBytes(keyString);
 
             for (int i = 0; i < 6; i++)
