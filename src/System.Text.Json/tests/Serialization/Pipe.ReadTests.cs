@@ -22,23 +22,45 @@ namespace System.Text.Json.Serialization.Tests
             _pipe.Reader.Complete();
         }
 
-        private readonly Pipe _pipe;
+        private Pipe _pipe;
 
         [Fact]
         public async Task ReadSimpleObjectPipeAsync()
         {
+
+            //using (MemoryStream stream = new MemoryStream(SimpleTestClass.s_data))
+            //{
+            //    JsonSerializerOptions options = new JsonSerializerOptions
+            //    {
+            //        DefaultBufferSize = 1
+            //    };
+
+            //    for (int i = 0; i < 100_000; i++)
+            //    {
+            //        stream.Seek(0, SeekOrigin.Begin);
+            //        SimpleTestClass obj = await JsonSerializer.ReadAsync<SimpleTestClass>(stream, options);
+            //        obj.Verify();
+            //    }
+            //}
+
             byte[] bytes = SimpleTestClass.s_data;
 
             await _pipe.Writer.WriteAsync(bytes);
-            await _pipe.Writer.FlushAsync();
+            _pipe.Writer.Complete();
 
             JsonSerializerOptions options = new JsonSerializerOptions
             {
                 DefaultBufferSize = 1
             };
 
-            SimpleTestClass obj = await JsonSerializer.ReadAsync<SimpleTestClass>(_pipe.Reader, options);
-            obj.Verify();
+            for (int i = 0; i < 100_000; i++)
+            {
+                _pipe = new Pipe(new PipeOptions());
+                await _pipe.Writer.WriteAsync(bytes);
+                _pipe.Writer.Complete();
+                SimpleTestClass obj = await JsonSerializer.ReadAsync<SimpleTestClass>(_pipe.Reader, options);
+                obj.Verify();
+            }
         }
     }
 }

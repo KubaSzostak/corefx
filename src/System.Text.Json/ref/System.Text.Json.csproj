@@ -9,10 +9,12 @@
   <ItemGroup Condition="'$(TargetGroup)' != 'netstandard'">
     <ProjectReference Include="..\..\System.Memory\ref\System.Memory.csproj" />
     <ProjectReference Include="..\..\System.Runtime\ref\System.Runtime.csproj" />
-    <ProjectReference Include="..\..\System.IO.Pipelines\ref\System.IO.Pipelines.csproj" />
   </ItemGroup>
   <ItemGroup Condition="'$(TargetGroup)' == 'netstandard'">
     <Reference Include="System.Memory" />
     <Reference Include="System.Threading.Tasks.Extensions" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System.IO.Pipelines" />
   </ItemGroup>
 </Project>
