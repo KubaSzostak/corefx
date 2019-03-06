@@ -83,6 +83,7 @@
     <Compile Include="System\Text\Json\Serialization\JsonPropertyInfoOfTProperty.cs" />
     <Compile Include="System\Text\Json\Serialization\JsonSerializer.Read.HandleArray.cs" />
     <Compile Include="System\Text\Json\Serialization\JsonSerializer.Read.Stream.cs" />
+    <Compile Include="System\Text\Json\Serialization\JsonSerializer.Read.Pipe.cs" />
     <Compile Include="System\Text\Json\Serialization\JsonSerializer.Read.HandleValue.cs" />
     <Compile Include="System\Text\Json\Serialization\JsonSerializer.Read.HandleObject.cs" />
     <Compile Include="System\Text\Json\Serialization\JsonSerializer.Read.String.cs" />
@@ -153,6 +154,7 @@
     <Reference Include="System.Collections.Concurrent" />
     <Reference Include="System.Linq" />
     <Reference Include="System.Memory" />
+    <Reference Include="System.IO.Pipelines" />
     <Reference Include="System.Numerics.Vectors" />
     <Reference Include="System.Runtime.CompilerServices.Unsafe" />
     <Reference Include="System.Threading.Tasks" />

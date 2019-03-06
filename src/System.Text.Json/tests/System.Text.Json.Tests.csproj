@@ -33,6 +33,7 @@
     <Compile Include="Serialization\PropertyVisibilityTests.cs" />
     <Compile Include="Serialization\SpanTests.cs" />
     <Compile Include="Serialization\Stream.ReadTests.cs" />
+    <Compile Include="Serialization\Pipe.ReadTests.cs" />
     <Compile Include="Serialization\Stream.WriteTests.cs" />
     <Compile Include="Serialization\String.ReadTests.cs" />
     <Compile Include="Serialization\String.WriteTests.cs" />
