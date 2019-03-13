@@ -184,6 +184,7 @@ namespace System.Text.Json
         [System.CLSCompliantAttribute(false)]
         public ulong GetUInt64() { throw null; }
         public bool Read() { throw null; }
+        public bool TrySkip() { throw null; }
         public bool TryGetDecimal(out decimal value) { throw null; }
         public bool TryGetDouble(out double value) { throw null; }
         public bool TryGetInt32(out int value) { throw null; }

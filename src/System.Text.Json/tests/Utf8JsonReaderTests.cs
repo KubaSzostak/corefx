@@ -248,6 +248,244 @@ namespace System.Text.Json.Tests
         }
 
         [Theory]
+        [MemberData(nameof(TrySkipValues))]
+        public static void TestTrySkip(string jsonString, JsonTokenType lastToken)
+        {
+            List<JsonTokenType> expectedTokenTypes = JsonTestHelper.GetTokenTypes(jsonString);
+            TrySkipHelper(jsonString, lastToken, expectedTokenTypes, JsonCommentHandling.Disallow);
+            TrySkipHelper(jsonString, lastToken, expectedTokenTypes, JsonCommentHandling.Skip);
+            TrySkipHelper(jsonString, lastToken, expectedTokenTypes, JsonCommentHandling.Allow);
+        }
+
+        [Theory]
+        [MemberData(nameof(TrySkipValues))]
+        public static void TestTrySkipWithComments(string jsonString, JsonTokenType lastToken)
+        {
+            List<JsonTokenType> expectedTokenTypesWithoutComments = JsonTestHelper.GetTokenTypes(jsonString);
+
+            jsonString = JsonTestHelper.InsertCommentsEverywhere(jsonString);
+
+            List<JsonTokenType> expectedTokenTypes = JsonTestHelper.GetTokenTypes(jsonString);
+            TrySkipHelper(jsonString, JsonTokenType.Comment, expectedTokenTypes, JsonCommentHandling.Allow);
+            TrySkipHelper(jsonString, lastToken, expectedTokenTypesWithoutComments, JsonCommentHandling.Skip);
+        }
+
+        private static void TrySkipHelper(string jsonString, JsonTokenType lastToken, List<JsonTokenType> expectedTokenTypes, JsonCommentHandling commentHandling)
+        {
+            byte[] dataUtf8 = Encoding.UTF8.GetBytes(jsonString);
+            var state = new JsonReaderState(new JsonReaderOptions { CommentHandling = commentHandling });
+            var json = new Utf8JsonReader(dataUtf8, isFinalBlock: true, state);
+
+            JsonReaderState previous = json.CurrentState;
+            Assert.Equal(JsonTokenType.None, json.TokenType);
+            Assert.Equal(0, json.CurrentDepth);
+            Assert.Equal(0, json.BytesConsumed);
+            Assert.Equal(false, json.HasValueSequence);
+            Assert.True(json.ValueSpan.SequenceEqual(default));
+            Assert.True(json.ValueSequence.IsEmpty);
+
+            Assert.True(json.TrySkip());
+
+            JsonReaderState current = json.CurrentState;
+            Assert.Equal(JsonTokenType.None, json.TokenType);
+            Assert.Equal(previous, current);
+            Assert.Equal(0, json.CurrentDepth);
+            Assert.Equal(0, json.BytesConsumed);
+            Assert.Equal(false, json.HasValueSequence);
+            Assert.True(json.ValueSpan.SequenceEqual(default));
+            Assert.True(json.ValueSequence.IsEmpty);
+
+            int totalReads = 0;
+            while (json.Read())
+            {
+                totalReads++;
+            }
+
+            Assert.Equal(expectedTokenTypes.Count, totalReads);
+
+            previous = json.CurrentState;
+            Assert.Equal(lastToken, json.TokenType);
+            Assert.Equal(0, json.CurrentDepth);
+            Assert.Equal(dataUtf8.Length, json.BytesConsumed);
+            Assert.Equal(false, json.HasValueSequence);
+            Assert.True(json.ValueSpan.SequenceEqual(default));
+            Assert.True(json.ValueSequence.IsEmpty);
+
+            Assert.True(json.TrySkip());
+
+            current = json.CurrentState;
+            Assert.Equal(previous, current);
+            Assert.Equal(lastToken, json.TokenType);
+            Assert.Equal(0, json.CurrentDepth);
+            Assert.Equal(dataUtf8.Length, json.BytesConsumed);
+            Assert.Equal(false, json.HasValueSequence);
+            Assert.True(json.ValueSpan.SequenceEqual(default));
+            Assert.True(json.ValueSequence.IsEmpty);
+
+            for (int i = 0; i < totalReads; i++)
+            {
+                state = new JsonReaderState(new JsonReaderOptions { CommentHandling = commentHandling });
+                json = new Utf8JsonReader(dataUtf8, isFinalBlock: true, state);
+                for (int j = 0; j < i; j++)
+                {
+                    Assert.True(json.Read());
+                }
+                Assert.True(json.TrySkip());
+                Assert.True(expectedTokenTypes[i] == json.TokenType, $"Expected: {expectedTokenTypes[i]}, Actual: {json.TokenType}, , Index: {i}, BytesConsumed: {json.BytesConsumed}");
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(TrySkipValues))]
+        public static void TestTrySkipPartial(string jsonString, JsonTokenType lastToken)
+        {
+            byte[] dataUtf8 = Encoding.UTF8.GetBytes(jsonString);
+
+            // Skip, then skip some more
+            for (int i = 0; i < dataUtf8.Length; i++)
+            {
+                JsonReaderState state = default;
+                var json = new Utf8JsonReader(dataUtf8.AsSpan(0, i), isFinalBlock: false, state);
+
+                long bytesConsumed = json.BytesConsumed;
+                while (json.TrySkip())
+                {
+                    Assert.True(json.TokenType != JsonTokenType.PropertyName && json.TokenType != JsonTokenType.StartObject && json.TokenType != JsonTokenType.StartArray);
+                    if (bytesConsumed == json.BytesConsumed)
+                    {
+                        if (!json.Read())
+                        {
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        bytesConsumed = json.BytesConsumed;
+                    }
+                }
+
+                ValidateNextSkip(ref json);
+
+                long consumed = json.BytesConsumed;
+                Assert.Equal(consumed, json.CurrentState.BytesConsumed);
+
+                json = new Utf8JsonReader(dataUtf8.AsSpan((int)consumed), isFinalBlock: true, json.CurrentState);
+                while (json.TrySkip())
+                {
+                    Assert.True(json.TokenType != JsonTokenType.PropertyName && json.TokenType != JsonTokenType.StartObject && json.TokenType != JsonTokenType.StartArray);
+                    if (bytesConsumed == json.BytesConsumed)
+                    {
+                        if (!json.Read())
+                        {
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        bytesConsumed = json.BytesConsumed;
+                    }
+                }
+                Assert.Equal(dataUtf8.Length - consumed, json.BytesConsumed);
+            }
+
+            // Read, then skip
+            for (int i = 0; i < dataUtf8.Length; i++)
+            {
+                JsonReaderState state = default;
+                var json = new Utf8JsonReader(dataUtf8.AsSpan(0, i), isFinalBlock: false, state);
+                while (json.Read())
+                    ;
+
+                ValidateNextSkip(ref json);
+
+                long consumed = json.BytesConsumed;
+                Assert.Equal(consumed, json.CurrentState.BytesConsumed);
+
+                json = new Utf8JsonReader(dataUtf8.AsSpan((int)consumed), isFinalBlock: true, json.CurrentState);
+                long bytesConsumed = json.BytesConsumed;
+                while (json.TrySkip())
+                {
+                    Assert.True(json.TokenType != JsonTokenType.PropertyName && json.TokenType != JsonTokenType.StartObject && json.TokenType != JsonTokenType.StartArray);
+                    if (bytesConsumed == json.BytesConsumed)
+                    {
+                        if (!json.Read())
+                        {
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        bytesConsumed = json.BytesConsumed;
+                    }
+                }
+                Assert.Equal(dataUtf8.Length - consumed, json.BytesConsumed);
+            }
+
+            // Skip, then read
+            for (int i = 0; i < dataUtf8.Length; i++)
+            {
+                JsonReaderState state = default;
+                var json = new Utf8JsonReader(dataUtf8.AsSpan(0, i), isFinalBlock: false, state);
+                long bytesConsumed = json.BytesConsumed;
+                while (json.TrySkip())
+                {
+                    Assert.True(json.TokenType != JsonTokenType.PropertyName && json.TokenType != JsonTokenType.StartObject && json.TokenType != JsonTokenType.StartArray);
+                    if (bytesConsumed == json.BytesConsumed)
+                    {
+                        if (!json.Read())
+                        {
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        bytesConsumed = json.BytesConsumed;
+                    }
+                }
+
+                ValidateNextSkip(ref json);
+
+                long consumed = json.BytesConsumed;
+                Assert.Equal(consumed, json.CurrentState.BytesConsumed);
+
+                json = new Utf8JsonReader(dataUtf8.AsSpan((int)consumed), isFinalBlock: true, json.CurrentState);
+                while (json.Read())
+                    ;
+                Assert.Equal(dataUtf8.Length - consumed, json.BytesConsumed);
+                Assert.Equal(lastToken, json.TokenType);
+            }
+        }
+
+        private static void ValidateNextSkip(ref Utf8JsonReader json)
+        {
+            JsonReaderState previous = json.CurrentState;
+            JsonTokenType prevTokenType = json.TokenType;
+            int prevDepth = json.CurrentDepth;
+            long prevConsumed = json.BytesConsumed;
+            Assert.Equal(false, json.HasValueSequence);
+            Assert.True(json.ValueSequence.IsEmpty);
+            ReadOnlySpan<byte> prevValue = json.ValueSpan;
+
+            if (json.TokenType == JsonTokenType.PropertyName || json.TokenType == JsonTokenType.StartObject || json.TokenType == JsonTokenType.StartArray)
+            {
+                Assert.False(json.TrySkip());
+            }
+            else
+            {
+                Assert.True(json.TrySkip());
+            }
+
+            JsonReaderState current = json.CurrentState;
+            Assert.Equal(previous, current);
+            Assert.Equal(prevTokenType, json.TokenType);
+            Assert.Equal(prevDepth, json.CurrentDepth);
+            Assert.Equal(prevConsumed, json.BytesConsumed);
+            Assert.Equal(false, json.HasValueSequence);
+            Assert.True(json.ValueSequence.IsEmpty);
+            Assert.True(json.ValueSpan.SequenceEqual(prevValue));
+        }
+
+        [Theory]
         // Pad depth by nested objects, but minimize the text
         [InlineData(1, true, true)]
         [InlineData(2, true, true)]
@@ -2024,6 +2262,28 @@ namespace System.Text.Json.Tests
                     new object[] {"  null  ", "null"},
                     new object[] {"  true  ", "true"},
                     new object[] {"  false  ", "false"},
+                };
+            }
+        }
+
+        public static IEnumerable<object[]> TrySkipValues
+        {
+            get
+            {
+                return new List<object[]>
+                {
+                    new object[] {"[[[]], {\"a\":1, \"b\": 2}, 3, {\"a\":{}, \"b\":{\"c\":[]} }, [{\"a\":1, \"b\": 2}, null]]", JsonTokenType.EndArray},
+                    new object[] { "[]", JsonTokenType.EndArray},
+                    new object[] {"[[],[],[],[]]", JsonTokenType.EndArray},
+                    new object[] {"[[[],[],[]]]", JsonTokenType.EndArray},
+                    new object[] {"[{},{},{},{}]", JsonTokenType.EndArray},
+                    new object[] {"[{\"a\":[], \"b\":[], \"c\":[]}]", JsonTokenType.EndArray},
+                    new object[] {"{\"a\":{\"b\":{}}, \"c\":[1, 2], \"d\": 3, \"e\":[[], [{}] ], \"f\":{\"g\":[1, 2], \"e\":null}}", JsonTokenType.EndObject},
+                    new object[] {"{}", JsonTokenType.EndObject},
+                    new object[] {"{\"a\":{}, \"b\":{}, \"c\":{}, \"d\":{}}", JsonTokenType.EndObject},
+                    new object[] {"{\"a\":{\"b\":{}, \"c\":{}, \"d\":{}}}", JsonTokenType.EndObject},
+                    new object[] {"{\"a\":[], \"b\":[], \"c\":[], \"d\":[]}", JsonTokenType.EndObject},
+                    new object[] {"{\"a\":[{}, {}, {}]}", JsonTokenType.EndObject},
                 };
             }
         }
