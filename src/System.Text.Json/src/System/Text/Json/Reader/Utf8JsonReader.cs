@@ -215,6 +215,27 @@ namespace System.Text.Json
             return retVal;
         }
 
+        public void Skip()
+        {
+            if (!_isFinalBlock)
+            {
+                throw ThrowHelper.GetInvalidOperationException_CannotSkipOnPartial();
+            }
+
+            if (TokenType == JsonTokenType.PropertyName)
+            {
+                Read();
+            }
+
+            if (TokenType == JsonTokenType.StartObject || TokenType == JsonTokenType.StartArray)
+            {
+                int depth = CurrentDepth;
+                while (Read() && depth <= CurrentDepth)
+                {
+                }
+            }
+        }
+
         public bool TrySkip()
         {
             Utf8JsonReaderFields fieldsCopy = default;
@@ -253,7 +274,7 @@ namespace System.Text.Json
             return result;
         }
 
-        internal struct Utf8JsonReaderFields
+        private struct Utf8JsonReaderFields
         {
             public long _lineNumber;
             public long _bytePositionInLine;

@@ -1,4 +1,5 @@
-﻿<root>
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
   <!-- 
     Microsoft ResX Schema 
     
@@ -301,5 +302,8 @@
   </data>
   <data name="EnumConverterNotImplemented" xml:space="preserve">
     <value>EnumConverter is not yet supported on .NET Standard 2.0.</value>
+  </data>
+  <data name="CannotSkip" xml:space="preserve">
+    <value>Cannot Skip on partial JSON payload. Either get the whole payload and set _isFinalBlock to true or call TrySkip.</value>
   </data>
 </root>
