@@ -525,7 +525,7 @@ namespace System.Text.Json.Tests
         {
             byte[] dataUtf8 = Encoding.UTF8.GetBytes(jsonString);
 
-            var json = new Utf8JsonReader(dataUtf8.AsSpan(0, i), isFinalBlock: false, default);
+            var json = new Utf8JsonReader(dataUtf8, isFinalBlock: false, default);
             try
             {
                 json.Skip();
@@ -563,8 +563,6 @@ namespace System.Text.Json.Tests
                     }
                 }
 
-                ValidateNextSkip(ref json);
-
                 long consumed = json.BytesConsumed;
                 Assert.Equal(consumed, json.CurrentState.BytesConsumed);
 
@@ -592,11 +590,9 @@ namespace System.Text.Json.Tests
             for (int i = 0; i < dataUtf8.Length; i++)
             {
                 JsonReaderState state = default;
-                var json = new Utf8JsonReader(dataUtf8.AsSpan(0, i), isFinalBlock: false, state);
+                json = new Utf8JsonReader(dataUtf8.AsSpan(0, i), isFinalBlock: false, state);
                 while (json.Read())
                     ;
-
-                ValidateNextSkip(ref json);
 
                 long consumed = json.BytesConsumed;
                 Assert.Equal(consumed, json.CurrentState.BytesConsumed);
@@ -623,26 +619,20 @@ namespace System.Text.Json.Tests
             }
         }
 
-        private static void ValidateNextSkip(ref Utf8JsonReader json)
+        [Fact]
+        public static void SkipInvalid()
         {
-            JsonReaderState previous = json.CurrentState;
-            JsonTokenType prevTokenType = json.TokenType;
-            int prevDepth = json.CurrentDepth;
-            long prevConsumed = json.BytesConsumed;
-            Assert.Equal(false, json.HasValueSequence);
-            Assert.True(json.ValueSequence.IsEmpty);
-            ReadOnlySpan<byte> prevValue = json.ValueSpan;
-
-            json.Skip();
-
-            JsonReaderState current = json.CurrentState;
-            Assert.Equal(previous, current);
-            Assert.Equal(prevTokenType, json.TokenType);
-            Assert.Equal(prevDepth, json.CurrentDepth);
-            Assert.Equal(prevConsumed, json.BytesConsumed);
-            Assert.Equal(false, json.HasValueSequence);
-            Assert.True(json.ValueSequence.IsEmpty);
-            Assert.True(json.ValueSpan.SequenceEqual(prevValue));
+            string jsonString = "[[[]], {\"a\":1, \"b\": 2}, 3, {\"a\":{}, \"b\":{\"c\":[]} }, [{\"a\":1, \"b\": 2}, null]";
+            byte[] dataUtf8 = Encoding.UTF8.GetBytes(jsonString);
+            var json = new Utf8JsonReader(dataUtf8, isFinalBlock: true, default);
+            Assert.True(json.Read());
+            Assert.Equal(JsonTokenType.StartArray, json.TokenType);
+            try
+            {
+                json.Skip();
+                Assert.True(false, "Expected JsonReaderException was not thrown for incomplete/invalid JSON payload when skipping.");
+            }
+            catch (JsonReaderException) { }
         }
 
         [Theory]

@@ -230,8 +230,10 @@ namespace System.Text.Json
             if (TokenType == JsonTokenType.StartObject || TokenType == JsonTokenType.StartArray)
             {
                 int depth = CurrentDepth;
-                while (Read() && depth <= CurrentDepth)
+                while (depth <= CurrentDepth)
                 {
+                    bool result = Read();
+                    Debug.Assert(result);
                 }
             }
         }
