@@ -101,6 +101,20 @@
     <Compile Include="System\Text\Json\Writer\JsonWriterOptions.cs" />
     <Compile Include="System\Text\Json\Writer\JsonWriterState.cs" />
     <Compile Include="System\Text\Json\Writer\SequenceValidity.cs" />
+    <Compile Include="System\Text\Json\Writer\Utf8JsonWriter_Fetch.cs" />
+    <Compile Include="System\Text\Json\Writer\Utf8JsonWriter_Fetch.WriteProperties.Helpers.cs" />
+    <Compile Include="System\Text\Json\Writer\Utf8JsonWriter_Fetch.WriteProperties.SignedNumber.cs" />
+    <Compile Include="System\Text\Json\Writer\Utf8JsonWriter_Fetch.WriteProperties.String.cs" />
+    <Compile Include="System\Text\Json\Writer\Utf8JsonWriter_Fetch.WriteValues.Helpers.cs" />
+    <Compile Include="System\Text\Json\Writer\Utf8JsonWriter_Fetch.WriteValues.SignedNumber.cs" />
+    <Compile Include="System\Text\Json\Writer\Utf8JsonWriter_Fetch.WriteValues.String.cs" />
+    <Compile Include="System\Text\Json\Writer\Utf8JsonWriter_Internal.cs" />
+    <Compile Include="System\Text\Json\Writer\Utf8JsonWriter_Internal.WriteProperties.Helpers.cs" />
+    <Compile Include="System\Text\Json\Writer\Utf8JsonWriter_Internal.WriteProperties.SignedNumber.cs" />
+    <Compile Include="System\Text\Json\Writer\Utf8JsonWriter_Internal.WriteProperties.String.cs" />
+    <Compile Include="System\Text\Json\Writer\Utf8JsonWriter_Internal.WriteValues.Helpers.cs" />
+    <Compile Include="System\Text\Json\Writer\Utf8JsonWriter_Internal.WriteValues.SignedNumber.cs" />
+    <Compile Include="System\Text\Json\Writer\Utf8JsonWriter_Internal.WriteValues.String.cs" />
     <Compile Include="System\Text\Json\Writer\Utf8JsonWriter.cs" />
     <Compile Include="System\Text\Json\Writer\Utf8JsonWriter.WriteProperties.DateTime.cs" />
     <Compile Include="System\Text\Json\Writer\Utf8JsonWriter.WriteProperties.DateTimeOffset.cs" />
@@ -144,6 +158,7 @@
     <Reference Include="System.Memory" />
     <Reference Include="System.Numerics.Vectors" />
     <Reference Include="System.Runtime.CompilerServices.Unsafe" />
+    <Reference Include="System.Threading" />
     <Reference Include="System.Threading.Tasks" />
     <Reference Include="System.Threading.Tasks.Extensions" />
   </ItemGroup>
