@@ -342,6 +342,7 @@ namespace System.Text.Json
         public void Flush(System.IO.Stream stream, bool isFinalBlock = true) { }
         public void Flush(System.Buffers.IBufferWriter<byte> output, bool isFinalBlock = true) { }
         public System.Threading.Tasks.Task FlushAsync(System.IO.Stream stream, System.Threading.CancellationToken cancellationToken = default, bool isFinalBlock = true) { throw null; }
+        public long BytesWritten { get { throw null; } }
         public void Dispose() { }
         public void Clear() { }
         public void WriteEndArray() { }

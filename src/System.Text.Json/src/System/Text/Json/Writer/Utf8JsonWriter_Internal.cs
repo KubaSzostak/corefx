@@ -47,6 +47,14 @@ namespace System.Text.Json
 
         private int Indentation => CurrentDepth * JsonConstants.SpacesPerIndent;
 
+        public long BytesWritten
+        {
+            get
+            {
+                return _index;
+            }
+        }
+
         /// <summary>
         /// Tracks the recursive depth of the nested objects / arrays within the JSON text
         /// written so far. This provides the depth of the current token.
