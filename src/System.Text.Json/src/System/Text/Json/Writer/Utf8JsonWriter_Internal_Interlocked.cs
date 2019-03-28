@@ -43,7 +43,7 @@ namespace System.Text.Json
         // else, no list separator is needed since we are writing the first item.
         private int _currentDepth;
 
-        private static int _useCount = 0;
+        //private static int _useCount = 0;
 
         private int Indentation => CurrentDepth * JsonConstants.SpacesPerIndent;
 
@@ -52,6 +52,32 @@ namespace System.Text.Json
             get
             {
                 return _index;
+            }
+        }
+
+        private int _callCount;
+
+        private struct SingleThread : IDisposable
+        {
+            private Utf8JsonWriter_Internal_Interlocked _this;
+
+            public static SingleThread Lock(Utf8JsonWriter_Internal_Interlocked writer)
+            {
+                if (Interlocked.Increment(ref writer._callCount) != 1)
+                {
+                    Interlocked.Decrement(ref writer._callCount);
+                    ThrowHelper.ThrowInvalidOperationException("Multiple threads are accessing a shared writer.");
+                }
+                return new SingleThread { _this = writer };
+            }
+
+            public void Dispose()
+            {
+                if (_this != null)
+                {
+                    Interlocked.Decrement(ref _this._callCount);
+                    _this = null;
+                }
             }
         }
 
@@ -90,7 +116,7 @@ namespace System.Text.Json
 
         public void Flush(Stream stream, bool isFinalBlock = true)
         {
-            Lock();
+            using SingleThread locked = SingleThread.Lock(this);
 
             if (isFinalBlock && !_writerOptions.SkipValidation && (CurrentDepth != 0 || _tokenType == JsonTokenType.None))
                 ThrowHelper.ThrowInvalidOperationException_DepthNonZeroOrEmptyJson(_currentDepth);
@@ -98,12 +124,12 @@ namespace System.Text.Json
             stream.Write(_rentedBuffer);
             ClearHelper();
 
-            Unlock();
+            //Unlock();
         }
 
         public void Flush(IBufferWriter<byte> output, bool isFinalBlock = true)
         {
-            Lock();
+            using SingleThread locked = SingleThread.Lock(this);
 
             if (isFinalBlock && !_writerOptions.SkipValidation && (CurrentDepth != 0 || _tokenType == JsonTokenType.None))
                 ThrowHelper.ThrowInvalidOperationException_DepthNonZeroOrEmptyJson(_currentDepth);
@@ -113,12 +139,12 @@ namespace System.Text.Json
             output.Advance(_index);
             ClearHelper();
 
-            Unlock();
+            //Unlock();
         }
 
         public async Task FlushAsync(Stream stream, CancellationToken cancellationToken = default, bool isFinalBlock = true)
         {
-            Lock();
+            using SingleThread locked = SingleThread.Lock(this);
 
             if (isFinalBlock && !_writerOptions.SkipValidation && (CurrentDepth != 0 || _tokenType == JsonTokenType.None))
                 ThrowHelper.ThrowInvalidOperationException_DepthNonZeroOrEmptyJson(_currentDepth);
@@ -126,7 +152,7 @@ namespace System.Text.Json
             await stream.WriteAsync(_rentedBuffer, cancellationToken);
             ClearHelper();
 
-            Unlock();
+            //Unlock();
         }
 
         /// <summary>
@@ -138,12 +164,12 @@ namespace System.Text.Json
         /// </exception>
         public void WriteStartArray()
         {
-            Lock();
+            using SingleThread locked = SingleThread.Lock(this);
 
             WriteStart(JsonConstants.OpenBracket);
             _tokenType = JsonTokenType.StartArray;
 
-            Unlock();
+            //Unlock();
         }
 
         /// <summary>
@@ -155,28 +181,28 @@ namespace System.Text.Json
         /// </exception>
         public void WriteStartObject()
         {
-            Lock();
+            using SingleThread locked = SingleThread.Lock(this);
 
             WriteStart(JsonConstants.OpenBrace);
             _tokenType = JsonTokenType.StartObject;
 
-            Unlock();
+            //Unlock();
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void Lock()
-        {
-            if (Interlocked.Increment(ref _useCount) != 1)
-            {
-                ThrowHelper.ThrowInvalidOperationException("Multiple threads are accessing a shared writer.");
-            }
-        }
+        //[MethodImpl(MethodImplOptions.AggressiveInlining)]
+        //private void Lock1()
+        //{
+        //    if (Interlocked.Increment(ref _useCount) != 1)
+        //    {
+        //        ThrowHelper.ThrowInvalidOperationException("Multiple threads are accessing a shared writer.");
+        //    }
+        //}
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void Unlock()
-        {
-            Interlocked.Decrement(ref _useCount);
-        }
+        //[MethodImpl(MethodImplOptions.AggressiveInlining)]
+        //private void Unlock2()
+        //{
+        //    Interlocked.Decrement(ref _useCount);
+        //}
 
         private void WriteStart(byte token)
         {
@@ -302,7 +328,7 @@ namespace System.Text.Json
         /// </exception>
         public void WriteStartArray(ReadOnlySpan<byte> utf8PropertyName, bool escape = true)
         {
-            Lock();
+            using SingleThread locked = SingleThread.Lock(this);
 
             ValidatePropertyNameAndDepth(utf8PropertyName);
 
@@ -320,7 +346,7 @@ namespace System.Text.Json
             _isNotPrimitive = true;
             _tokenType = JsonTokenType.StartArray;
 
-            Unlock();
+            //Unlock();
         }
 
         /// <summary>
@@ -337,7 +363,7 @@ namespace System.Text.Json
         /// </exception>
         public void WriteStartObject(ReadOnlySpan<byte> utf8PropertyName, bool escape = true)
         {
-            Lock();
+            using SingleThread locked = SingleThread.Lock(this);
 
             ValidatePropertyNameAndDepth(utf8PropertyName);
 
@@ -355,7 +381,7 @@ namespace System.Text.Json
             _isNotPrimitive = true;
             _tokenType = JsonTokenType.StartObject;
 
-            Unlock();
+            //Unlock();
         }
 
         private void WriteStartEscape(ReadOnlySpan<byte> utf8PropertyName, byte token)
@@ -472,7 +498,7 @@ namespace System.Text.Json
         /// </exception>
         public void WriteStartArray(ReadOnlySpan<char> propertyName, bool escape = true)
         {
-            Lock();
+            using SingleThread locked = SingleThread.Lock(this);
 
             ValidatePropertyNameAndDepth(propertyName);
 
@@ -490,7 +516,7 @@ namespace System.Text.Json
             _isNotPrimitive = true;
             _tokenType = JsonTokenType.StartArray;
 
-            Unlock();
+            //Unlock();
         }
 
         /// <summary>
@@ -507,7 +533,7 @@ namespace System.Text.Json
         /// </exception>
         public void WriteStartObject(ReadOnlySpan<char> propertyName, bool escape = true)
         {
-            Lock();
+            using SingleThread locked = SingleThread.Lock(this);
 
             ValidatePropertyNameAndDepth(propertyName);
 
@@ -525,7 +551,7 @@ namespace System.Text.Json
             _isNotPrimitive = true;
             _tokenType = JsonTokenType.StartObject;
 
-            Unlock();
+            //Unlock();
         }
 
         private void WriteStartEscape(ReadOnlySpan<char> propertyName, byte token)
@@ -605,12 +631,12 @@ namespace System.Text.Json
         /// </exception>
         public void WriteEndArray()
         {
-            Lock();
+            using SingleThread locked = SingleThread.Lock(this);
 
             WriteEnd(JsonConstants.CloseBracket);
             _tokenType = JsonTokenType.EndArray;
 
-            Unlock();
+            //Unlock();
         }
 
         /// <summary>
@@ -621,12 +647,12 @@ namespace System.Text.Json
         /// </exception>
         public void WriteEndObject()
         {
-            Lock();
+            using SingleThread locked = SingleThread.Lock(this);
 
             WriteEnd(JsonConstants.CloseBrace);
             _tokenType = JsonTokenType.EndObject;
 
-            Unlock();
+            //Unlock();
         }
 
         private void WriteEnd(byte token)
@@ -858,7 +884,7 @@ namespace System.Text.Json
 
         public void Dispose()
         {
-            Lock();
+            using SingleThread locked = SingleThread.Lock(this);
 
             if (_rentedBuffer == null)
             {
@@ -869,18 +895,18 @@ namespace System.Text.Json
             ArrayPool<byte>.Shared.Return(_rentedBuffer);
             _rentedBuffer = null;
 
-            Unlock();
+            //Unlock();
         }
 
         public void Clear()
         {
-            Lock();
+            using SingleThread locked = SingleThread.Lock(this);
 
             CheckIfDisposed();
 
             ClearHelper();
 
-            Unlock();
+            //Unlock();
         }
 
         private void ClearHelper()

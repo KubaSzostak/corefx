@@ -36,7 +36,7 @@ namespace System.Text.Json
         /// </exception>
         public void WriteStringValue(ReadOnlySpan<char> value, bool escape = true)
         {
-            Lock();
+            using SingleThread locked = SingleThread.Lock(this);
 
             JsonWriterHelper.ValidateValue(value);
 
@@ -52,7 +52,7 @@ namespace System.Text.Json
             SetFlagToAddListSeparatorBeforeNextItem();
             _tokenType = JsonTokenType.String;
 
-            Unlock();
+            //Unlock();
         }
 
         private void WriteStringEscape(ReadOnlySpan<char> value)
@@ -145,7 +145,7 @@ namespace System.Text.Json
         /// </exception>
         public void WriteStringValue(ReadOnlySpan<byte> utf8Value, bool escape = true)
         {
-            Lock();
+            using SingleThread locked = SingleThread.Lock(this);
 
             JsonWriterHelper.ValidateValue(utf8Value);
 
@@ -161,7 +161,7 @@ namespace System.Text.Json
             SetFlagToAddListSeparatorBeforeNextItem();
             _tokenType = JsonTokenType.String;
 
-            Unlock();
+            //Unlock();
         }
 
         private void WriteStringEscape(ReadOnlySpan<byte> utf8Value)

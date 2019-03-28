@@ -45,7 +45,7 @@ namespace System.Text.Json
         /// </remarks>
         public void WriteNumber(ReadOnlySpan<char> propertyName, long value, bool escape = true)
         {
-            Lock();
+            using SingleThread locked = SingleThread.Lock(this);
 
             JsonWriterHelper.ValidateProperty(propertyName);
 
@@ -61,7 +61,7 @@ namespace System.Text.Json
             SetFlagToAddListSeparatorBeforeNextItem();
             _tokenType = JsonTokenType.Number;
 
-            Unlock();
+            //Unlock();
         }
 
         /// <summary>
@@ -81,7 +81,7 @@ namespace System.Text.Json
         /// </remarks>
         public void WriteNumber(ReadOnlySpan<byte> utf8PropertyName, long value, bool escape = true)
         {
-            Lock();
+            using SingleThread locked = SingleThread.Lock(this);
 
             JsonWriterHelper.ValidateProperty(utf8PropertyName);
 
@@ -97,7 +97,7 @@ namespace System.Text.Json
             SetFlagToAddListSeparatorBeforeNextItem();
             _tokenType = JsonTokenType.Number;
 
-            Unlock();
+            //Unlock();
         }
 
         /// <summary>

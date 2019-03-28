@@ -42,7 +42,7 @@ namespace System.Text.Json
         /// </exception>
         public void WriteString(ReadOnlySpan<char> propertyName, ReadOnlySpan<char> value, bool escape = true)
         {
-            Lock();
+            using SingleThread locked = SingleThread.Lock(this);
 
             JsonWriterHelper.ValidatePropertyAndValue(propertyName, value);
 
@@ -58,7 +58,7 @@ namespace System.Text.Json
             SetFlagToAddListSeparatorBeforeNextItem();
             _tokenType = JsonTokenType.String;
 
-            Unlock();
+            //Unlock();
         }
 
         /// <summary>
@@ -76,7 +76,7 @@ namespace System.Text.Json
         /// </exception>
         public void WriteString(ReadOnlySpan<byte> utf8PropertyName, ReadOnlySpan<byte> utf8Value, bool escape = true)
         {
-            Lock();
+            using SingleThread locked = SingleThread.Lock(this);
 
             JsonWriterHelper.ValidatePropertyAndValue(utf8PropertyName, utf8Value);
 
@@ -92,7 +92,7 @@ namespace System.Text.Json
             SetFlagToAddListSeparatorBeforeNextItem();
             _tokenType = JsonTokenType.String;
 
-            Unlock();
+            //Unlock();
         }
 
         /// <summary>
@@ -126,7 +126,7 @@ namespace System.Text.Json
         /// </exception>
         public void WriteString(ReadOnlySpan<byte> utf8PropertyName, ReadOnlySpan<char> value, bool escape = true)
         {
-            Lock();
+            using SingleThread locked = SingleThread.Lock(this);
 
             JsonWriterHelper.ValidatePropertyAndValue(utf8PropertyName, value);
 
@@ -142,7 +142,7 @@ namespace System.Text.Json
             SetFlagToAddListSeparatorBeforeNextItem();
             _tokenType = JsonTokenType.String;
 
-            Unlock();
+            //Unlock();
         }
 
         /// <summary>
@@ -176,7 +176,7 @@ namespace System.Text.Json
         /// </exception>
         public void WriteString(ReadOnlySpan<char> propertyName, ReadOnlySpan<byte> utf8Value, bool escape = true)
         {
-            Lock();
+            using SingleThread locked = SingleThread.Lock(this);
 
             JsonWriterHelper.ValidatePropertyAndValue(propertyName, utf8Value);
 
@@ -192,7 +192,7 @@ namespace System.Text.Json
             SetFlagToAddListSeparatorBeforeNextItem();
             _tokenType = JsonTokenType.String;
 
-            Unlock();
+            //Unlock();
         }
 
         /// <summary>

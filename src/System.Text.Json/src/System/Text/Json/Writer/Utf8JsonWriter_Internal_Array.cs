@@ -147,8 +147,6 @@ namespace System.Text.Json
         /// </exception>
         public void WriteStartObject()
         {
-            
-
             WriteStart(JsonConstants.OpenBrace);
             _tokenType = JsonTokenType.StartObject;
         }
