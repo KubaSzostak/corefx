@@ -36,6 +36,8 @@ namespace System.Text.Json
         /// </exception>
         public void WriteStringValue(ReadOnlySpan<char> value, bool escape = true)
         {
+            Lock();
+
             JsonWriterHelper.ValidateValue(value);
 
             if (escape)
@@ -49,6 +51,8 @@ namespace System.Text.Json
 
             SetFlagToAddListSeparatorBeforeNextItem();
             _tokenType = JsonTokenType.String;
+
+            Unlock();
         }
 
         private void WriteStringEscape(ReadOnlySpan<char> value)
@@ -141,6 +145,8 @@ namespace System.Text.Json
         /// </exception>
         public void WriteStringValue(ReadOnlySpan<byte> utf8Value, bool escape = true)
         {
+            Lock();
+
             JsonWriterHelper.ValidateValue(utf8Value);
 
             if (escape)
@@ -154,6 +160,8 @@ namespace System.Text.Json
 
             SetFlagToAddListSeparatorBeforeNextItem();
             _tokenType = JsonTokenType.String;
+
+            Unlock();
         }
 
         private void WriteStringEscape(ReadOnlySpan<byte> utf8Value)

@@ -42,6 +42,8 @@ namespace System.Text.Json
         /// </exception>
         public void WriteString(ReadOnlySpan<char> propertyName, ReadOnlySpan<char> value, bool escape = true)
         {
+            Lock();
+
             JsonWriterHelper.ValidatePropertyAndValue(propertyName, value);
 
             if (escape)
@@ -55,6 +57,8 @@ namespace System.Text.Json
 
             SetFlagToAddListSeparatorBeforeNextItem();
             _tokenType = JsonTokenType.String;
+
+            Unlock();
         }
 
         /// <summary>
@@ -72,6 +76,8 @@ namespace System.Text.Json
         /// </exception>
         public void WriteString(ReadOnlySpan<byte> utf8PropertyName, ReadOnlySpan<byte> utf8Value, bool escape = true)
         {
+            Lock();
+
             JsonWriterHelper.ValidatePropertyAndValue(utf8PropertyName, utf8Value);
 
             if (escape)
@@ -85,6 +91,8 @@ namespace System.Text.Json
 
             SetFlagToAddListSeparatorBeforeNextItem();
             _tokenType = JsonTokenType.String;
+
+            Unlock();
         }
 
         /// <summary>
@@ -118,6 +126,8 @@ namespace System.Text.Json
         /// </exception>
         public void WriteString(ReadOnlySpan<byte> utf8PropertyName, ReadOnlySpan<char> value, bool escape = true)
         {
+            Lock();
+
             JsonWriterHelper.ValidatePropertyAndValue(utf8PropertyName, value);
 
             if (escape)
@@ -131,6 +141,8 @@ namespace System.Text.Json
 
             SetFlagToAddListSeparatorBeforeNextItem();
             _tokenType = JsonTokenType.String;
+
+            Unlock();
         }
 
         /// <summary>
@@ -164,6 +176,8 @@ namespace System.Text.Json
         /// </exception>
         public void WriteString(ReadOnlySpan<char> propertyName, ReadOnlySpan<byte> utf8Value, bool escape = true)
         {
+            Lock();
+
             JsonWriterHelper.ValidatePropertyAndValue(propertyName, utf8Value);
 
             if (escape)
@@ -177,6 +191,8 @@ namespace System.Text.Json
 
             SetFlagToAddListSeparatorBeforeNextItem();
             _tokenType = JsonTokenType.String;
+
+            Unlock();
         }
 
         /// <summary>

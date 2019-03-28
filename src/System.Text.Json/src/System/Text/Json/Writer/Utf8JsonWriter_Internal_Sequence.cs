@@ -70,6 +70,32 @@ namespace System.Text.Json
         private long _totalWritten;
         private int _segment;
 
+        private int _callCount;
+
+        private struct SingleThread : IDisposable
+        {
+            private Utf8JsonWriter_Internal_Sequence _this;
+
+            public static SingleThread Lock(Utf8JsonWriter_Internal_Sequence writer)
+            {
+                if (Interlocked.Increment(ref writer._callCount) != 1)
+                {
+                    Interlocked.Decrement(ref writer._callCount);
+                    ThrowHelper.ThrowInvalidOperationException("Multiple threads are accessing a shared writer.");
+                }
+                return new SingleThread { _this = writer };
+            }
+
+            public void Dispose()
+            {
+                if (_this != null)
+                {
+                    Interlocked.Decrement(ref _this._callCount);
+                    _this = null;
+                }
+            }
+        }
+
         /// <summary>
         /// Constructs a new <see cref="Utf8JsonWriter"/> instance.
         /// </summary>
@@ -104,6 +130,8 @@ namespace System.Text.Json
 
         public void Flush(Stream stream, bool isFinalBlock = true)
         {
+            Lock();
+
             if (isFinalBlock && !_writerOptions.SkipValidation && (CurrentDepth != 0 || _tokenType == JsonTokenType.None))
                 ThrowHelper.ThrowInvalidOperationException_DepthNonZeroOrEmptyJson(_currentDepth);
 
@@ -127,10 +155,14 @@ namespace System.Text.Json
             _index = 0;
 
             _segment = 0;
+
+            Unlock();
         }
 
         public void Flush(IBufferWriter<byte> output, bool isFinalBlock = true)
         {
+            Lock();
+
             if (isFinalBlock && !_writerOptions.SkipValidation && (CurrentDepth != 0 || _tokenType == JsonTokenType.None))
                 ThrowHelper.ThrowInvalidOperationException_DepthNonZeroOrEmptyJson(_currentDepth);
 
@@ -166,10 +198,14 @@ namespace System.Text.Json
             _segment = 0;
 
             output.Advance(total);
+
+            Unlock();
         }
 
         public async Task FlushAsync(Stream stream, CancellationToken cancellationToken = default, bool isFinalBlock = true)
         {
+            Lock();
+
             if (isFinalBlock && !_writerOptions.SkipValidation && (CurrentDepth != 0 || _tokenType == JsonTokenType.None))
                 ThrowHelper.ThrowInvalidOperationException_DepthNonZeroOrEmptyJson(_currentDepth);
 
@@ -190,23 +226,25 @@ namespace System.Text.Json
             _index = 0;
 
             _segment = 0;
+
+            Unlock();
         }
 
-        private static int s_useCount = 0;
+        //private static int s_useCount = 0;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void Lock()
         {
-            if (Interlocked.Increment(ref s_useCount) != 1)
-            {
-                ThrowHelper.ThrowInvalidOperationException("Multiple threads are accessing a shared writer.");
-            }
+            //if (Interlocked.Increment(ref s_useCount) != 1)
+            //{
+            //    ThrowHelper.ThrowInvalidOperationException("Multiple threads are accessing a shared writer.");
+            //}
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void Unlock()
         {
-            Interlocked.Decrement(ref s_useCount);
+            //Interlocked.Decrement(ref s_useCount);
         }
 
         /// <summary>
@@ -218,8 +256,12 @@ namespace System.Text.Json
         /// </exception>
         public void WriteStartArray()
         {
+            Lock();
+
             WriteStart(JsonConstants.OpenBracket);
             _tokenType = JsonTokenType.StartArray;
+
+            Unlock();
         }
 
         /// <summary>
@@ -231,8 +273,12 @@ namespace System.Text.Json
         /// </exception>
         public void WriteStartObject()
         {
+            Lock();
+
             WriteStart(JsonConstants.OpenBrace);
             _tokenType = JsonTokenType.StartObject;
+
+            Unlock();
         }
 
         private void WriteStart(byte token)
@@ -359,6 +405,8 @@ namespace System.Text.Json
         /// </exception>
         public void WriteStartArray(ReadOnlySpan<byte> utf8PropertyName, bool escape = true)
         {
+            Lock();
+
             ValidatePropertyNameAndDepth(utf8PropertyName);
 
             if (escape)
@@ -374,6 +422,8 @@ namespace System.Text.Json
             _currentDepth++;
             _isNotPrimitive = true;
             _tokenType = JsonTokenType.StartArray;
+
+            Unlock();
         }
 
         /// <summary>
@@ -390,6 +440,8 @@ namespace System.Text.Json
         /// </exception>
         public void WriteStartObject(ReadOnlySpan<byte> utf8PropertyName, bool escape = true)
         {
+            Lock();
+
             ValidatePropertyNameAndDepth(utf8PropertyName);
 
             if (escape)
@@ -405,6 +457,8 @@ namespace System.Text.Json
             _currentDepth++;
             _isNotPrimitive = true;
             _tokenType = JsonTokenType.StartObject;
+
+            Unlock();
         }
 
         private void WriteStartEscape(ReadOnlySpan<byte> utf8PropertyName, byte token)
@@ -521,6 +575,8 @@ namespace System.Text.Json
         /// </exception>
         public void WriteStartArray(ReadOnlySpan<char> propertyName, bool escape = true)
         {
+            Lock();
+
             ValidatePropertyNameAndDepth(propertyName);
 
             if (escape)
@@ -536,6 +592,8 @@ namespace System.Text.Json
             _currentDepth++;
             _isNotPrimitive = true;
             _tokenType = JsonTokenType.StartArray;
+
+            Unlock();
         }
 
         /// <summary>
@@ -552,6 +610,8 @@ namespace System.Text.Json
         /// </exception>
         public void WriteStartObject(ReadOnlySpan<char> propertyName, bool escape = true)
         {
+            Lock();
+
             ValidatePropertyNameAndDepth(propertyName);
 
             if (escape)
@@ -567,6 +627,8 @@ namespace System.Text.Json
             _currentDepth++;
             _isNotPrimitive = true;
             _tokenType = JsonTokenType.StartObject;
+
+            Unlock();
         }
 
         private void WriteStartEscape(ReadOnlySpan<char> propertyName, byte token)
@@ -646,8 +708,12 @@ namespace System.Text.Json
         /// </exception>
         public void WriteEndArray()
         {
+            Lock();
+
             WriteEnd(JsonConstants.CloseBracket);
             _tokenType = JsonTokenType.EndArray;
+
+            Unlock();
         }
 
         /// <summary>
@@ -658,8 +724,12 @@ namespace System.Text.Json
         /// </exception>
         public void WriteEndObject()
         {
+            Lock();
+
             WriteEnd(JsonConstants.CloseBrace);
             _tokenType = JsonTokenType.EndObject;
+
+            Unlock();
         }
 
         private void WriteEnd(byte token)
@@ -904,6 +974,8 @@ namespace System.Text.Json
 
         public void Dispose()
         {
+            Lock();
+
             if (_buffers == null)
             {
                 return;
@@ -919,13 +991,19 @@ namespace System.Text.Json
             }
 
             _buffers = null;
+
+            Unlock();
         }
 
         public void Clear()
         {
+            Lock();
+
             CheckIfDisposed();
 
             ClearHelper();
+
+            Unlock();
         }
 
         private void ClearHelper()

@@ -35,6 +35,8 @@ namespace System.Text.Json
         /// </remarks>
         public void WriteNumberValue(long value)
         {
+            Lock();
+
             ValidateWritingValue();
             if (_writerOptions.Indented)
             {
@@ -47,6 +49,8 @@ namespace System.Text.Json
 
             SetFlagToAddListSeparatorBeforeNextItem();
             _tokenType = JsonTokenType.Number;
+
+            Unlock();
         }
 
         private void WriteNumberValueMinimized_new(long value)

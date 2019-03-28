@@ -45,6 +45,8 @@ namespace System.Text.Json
         /// </remarks>
         public void WriteNumber(ReadOnlySpan<char> propertyName, long value, bool escape = true)
         {
+            Lock();
+
             JsonWriterHelper.ValidateProperty(propertyName);
 
             if (escape)
@@ -58,6 +60,8 @@ namespace System.Text.Json
 
             SetFlagToAddListSeparatorBeforeNextItem();
             _tokenType = JsonTokenType.Number;
+
+            Unlock();
         }
 
         /// <summary>
@@ -77,6 +81,8 @@ namespace System.Text.Json
         /// </remarks>
         public void WriteNumber(ReadOnlySpan<byte> utf8PropertyName, long value, bool escape = true)
         {
+            Lock();
+
             JsonWriterHelper.ValidateProperty(utf8PropertyName);
 
             if (escape)
@@ -90,6 +96,8 @@ namespace System.Text.Json
 
             SetFlagToAddListSeparatorBeforeNextItem();
             _tokenType = JsonTokenType.Number;
+
+            Unlock();
         }
 
         /// <summary>
