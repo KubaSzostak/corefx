@@ -8,7 +8,7 @@ using System.Diagnostics;
 
 namespace System.Text.Json
 {
-    public partial class Utf8JsonWriter_Internal_Sequence
+    public partial class Utf8JsonWriter_Internal_Array
     {
         /// <summary>
         /// Writes the <see cref="int"/> value (as a JSON number) as an element of a JSON array.
@@ -35,7 +35,7 @@ namespace System.Text.Json
         /// </remarks>
         public void WriteNumberValue(long value)
         {
-            using SingleThread locked = SingleThread.Lock(this);
+            
 
             ValidateWritingValue();
             if (_writerOptions.Indented)
@@ -56,10 +56,6 @@ namespace System.Text.Json
             if (_currentDepth < 0)
             {
                 _rentedBuffer[_index++] = JsonConstants.ListSeparator;
-            }
-
-            {
-                _ = _rentedBuffer.Length;
             }
 
             bool result = Utf8Formatter.TryFormat(value, _rentedBuffer.AsSpan(_index), out int bytesWritten);
