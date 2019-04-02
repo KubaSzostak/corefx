@@ -30,6 +30,12 @@
     <Project Include="$(MSBuildThisFileDirectory)System.Net.Http.WinHttpHandler\pkg\System.Net.Http.WinHttpHandler.pkgproj">
       <AdditionalProperties>$(AdditionalProperties)</AdditionalProperties>
     </Project>
+    <Project Include="$(MSBuildThisFileDirectory)System.Diagnostics.DiagnosticSource\pkg\System.Diagnostics.DiagnosticSource.pkgproj">
+      <AdditionalProperties>$(AdditionalProperties)</AdditionalProperties>
+    </Project>
+    <Project Include="$(MSBuildThisFileDirectory)System.Memory\pkg\System.Memory.pkgproj">
+      <AdditionalProperties>$(AdditionalProperties)</AdditionalProperties>
+    </Project>
   </ItemGroup>
 
   <!-- Need the PackageIndexFile file property from baseline.props -->

@@ -54,6 +54,17 @@ namespace System.Diagnostics
             }
         }
 
+#if NEW_API_ADDED
+        /// <summary>
+        /// Add a subscriber (Observer).  If 'IsEnabled' == null (or not present), then the Source's IsEnabled 
+        /// will always return true.  
+        /// </summary>
+        public void CopyTo(System.Span<byte> destination)
+        {
+            throw new NotImplementedException();
+        }
+#endif
+
         // Subscription implementation 
         /// <summary>
         /// Add a subscriber (Observer).  If 'IsEnabled' == null (or not present), then the Source's IsEnabled 

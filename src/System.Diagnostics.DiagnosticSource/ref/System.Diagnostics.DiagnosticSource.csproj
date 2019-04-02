@@ -6,9 +6,13 @@
     <!-- Must match version supported by frameworks which support 4.0.* inbox.
          Can be removed when API is added and this assembly is versioned to 4.1.* -->
     <AssemblyVersion Condition="'$(TargetsNetFx)' != 'true'">4.0.3.0</AssemblyVersion>
+    <CLSCompliant>false</CLSCompliant>
   </PropertyGroup>
   <PropertyGroup Condition="'$(TargetGroup)' == 'net45' OR '$(TargetGroup)' == 'netfx'">
      <DefineConstants>$(DefineConstants);ALLOW_PARTIALLY_TRUSTED_CALLERS</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(TargetGroup)' != 'netstandard1.1'">
+     <DefineConstants>$(DefineConstants);NEW_API_ADDED</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'net45-Debug|AnyCPU'" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'net45-Release|AnyCPU'" />
@@ -25,10 +29,19 @@
   </ItemGroup>
   <ItemGroup Condition="'$(TargetGroup)' != 'netstandard1.1'">
     <Compile Include="System.Diagnostics.DiagnosticSourceActivity.cs" />
+    <Reference Include="System.Memory" />
   </ItemGroup>
   <ItemGroup Condition="'$(TargetGroup)' == 'net45' OR '$(TargetGroup)' == 'netfx'">
     <Reference Include="mscorlib" />
   </ItemGroup>
+
+	<ItemGroup Condition="'$(TargetGroup)' == 'net45'">
+    <Reference Include="System.Runtime" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetGroup)' == 'netfx'">
+    <Reference Include="netstandard" />
+  </ItemGroup>
+
   <ItemGroup Condition="'$(TargetGroup)' == 'netstandard1.1' or '$(TargetGroup)' == 'netstandard1.3'">
     <Reference Include="System.Runtime" />
   </ItemGroup>
