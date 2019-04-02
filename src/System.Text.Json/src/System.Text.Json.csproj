@@ -143,6 +143,13 @@
     <Compile Include="System\Text\Json\Writer\Utf8JsonWriter_Internal_Array.WriteValues.Helpers.cs" />
     <Compile Include="System\Text\Json\Writer\Utf8JsonWriter_Internal_Array.WriteValues.SignedNumber.cs" />
     <Compile Include="System\Text\Json\Writer\Utf8JsonWriter_Internal_Array.WriteValues.String.cs" />
+    <Compile Include="System\Text\Json\Writer\Utf8JsonWriter_Memory.cs" />
+    <Compile Include="System\Text\Json\Writer\Utf8JsonWriter_Memory.WriteProperties.Helpers.cs" />
+    <Compile Include="System\Text\Json\Writer\Utf8JsonWriter_Memory.WriteProperties.SignedNumber.cs" />
+    <Compile Include="System\Text\Json\Writer\Utf8JsonWriter_Memory.WriteProperties.String.cs" />
+    <Compile Include="System\Text\Json\Writer\Utf8JsonWriter_Memory.WriteValues.Helpers.cs" />
+    <Compile Include="System\Text\Json\Writer\Utf8JsonWriter_Memory.WriteValues.SignedNumber.cs" />
+    <Compile Include="System\Text\Json\Writer\Utf8JsonWriter_Memory.WriteValues.String.cs" />
     <Compile Include="System\Text\Json\Writer\Utf8JsonWriter.cs" />
     <Compile Include="System\Text\Json\Writer\Utf8JsonWriter.WriteProperties.DateTime.cs" />
     <Compile Include="System\Text\Json\Writer\Utf8JsonWriter.WriteProperties.DateTimeOffset.cs" />
