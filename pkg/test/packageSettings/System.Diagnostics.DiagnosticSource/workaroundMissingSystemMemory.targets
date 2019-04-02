@@ -6,6 +6,6 @@
 
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Condition="$(TargetFramework.StartsWith('netstandard1.')) OR $(TargetFramework.StartsWith('netcoreapp1.'))">
-    <PackageReference Include="System.Memory" Version="4.5.1" />
+    <PackageReference Include="System.Memory" Version="4.5.3" />
   </ItemGroup>
 </Project>
