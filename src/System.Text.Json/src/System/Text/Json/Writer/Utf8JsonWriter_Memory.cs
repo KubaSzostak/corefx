@@ -8,6 +8,41 @@ using System.Runtime.CompilerServices;
 
 namespace System.Text.Json
 {
+    internal struct UnsafeMemory<T>
+    {
+        private readonly IntPtr _object;
+        private readonly int _index;
+        private readonly int _length;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public UnsafeMemory<T> Slice(int start)
+        {
+            if ((uint)start > (uint)_length)
+            {
+                ThrowArgumentOutOfRangeException();
+            }
+
+            // It is expected for _index + start to be negative if the memory is already pre-pinned.
+            return new UnsafeMemory<T>(_object, _index + start, _length - start);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal UnsafeMemory(IntPtr obj, int start, int length)
+        {
+            // No validation performed in release builds; caller must provide any necessary validation.
+
+            _object = obj;
+            _index = start;
+            _length = length;
+        }
+
+        internal static void ThrowArgumentOutOfRangeException()
+        {
+            throw new ArgumentOutOfRangeException();
+        }
+    }
+
+
     /// <summary>
     /// Provides a high-performance API for forward-only, non-cached writing of UTF-8 encoded JSON text.
     /// It writes the text sequentially with no caching and adheres to the JSON RFC
@@ -138,6 +173,10 @@ namespace System.Text.Json
             Debug.Assert(count >= 0 && _buffered <= int.MaxValue - count);
 
             _buffered += count;
+
+            //UnsafeMemory<byte> temp = Unsafe.As<Memory<byte>, UnsafeMemory<byte>>(ref _buffer).Slice(count);
+            //_buffer = Unsafe.As<UnsafeMemory<byte>, Memory<byte>>(ref temp);
+
             _buffer = _buffer.Slice(count);
         }
 
@@ -403,18 +442,18 @@ namespace System.Text.Json
             if (_writerOptions.Indented)
             {
                 idx = WritePropertyNameIndented(utf8PropertyName);
+
+                if (1 > _buffer.Length - idx)
+                {
+                    AdvanceAndGrow(ref idx, 1);
+                }
+                Span<byte> output = _buffer.Span;
+                output[idx++] = token;
             }
             else
             {
-                idx = WritePropertyNameMinimized(utf8PropertyName);
+                idx = WritePropertyNameMinimized(utf8PropertyName, token);
             }
-
-            if (1 > _buffer.Length - idx)
-            {
-                AdvanceAndGrow(ref idx, 1);
-            }
-            Span<byte> output = _buffer.Span;
-            output[idx++] = token;
 
             Advance(idx);
         }
@@ -568,18 +607,19 @@ namespace System.Text.Json
             if (_writerOptions.Indented)
             {
                 idx = WritePropertyNameIndented(propertyName);
+
+                if (1 > _buffer.Length - idx)
+                {
+                    AdvanceAndGrow(ref idx, 1);
+                }
+                Span<byte> output = _buffer.Span;
+                output[idx++] = token;
+
             }
             else
             {
-                idx = WritePropertyNameMinimized(propertyName);
+                idx = WritePropertyNameMinimized(propertyName, token);
             }
-
-            if (1 > _buffer.Length - idx)
-            {
-                AdvanceAndGrow(ref idx, 1);
-            }
-            Span<byte> output = _buffer.Span;
-            output[idx++] = token;
 
             Advance(idx);
         }
@@ -847,16 +887,16 @@ namespace System.Text.Json
             while (true)
             {
                 Span<byte> output = _buffer.Span;
-                if (span.Length <= _buffer.Length - idx)
+                if (span.Length <= output.Length - idx)
                 {
                     span.CopyTo(output.Slice(idx));
                     idx += span.Length;
                     break;
                 }
 
-                span.Slice(0, _buffer.Length - idx).CopyTo(output.Slice(idx));
-                span = span.Slice(_buffer.Length - idx);
-                idx = _buffer.Length;
+                span.Slice(0, output.Length - idx).CopyTo(output.Slice(idx));
+                span = span.Slice(output.Length - idx);
+                idx = output.Length;
                 AdvanceAndGrow(ref idx);
             }
         }

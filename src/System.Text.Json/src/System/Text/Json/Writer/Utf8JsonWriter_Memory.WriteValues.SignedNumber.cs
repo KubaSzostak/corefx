@@ -3,6 +3,8 @@
 // See the LICENSE file in the project root for more information.
 
 using System.Buffers;
+using System.Buffers.Text;
+using System.Diagnostics;
 
 namespace System.Text.Json
 {
@@ -49,10 +51,23 @@ namespace System.Text.Json
 
         private void WriteNumberValueMinimized(long value)
         {
-            int idx = 0;
-            WriteListSeparator(ref idx);
+            if (_buffer.Length < JsonConstants.MaximumFormatInt64Length + 1)
+            {
+                GrowAndEnsure(JsonConstants.MaximumFormatInt64Length + 1);
+            }
 
-            WriteNumberValueFormatLoop(value, ref idx);
+            int idx = 0;
+
+            Span<byte> output = _buffer.Span;
+            if (_currentDepth < 0)
+            {
+                output[idx++] = JsonConstants.ListSeparator;
+            }
+
+            bool result = Utf8Formatter.TryFormat(value, output.Slice(idx), out int bytesWritten);
+            Debug.Assert(result);
+
+            idx += bytesWritten;
 
             Advance(idx);
         }

@@ -790,11 +790,12 @@ namespace System.Text.Json
 
         private void WriteStringValue(ReadOnlySpan<char> escapedValue, ref int idx)
         {
-            if (_buffer.Length <= idx)
+            Span<byte> output = _buffer.Span;
+            if (output.Length <= idx)
             {
                 AdvanceAndGrow(ref idx);
+                output = _buffer.Span;
             }
-            Span<byte> output = _buffer.Span;
             output[idx++] = JsonConstants.Quote;
 
             ReadOnlySpan<byte> byteSpan = MemoryMarshal.AsBytes(escapedValue);
@@ -812,7 +813,7 @@ namespace System.Text.Json
                 output = _buffer.Span;
             }
 
-            if (_buffer.Length <= idx)
+            if (output.Length <= idx)
             {
                 AdvanceAndGrow(ref idx);
                 output = _buffer.Span;

@@ -4,6 +4,7 @@
 
 using System.Buffers;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 
 namespace System.Text.Json
 {
@@ -82,10 +83,29 @@ namespace System.Text.Json
 
         private void WriteStringMinimized(ReadOnlySpan<char> escapedValue)
         {
-            int idx = 0;
-            WriteListSeparator(ref idx);
+            int length = (escapedValue.Length * 3) + 3;
+            if (_buffer.Length < length)
+            {
+                GrowAndEnsure(length);
+            }
 
-            WriteStringValue(escapedValue, ref idx);
+            Span<byte> output = _buffer.Span;
+            int idx = 0;
+
+            if (_currentDepth < 0)
+            {
+                output[idx++] = JsonConstants.ListSeparator;
+            }
+
+            output[idx++] = JsonConstants.Quote;
+
+            ReadOnlySpan<byte> byteSpan = MemoryMarshal.AsBytes(escapedValue);
+
+            OperationStatus status = JsonWriterHelper.ToUtf8(byteSpan, output.Slice(idx), out int consumed, out int written);
+            idx += written;
+            Debug.Assert(status == OperationStatus.Done);
+
+            output[idx++] = JsonConstants.Quote;
 
             Advance(idx);
         }
@@ -192,10 +212,26 @@ namespace System.Text.Json
 
         private void WriteStringMinimized(ReadOnlySpan<byte> escapedValue)
         {
-            int idx = 0;
-            WriteListSeparator(ref idx);
+            if (_buffer.Length < escapedValue.Length + 3)
+            {
+                GrowAndEnsure(escapedValue.Length + 3);
+            }
 
-            WriteStringValue(escapedValue, ref idx);
+            Span<byte> output = _buffer.Span;
+
+            int idx = 0;
+
+            if (_currentDepth < 0)
+            {
+                output[idx++] = JsonConstants.ListSeparator;
+            }
+
+            output[idx++] = JsonConstants.Quote;
+
+            escapedValue.CopyTo(output.Slice(idx));
+            idx += escapedValue.Length;
+
+            output[idx++] = JsonConstants.Quote;
 
             Advance(idx);
         }
