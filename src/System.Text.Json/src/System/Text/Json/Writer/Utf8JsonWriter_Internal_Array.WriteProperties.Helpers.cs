@@ -84,6 +84,29 @@ namespace System.Text.Json
             _rentedBuffer[_index++] = JsonConstants.KeyValueSeperator;
         }
 
+        private void WritePropertyNameMinimized(ReadOnlySpan<byte> escapedPropertyName, byte token)
+        {
+            int maxLengthRequired = escapedPropertyName.Length + 5;
+
+            if (_rentedBuffer.Length - _index < maxLengthRequired)
+            {
+                GrowAndEnsure(maxLengthRequired);
+            }
+
+            if (_currentDepth < 0)
+            {
+                _rentedBuffer[_index++] = JsonConstants.ListSeparator;
+            }
+            _rentedBuffer[_index++] = JsonConstants.Quote;
+
+            escapedPropertyName.CopyTo(_rentedBuffer.AsSpan(_index));
+            _index += escapedPropertyName.Length;
+
+            _rentedBuffer[_index++] = JsonConstants.Quote;
+            _rentedBuffer[_index++] = JsonConstants.KeyValueSeperator;
+            _rentedBuffer[_index++] = token;
+        }
+
         private void WritePropertyNameIndented(ReadOnlySpan<byte> escapedPropertyName)
         {
             if (_currentDepth < 0)

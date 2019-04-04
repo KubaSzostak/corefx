@@ -345,18 +345,17 @@ namespace System.Text.Json
             if (_writerOptions.Indented)
             {
                 WritePropertyNameIndented(utf8PropertyName);
+                if (_rentedBuffer.Length <= _index)
+                {
+                    GrowAndEnsure();
+                }
+
+                _rentedBuffer[_index++] = token;
             }
             else
             {
-                WritePropertyNameMinimized(utf8PropertyName);
+                WritePropertyNameMinimized(utf8PropertyName, token);
             }
-
-            if (_rentedBuffer.Length <= _index)
-            {
-                GrowAndEnsure();
-            }
-
-            _rentedBuffer[_index++] = token;
         }
 
         private void WriteStartEscapeProperty(ReadOnlySpan<byte> utf8PropertyName, byte token, int firstEscapeIndexProp)

@@ -213,9 +213,23 @@ namespace System.Text.Json
 
         private void WriteStringMinimized(ReadOnlySpan<byte> escapedValue)
         {
-            WriteListSeparator();
+            int maxLengthRequired = escapedValue.Length + 3;
 
-            WriteStringValue(escapedValue);
+            if (_rentedBuffer.Length - _index < maxLengthRequired)
+            {
+                GrowAndEnsure(maxLengthRequired);
+            }
+
+            if (_currentDepth < 0)
+            {
+                _rentedBuffer[_index++] = JsonConstants.ListSeparator;
+            }
+            _rentedBuffer[_index++] = JsonConstants.Quote;
+
+            escapedValue.CopyTo(_rentedBuffer.AsSpan(_index));
+            _index += escapedValue.Length;
+
+            _rentedBuffer[_index++] = JsonConstants.Quote;
         }
 
         private void WriteStringIndented(ReadOnlySpan<byte> escapedValue)

@@ -192,27 +192,10 @@ namespace System.Text.Json
 
         private void WriteStringMinimized(ReadOnlySpan<byte> escapedValue)
         {
-            //Span<byte> local = _tempMemoryField.Span;
-            if (_buffer.Length - _buffered < escapedValue.Length + 3)
-            {
-                GrowAndEnsure(escapedValue.Length + 3);
-            }
-
-            Span<byte> output = _buffer.Slice(_buffered);
-
             int idx = 0;
+            WriteListSeparator(ref idx);
 
-            if (_currentDepth < 0)
-            {
-                output[idx++] = JsonConstants.ListSeparator;
-            }
-
-            output[idx++] = JsonConstants.Quote;
-
-            escapedValue.CopyTo(output.Slice(idx));
-            idx += escapedValue.Length;
-
-            output[idx++] = JsonConstants.Quote;
+            WriteStringValue(escapedValue, ref idx);
 
             Advance(idx);
         }

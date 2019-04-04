@@ -80,16 +80,30 @@ namespace System.Text.Json
             return idx;
         }
 
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private int WritePropertyNameMinimizedSlow(ReadOnlySpan<byte> escapedPropertyName, byte token, int maxLengthRequired)
+        {
+            throw new NotImplementedException();
+        }
+
         private int WritePropertyNameMinimized(ReadOnlySpan<byte> escapedPropertyName, byte token)
         {
-            if (_buffer.Length < escapedPropertyName.Length + 5)
+            int maxLengthRequired = escapedPropertyName.Length + 5;
+
+            if (maxLengthRequired > DefaultGrowthSize)
             {
-                GrowAndEnsure(escapedPropertyName.Length + 5);
+                return WritePropertyNameMinimizedSlow(escapedPropertyName, token, maxLengthRequired);
+            }
+
+            if (_buffer.Length - _buffered < maxLengthRequired)
+            {
+                int minLengthRequired = escapedPropertyName.Length + 4;
+                GrowAndEnsure(minLengthRequired, maxLengthRequired);
             }
 
             Span<byte> output = _buffer.Span;
 
-            int idx = 0;
+            int idx = _buffered;
 
             if (_currentDepth < 0)
             {
