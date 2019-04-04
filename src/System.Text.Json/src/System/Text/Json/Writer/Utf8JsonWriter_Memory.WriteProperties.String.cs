@@ -728,19 +728,17 @@ namespace System.Text.Json
         private void WriteStringMinimized(ReadOnlySpan<byte> escapedPropertyName, ReadOnlySpan<byte> escapedValue)
         {
             int idx = WritePropertyNameMinimized(escapedPropertyName);
-
-            WriteStringValue(escapedValue, ref idx);
-
             Advance(idx);
+
+            WriteStringValue(escapedValue);
         }
 
         private void WriteStringMinimized(ReadOnlySpan<char> escapedPropertyName, ReadOnlySpan<byte> escapedValue)
         {
             int idx = WritePropertyNameMinimized(escapedPropertyName);
-
-            WriteStringValue(escapedValue, ref idx);
-
             Advance(idx);
+
+            WriteStringValue(escapedValue);
         }
 
         private void WriteStringMinimized(ReadOnlySpan<byte> escapedPropertyName, ReadOnlySpan<char> escapedValue)
@@ -839,6 +837,41 @@ namespace System.Text.Json
                 output = _buffer.Span;
             }
             output[idx++] = JsonConstants.Quote;
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private int WriteStringValue(ReadOnlySpan<byte> escapedValue, int maxLengthRequired)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void WriteStringValue(ReadOnlySpan<byte> escapedValue)
+        {
+            int maxLengthRequired = escapedValue.Length + 2;
+
+            if (maxLengthRequired > DefaultGrowthSize)
+            {
+                WriteStringValue(escapedValue, maxLengthRequired);
+                return;
+            }
+
+            if (_buffer.Length - _buffered < maxLengthRequired)
+            {
+                GrowAndEnsure(maxLengthRequired);
+            }
+
+            Span<byte> output = _buffer.Span;
+
+            int idx = _buffered;
+
+            output[idx++] = JsonConstants.Quote;
+
+            escapedValue.CopyTo(output.Slice(idx));
+            idx += escapedValue.Length;
+
+            output[idx++] = JsonConstants.Quote;
+
+            Advance(idx);
         }
     }
 }

@@ -52,7 +52,48 @@ namespace System.Text.Json
             }
         }
 
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private int WritePropertyNameMinimizedSlow(ReadOnlySpan<byte> escapedPropertyName, int maxLengthRequired)
+        {
+            throw new NotImplementedException();
+        }
+
         private int WritePropertyNameMinimized(ReadOnlySpan<byte> escapedPropertyName)
+        {
+            int maxLengthRequired = escapedPropertyName.Length + 4;
+
+            if (maxLengthRequired > DefaultGrowthSize)
+            {
+                return WritePropertyNameMinimizedSlow(escapedPropertyName, maxLengthRequired);
+            }
+
+            if (_buffer.Length - _buffered < maxLengthRequired)
+            {
+                int minLengthRequired = escapedPropertyName.Length + 3;
+                GrowAndEnsure(minLengthRequired, maxLengthRequired);
+            }
+
+            Span<byte> output = _buffer.Span;
+
+            int idx = _buffered;
+
+            if (_currentDepth < 0)
+            {
+                output[idx++] = JsonConstants.ListSeparator;
+            }
+
+            output[idx++] = JsonConstants.Quote;
+
+            escapedPropertyName.CopyTo(output.Slice(idx));
+            idx += escapedPropertyName.Length;
+
+            output[idx++] = JsonConstants.Quote;
+            output[idx++] = JsonConstants.KeyValueSeperator;
+
+            return idx;
+        }
+
+        private int WritePropertyNameMinimized_old(ReadOnlySpan<byte> escapedPropertyName)
         {
             if (_buffer.Length < escapedPropertyName.Length + 5)
             {
@@ -189,7 +230,55 @@ namespace System.Text.Json
             return idx;
         }
 
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private int WritePropertyNameMinimizedSlow(ReadOnlySpan<char> escapedPropertyName, int maxLengthRequired)
+        {
+            throw new NotImplementedException();
+        }
+
         private int WritePropertyNameMinimized(ReadOnlySpan<char> escapedPropertyName)
+        {
+            int maxLengthRequired = (escapedPropertyName.Length * 3) + 4;
+
+            if (maxLengthRequired > DefaultGrowthSize)
+            {
+                return WritePropertyNameMinimizedSlow(escapedPropertyName, maxLengthRequired);
+            }
+
+            if (_buffer.Length - _buffered < maxLengthRequired)
+            {
+                int minLengthRequired = escapedPropertyName.Length + 3;
+                GrowAndEnsure(minLengthRequired, maxLengthRequired);
+            }
+
+            Span<byte> output = _buffer.Span;
+
+            int idx = _buffered;
+
+            if (_currentDepth < 0)
+            {
+                output[idx++] = JsonConstants.ListSeparator;
+            }
+
+            output[idx++] = JsonConstants.Quote;
+
+            ReadOnlySpan<byte> byteSpan = MemoryMarshal.AsBytes(escapedPropertyName);
+            OperationStatus status = JsonWriterHelper.ToUtf8(byteSpan, output.Slice(idx), out int consumed, out int written);
+            Debug.Assert(status != OperationStatus.DestinationTooSmall);
+            if (status != OperationStatus.Done)
+            {
+                throw new InvalidOperationException();
+            }
+            Debug.Assert(consumed == byteSpan.Length);
+            idx += written;
+
+            output[idx++] = JsonConstants.Quote;
+            output[idx++] = JsonConstants.KeyValueSeperator;
+
+            return idx;
+        }
+
+        private int WritePropertyNameMinimized_old(ReadOnlySpan<char> escapedPropertyName)
         {
             int idx = 0;
             Span<byte> output = _buffer.Span;
