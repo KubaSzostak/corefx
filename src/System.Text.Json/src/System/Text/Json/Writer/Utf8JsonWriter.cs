@@ -29,7 +29,7 @@ namespace System.Text.Json
         private readonly IBufferWriter<byte> _output;
         private int _buffered;
         private Span<byte> _buffer;
-        private Memory<byte> _temp;
+        private readonly Memory<byte> _tempMemoryField;
 
         /// <summary>
         /// Returns the total amount of bytes written by the <see cref="Utf8JsonWriter"/> so far
@@ -122,8 +122,9 @@ namespace System.Text.Json
             _output = bufferWriter ?? throw new ArgumentNullException(nameof(bufferWriter));
             _buffered = 0;
             BytesCommitted = 0;
-            _temp = _output.GetMemory();
-            _buffer = _temp.Span;
+            _tempMemoryField = _output.GetMemory();
+            //_buffer = _tempMemoryField.Span;
+            _buffer = _output.GetSpan();
 
             _inObject = state._inObject;
             _isNotPrimitive = state._isNotPrimitive;
@@ -140,9 +141,9 @@ namespace System.Text.Json
             Debug.Assert(count >= 0 && _buffered <= int.MaxValue - count);
 
             _buffered += count;
-            _buffer = _buffer.Slice(count);
+            //_buffer = _buffer.Slice(count);
 
-            _temp.Slice(count);
+            //_tempMemoryField.Slice(count);
         }
 
         /// <summary>
