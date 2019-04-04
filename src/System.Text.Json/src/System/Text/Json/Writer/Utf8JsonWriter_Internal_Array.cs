@@ -172,18 +172,14 @@ namespace System.Text.Json
 
         private void WriteStartMinimized(byte token)
         {
-            if (_currentDepth < 0)
-            {
-                if (_rentedBuffer.Length <= _index)
-                {
-                    GrowAndEnsure();
-                }
-                _rentedBuffer[_index++] = JsonConstants.ListSeparator;
-            }
-
-            if (_rentedBuffer.Length <= _index)
+            if (_rentedBuffer.Length - _index < 2)
             {
                 GrowAndEnsure();
+            }
+
+            if (_currentDepth < 0)
+            {
+                _rentedBuffer[_index++] = JsonConstants.ListSeparator;
             }
             _rentedBuffer[_index++] = token;
         }
@@ -515,18 +511,16 @@ namespace System.Text.Json
             if (_writerOptions.Indented)
             {
                 WritePropertyNameIndented(propertyName);
+                if (_rentedBuffer.Length <= _index)
+                {
+                    GrowAndEnsure();
+                }
+                _rentedBuffer[_index++] = token;
             }
             else
             {
-                WritePropertyNameMinimized(propertyName);
+                WritePropertyNameMinimized(propertyName, token);
             }
-
-            if (_rentedBuffer.Length <= _index)
-            {
-                GrowAndEnsure();
-            }
-
-            _rentedBuffer[_index++] = token;
         }
 
         private void WriteStartEscapeProperty(ReadOnlySpan<char> propertyName, byte token, int firstEscapeIndexProp)
@@ -747,6 +741,17 @@ namespace System.Text.Json
 
             _rentedBuffer = newBuffer;
         }
+
+        private void GrowAndEnsure(int growBy)
+        {
+            int newSize = checked(_rentedBuffer.Length + Math.Max(growBy, _rentedBuffer.Length));
+            var newBuffer = new byte[newSize];
+
+            Buffer.BlockCopy(_rentedBuffer, 0, newBuffer, 0, _index);
+
+            _rentedBuffer = newBuffer;
+        }
+
         private static void ThrowInvalidOperationException(int capacity)
         {
             throw new InvalidOperationException($"Cannot advance past the end of the buffer, which has a size of {capacity}.");

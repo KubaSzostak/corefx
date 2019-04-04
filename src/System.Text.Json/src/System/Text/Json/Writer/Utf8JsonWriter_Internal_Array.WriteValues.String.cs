@@ -4,6 +4,7 @@
 
 using System.Buffers;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 
 namespace System.Text.Json
 {
@@ -84,9 +85,30 @@ namespace System.Text.Json
 
         private void WriteStringMinimized(ReadOnlySpan<char> escapedValue)
         {
-            WriteListSeparator();
+            int maxLengthRequired = (escapedValue.Length * 3) + 3;
 
-            WriteStringValue(escapedValue);
+            if (_rentedBuffer.Length - _index < maxLengthRequired)
+            {
+                GrowAndEnsure(maxLengthRequired);
+            }
+
+            if (_currentDepth < 0)
+            {
+                _rentedBuffer[_index++] = JsonConstants.ListSeparator;
+            }
+            _rentedBuffer[_index++] = JsonConstants.Quote;
+
+            ReadOnlySpan<byte> byteSpan = MemoryMarshal.AsBytes(escapedValue);
+            OperationStatus status = JsonWriterHelper.ToUtf8(byteSpan, _rentedBuffer.AsSpan(_index), out int consumed, out int written);
+            Debug.Assert(status != OperationStatus.DestinationTooSmall);
+            if (status != OperationStatus.Done)
+            {
+                throw new InvalidOperationException();
+            }
+            Debug.Assert(consumed == byteSpan.Length);
+            _index += written;
+
+            _rentedBuffer[_index++] = JsonConstants.Quote;
         }
 
         private void WriteStringIndented(ReadOnlySpan<char> escapedValue)

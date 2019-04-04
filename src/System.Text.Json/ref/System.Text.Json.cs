@@ -341,6 +341,7 @@ namespace System.Text.Json
         public long BytesCommitted { get { throw null; } }
         public long BytesWritten { get { throw null; } }
         public int CurrentDepth { get { throw null; } }
+        public void Clear() { }
         public void Flush(bool isFinalBlock = true) { }
         public System.Text.Json.JsonWriterState GetCurrentState() { throw null; }
         public void WriteEndArray() { }

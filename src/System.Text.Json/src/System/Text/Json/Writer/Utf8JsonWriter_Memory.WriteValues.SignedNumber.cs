@@ -51,14 +51,17 @@ namespace System.Text.Json
 
         private void WriteNumberValueMinimized(long value)
         {
-            if (_buffer.Length < JsonConstants.MaximumFormatInt64Length + 1)
+            int maxLengthRequired = JsonConstants.MaximumFormatInt64Length + 1;
+
+            if (_buffer.Length - _buffered < maxLengthRequired)
             {
-                GrowAndEnsure(JsonConstants.MaximumFormatInt64Length + 1);
+                int minLengthRequired = 1;
+                GrowAndEnsure(minLengthRequired, maxLengthRequired);
             }
 
-            int idx = 0;
-
             Span<byte> output = _buffer.Span;
+            int idx = _buffered;
+           
             if (_currentDepth < 0)
             {
                 output[idx++] = JsonConstants.ListSeparator;

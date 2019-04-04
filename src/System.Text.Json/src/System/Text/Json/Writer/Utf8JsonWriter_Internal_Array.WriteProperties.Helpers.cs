@@ -182,6 +182,36 @@ namespace System.Text.Json
             _rentedBuffer[_index++] = JsonConstants.KeyValueSeperator;
         }
 
+        private void WritePropertyNameMinimized(ReadOnlySpan<char> escapedPropertyName, byte token)
+        {
+            int maxLengthRequired = (escapedPropertyName.Length * 3) + 5;
+
+            if (_rentedBuffer.Length - _index < maxLengthRequired)
+            {
+                GrowAndEnsure(maxLengthRequired);
+            }
+
+            if (_currentDepth < 0)
+            {
+                _rentedBuffer[_index++] = JsonConstants.ListSeparator;
+            }
+            _rentedBuffer[_index++] = JsonConstants.Quote;
+
+            ReadOnlySpan<byte> byteSpan = MemoryMarshal.AsBytes(escapedPropertyName);
+            OperationStatus status = JsonWriterHelper.ToUtf8(byteSpan, _rentedBuffer.AsSpan(_index), out int consumed, out int written);
+            Debug.Assert(status != OperationStatus.DestinationTooSmall);
+            if (status != OperationStatus.Done)
+            {
+                throw new InvalidOperationException();
+            }
+            Debug.Assert(consumed == byteSpan.Length);
+            _index += written;
+
+            _rentedBuffer[_index++] = JsonConstants.Quote;
+            _rentedBuffer[_index++] = JsonConstants.KeyValueSeperator;
+            _rentedBuffer[_index++] = token;
+        }
+
         private void WritePropertyNameIndented(ReadOnlySpan<char> escapedPropertyName)
         {
             if (_currentDepth < 0)

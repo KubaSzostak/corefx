@@ -4,6 +4,7 @@
 
 using System.Buffers;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace System.Text.Json
@@ -81,16 +82,30 @@ namespace System.Text.Json
             }
         }
 
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private int WriteStringMinimized(ReadOnlySpan<char> escapedValue, int maxLengthRequired)
+        {
+            throw new NotImplementedException();
+        }
+
         private void WriteStringMinimized(ReadOnlySpan<char> escapedValue)
         {
-            int length = (escapedValue.Length * 3) + 3;
-            if (_buffer.Length < length)
+            int maxLengthRequired = (escapedValue.Length * 3) + 3;
+
+            if (maxLengthRequired > DefaultGrowthSize)
             {
-                GrowAndEnsure(length);
+                WriteStringMinimized(escapedValue, maxLengthRequired);
+                return;
+            }
+
+            if (_buffer.Length - _buffered < maxLengthRequired)
+            {
+                int minLengthRequired = escapedValue.Length + 2;
+                GrowAndEnsure(minLengthRequired, maxLengthRequired);
             }
 
             Span<byte> output = _buffer.Span;
-            int idx = 0;
+            int idx = _buffered;
 
             if (_currentDepth < 0)
             {
@@ -100,10 +115,14 @@ namespace System.Text.Json
             output[idx++] = JsonConstants.Quote;
 
             ReadOnlySpan<byte> byteSpan = MemoryMarshal.AsBytes(escapedValue);
-
             OperationStatus status = JsonWriterHelper.ToUtf8(byteSpan, output.Slice(idx), out int consumed, out int written);
+            Debug.Assert(status != OperationStatus.DestinationTooSmall);
+            if (status != OperationStatus.Done)
+            {
+                throw new InvalidOperationException();
+            }
+            Debug.Assert(consumed == byteSpan.Length);
             idx += written;
-            Debug.Assert(status == OperationStatus.Done);
 
             output[idx++] = JsonConstants.Quote;
 

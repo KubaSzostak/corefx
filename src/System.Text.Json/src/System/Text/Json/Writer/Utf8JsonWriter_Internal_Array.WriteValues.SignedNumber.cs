@@ -66,8 +66,21 @@ namespace System.Text.Json
 
         private void WriteNumberValueMinimized(long value)
         {
-            WriteListSeparator();
-            WriteNumberValueFormatLoop(value);
+            int maxLengthRequired = JsonConstants.MaximumFormatInt64Length + 1;
+
+            if (_rentedBuffer.Length - _index < maxLengthRequired)
+            {
+                GrowAndEnsure();
+            }
+
+            if (_currentDepth < 0)
+            {
+                _rentedBuffer[_index++] = JsonConstants.ListSeparator;
+            }
+
+            bool result = Utf8Formatter.TryFormat(value, _rentedBuffer.AsSpan(_index), out int bytesWritten);
+            Debug.Assert(result);
+            _index += bytesWritten;
         }
 
         private void WriteNumberValueIndented(long value)

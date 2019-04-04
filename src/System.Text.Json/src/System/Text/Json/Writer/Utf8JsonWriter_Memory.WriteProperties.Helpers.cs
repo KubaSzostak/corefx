@@ -228,17 +228,30 @@ namespace System.Text.Json
             return idx;
         }
 
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private int WritePropertyNameMinimizedSlow(ReadOnlySpan<char> escapedPropertyName, byte token, int maxLengthRequired)
+        {
+            throw new NotImplementedException();
+        }
+
         private int WritePropertyNameMinimized(ReadOnlySpan<char> escapedPropertyName, byte token)
         {
-            int length = (escapedPropertyName.Length * 3) + 5;
-            if (_buffer.Length < length)
+            int maxLengthRequired = (escapedPropertyName.Length * 3) + 5;
+
+            if (maxLengthRequired > DefaultGrowthSize)
             {
-                GrowAndEnsure(length);
+                return WritePropertyNameMinimizedSlow(escapedPropertyName, token, maxLengthRequired);
+            }
+
+            if (_buffer.Length - _buffered < maxLengthRequired)
+            {
+                int minLengthRequired = escapedPropertyName.Length + 4;
+                GrowAndEnsure(minLengthRequired, maxLengthRequired);
             }
 
             Span<byte> output = _buffer.Span;
 
-            int idx = 0;
+            int idx = _buffered;
 
             if (_currentDepth < 0)
             {
@@ -249,8 +262,13 @@ namespace System.Text.Json
 
             ReadOnlySpan<byte> byteSpan = MemoryMarshal.AsBytes(escapedPropertyName);
             OperationStatus status = JsonWriterHelper.ToUtf8(byteSpan, output.Slice(idx), out int consumed, out int written);
+            Debug.Assert(status != OperationStatus.DestinationTooSmall);
+            if (status != OperationStatus.Done)
+            {
+                throw new InvalidOperationException();
+            }
+            Debug.Assert(consumed == byteSpan.Length);
             idx += written;
-            Debug.Assert(status == OperationStatus.Done);
 
             output[idx++] = JsonConstants.Quote;
             output[idx++] = JsonConstants.KeyValueSeperator;

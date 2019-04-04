@@ -167,17 +167,26 @@ namespace System.Text.Json
             _currentDepth = state._currentDepth;
         }
 
+        public void Clear()
+        {
+            _buffered = 0;
+            BytesCommitted = 0;
+            _buffer = _output.GetMemory();
+        }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void Advance(int count)
         {
             Debug.Assert(count >= 0 && _buffered <= int.MaxValue - count);
 
-            _buffered += count;
+            _buffered = count;
+
+            //_buffered += count;
 
             //UnsafeMemory<byte> temp = Unsafe.As<Memory<byte>, UnsafeMemory<byte>>(ref _buffer).Slice(count);
             //_buffer = Unsafe.As<UnsafeMemory<byte>, Memory<byte>>(ref temp);
 
-            _buffer = _buffer.Slice(count);
+            //_buffer = _buffer.Slice(count);
         }
 
         /// <summary>
@@ -252,26 +261,20 @@ namespace System.Text.Json
 
         private void WriteStartMinimized(byte token)
         {
-            int idx = 0;
+            if (_buffer.Length - _buffered < 2)
+            {
+                GrowAndEnsure(1, 2);
+            }
+
+            //int idx = _buffered;
             Span<byte> output = _buffer.Span;
             if (_currentDepth < 0)
             {
-                if (_buffer.Length <= idx)
-                {
-                    GrowAndEnsure();
-                    output = _buffer.Span;
-                }
-                output[idx++] = JsonConstants.ListSeparator;
+                output[_buffered++] = JsonConstants.ListSeparator;
             }
+            output[_buffered++] = token;
 
-            if (_buffer.Length <= idx)
-            {
-                AdvanceAndGrow(ref idx);
-                output = _buffer.Span;
-            }
-            output[idx++] = token;
-
-            Advance(idx);
+            //Advance(idx);
         }
 
         private void WriteStartSlow(byte token)
@@ -702,13 +705,13 @@ namespace System.Text.Json
 
         private void WriteEndMinimized(byte token)
         {
-            if (_buffer.Length < 1)
+            if (_buffer.Length <= _buffered)
             {
                 GrowAndEnsure();
             }
             Span<byte> output = _buffer.Span;
-            output[0] = token;
-            Advance(1);
+            output[_buffered++] = token;
+            //Advance(1);
         }
 
         private void WriteEndSlow(byte token)
@@ -863,6 +866,17 @@ namespace System.Text.Json
             if (_buffer.Length < minimumSize)
             {
                 ThrowHelper.ThrowArgumentException(ExceptionResource.FailedToGetMinimumSizeSpan, minimumSize);
+            }
+        }
+
+        private void GrowAndEnsure(int minimumSizeRequired, int maximumSizeRequired)
+        {
+            Flush();
+            Debug.Assert(maximumSizeRequired < DefaultGrowthSize);
+            _buffer = _output.GetMemory(DefaultGrowthSize);
+            if (_buffer.Length < minimumSizeRequired)
+            {
+                ThrowHelper.ThrowArgumentException(ExceptionResource.FailedToGetMinimumSizeSpan, minimumSizeRequired);
             }
         }
 
