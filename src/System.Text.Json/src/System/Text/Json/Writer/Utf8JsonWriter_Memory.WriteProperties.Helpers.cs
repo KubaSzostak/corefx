@@ -162,22 +162,20 @@ namespace System.Text.Json
 
         private int WritePropertyNameMinimized(ReadOnlySpan<char> escapedPropertyName)
         {
-            int idx = 0;
+            int idx = _buffered;
             Span<byte> output = _buffer.Span;
             if (_currentDepth < 0)
             {
-                if (_buffer.Length <= idx)
+                if (output.Length <= idx)
                 {
-                    GrowAndEnsure();
-                    output = _buffer.Span;
+                    output = GrowAndEnsureGetSpan();
                 }
                 output[idx++] = JsonConstants.ListSeparator;
             }
 
-            if (_buffer.Length <= idx)
+            if (output.Length <= idx)
             {
-                AdvanceAndGrow(ref idx);
-                output = _buffer.Span;
+                output = AdvanceAndGrowGetSpan(ref idx);
             }
             output[idx++] = JsonConstants.Quote;
 
@@ -192,23 +190,74 @@ namespace System.Text.Json
                     break;
                 }
                 partialConsumed += consumed;
-                AdvanceAndGrow(ref idx);
-                output = _buffer.Span;
+                output = AdvanceAndGrowGetSpan(ref idx);
             }
 
-            if (_buffer.Length <= idx)
+            if (output.Length <= idx)
             {
-                AdvanceAndGrow(ref idx);
-                output = _buffer.Span;
+                output = AdvanceAndGrowGetSpan(ref idx);
             }
             output[idx++] = JsonConstants.Quote;
 
-            if (_buffer.Length <= idx)
+            if (output.Length <= idx)
             {
-                AdvanceAndGrow(ref idx);
-                output = _buffer.Span;
+                output = AdvanceAndGrowGetSpan(ref idx);
             }
             output[idx++] = JsonConstants.KeyValueSeperator;
+
+            return idx;
+        }
+
+        private int WritePropertyNameMinimized(ReadOnlySpan<char> escapedPropertyName, byte token)
+        {
+            int idx = _buffered;
+            Span<byte> output = _buffer.Span;
+            if (_currentDepth < 0)
+            {
+                if (output.Length <= idx)
+                {
+                    output = GrowAndEnsureGetSpan();
+                }
+                output[idx++] = JsonConstants.ListSeparator;
+            }
+
+            if (output.Length <= idx)
+            {
+                output = AdvanceAndGrowGetSpan(ref idx);
+            }
+            output[idx++] = JsonConstants.Quote;
+
+            ReadOnlySpan<byte> byteSpan = MemoryMarshal.AsBytes(escapedPropertyName);
+            int partialConsumed = 0;
+            while (true)
+            {
+                OperationStatus status = JsonWriterHelper.ToUtf8(byteSpan.Slice(partialConsumed), output.Slice(idx), out int consumed, out int written);
+                idx += written;
+                if (status == OperationStatus.Done)
+                {
+                    break;
+                }
+                partialConsumed += consumed;
+                output = AdvanceAndGrowGetSpan(ref idx);
+            }
+
+            if (output.Length <= idx)
+            {
+                output = AdvanceAndGrowGetSpan(ref idx);
+            }
+            output[idx++] = JsonConstants.Quote;
+
+            if (output.Length <= idx)
+            {
+                output = AdvanceAndGrowGetSpan(ref idx);
+            }
+            output[idx++] = JsonConstants.KeyValueSeperator;
+
+            if (output.Length <= idx)
+            {
+                output = AdvanceAndGrowGetSpan(ref idx);
+            }
+            output[idx++] = token;
 
             return idx;
         }

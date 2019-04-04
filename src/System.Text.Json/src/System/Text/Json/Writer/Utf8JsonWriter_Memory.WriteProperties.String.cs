@@ -808,14 +808,12 @@ namespace System.Text.Json
                     break;
                 }
                 partialConsumed += consumed;
-                AdvanceAndGrow(ref idx);
-                output = _buffer.Span;
+                output = AdvanceAndGrowGetSpan(ref idx);
             }
 
-            if (_buffer.Length <= idx)
+            if (output.Length <= idx)
             {
-                AdvanceAndGrow(ref idx);
-                output = _buffer.Span;
+                output = AdvanceAndGrowGetSpan(ref idx);
             }
             output[idx++] = JsonConstants.Quote;
         }

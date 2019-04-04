@@ -137,8 +137,9 @@ namespace System.Text.Json
         {
             Debug.Assert(count >= 0 && _buffered <= int.MaxValue - count);
 
-            _buffered += count;
-            _buffer = _buffer.Slice(count);
+            _buffered = count;
+            //_buffered += count;
+            //_buffer = _buffer.Slice(count);
         }
 
         /// <summary>
@@ -213,22 +214,20 @@ namespace System.Text.Json
 
         private void WriteStartMinimized(byte token)
         {
-            int idx = 0;
+            int idx = _buffered;
             Span<byte> output = _buffer.Span;
             if (_currentDepth < 0)
             {
-                if (_buffer.Length <= idx)
+                if (output.Length <= idx)
                 {
-                    GrowAndEnsure();
-                    output = _buffer.Span;
+                    output = GrowAndEnsureGetSpan();
                 }
                 output[idx++] = JsonConstants.ListSeparator;
             }
 
-            if (_buffer.Length <= idx)
+            if (output.Length <= idx)
             {
-                AdvanceAndGrow(ref idx);
-                output = _buffer.Span;
+                output = AdvanceAndGrowGetSpan(ref idx);
             }
             output[idx++] = token;
 
@@ -568,18 +567,18 @@ namespace System.Text.Json
             if (_writerOptions.Indented)
             {
                 idx = WritePropertyNameIndented(propertyName);
+
+                if (1 > _buffer.Length - idx)
+                {
+                    AdvanceAndGrow(ref idx, 1);
+                }
+                Span<byte> output = _buffer.Span;
+                output[idx++] = token;
             }
             else
             {
-                idx = WritePropertyNameMinimized(propertyName);
+                idx = WritePropertyNameMinimized(propertyName, token);
             }
-
-            if (1 > _buffer.Length - idx)
-            {
-                AdvanceAndGrow(ref idx, 1);
-            }
-            Span<byte> output = _buffer.Span;
-            output[idx++] = token;
 
             Advance(idx);
         }
@@ -662,13 +661,13 @@ namespace System.Text.Json
 
         private void WriteEndMinimized(byte token)
         {
-            if (_buffer.Length < 1)
+            if (_buffer.Length <= _buffered)
             {
                 GrowAndEnsure();
             }
             Span<byte> output = _buffer.Span;
-            output[0] = token;
-            Advance(1);
+            output[_buffered++] = token;
+            //Advance(1);
         }
 
         private void WriteEndSlow(byte token)
@@ -815,6 +814,20 @@ namespace System.Text.Json
             }
         }
 
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private Span<byte> GrowAndEnsureGetSpan()
+        {
+            Flush();
+            int previousSpanLength = _buffer.Length;
+            Debug.Assert(previousSpanLength < DefaultGrowthSize);
+            _buffer = _output.GetMemory(DefaultGrowthSize);
+            if (_buffer.Length <= previousSpanLength)
+            {
+                ThrowHelper.ThrowArgumentException(ExceptionResource.FailedToGetLargerSpan);
+            }
+            return _buffer.Span;
+        }
+
         private void GrowAndEnsure(int minimumSize)
         {
             Flush();
@@ -826,6 +839,19 @@ namespace System.Text.Json
             }
         }
 
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private Span<byte> GrowAndEnsureGetSpan(int minimumSize)
+        {
+            Flush();
+            Debug.Assert(minimumSize < DefaultGrowthSize);
+            _buffer = _output.GetMemory(DefaultGrowthSize);
+            if (_buffer.Length < minimumSize)
+            {
+                ThrowHelper.ThrowArgumentException(ExceptionResource.FailedToGetMinimumSizeSpan, minimumSize);
+            }
+            return _buffer.Span;
+        }
+
         private void AdvanceAndGrow(ref int alreadyWritten)
         {
             Debug.Assert(alreadyWritten >= 0);
@@ -834,12 +860,32 @@ namespace System.Text.Json
             alreadyWritten = 0;
         }
 
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private Span<byte> AdvanceAndGrowGetSpan(ref int alreadyWritten)
+        {
+            Debug.Assert(alreadyWritten >= 0);
+            Advance(alreadyWritten);
+            Span<byte> span = GrowAndEnsureGetSpan();
+            alreadyWritten = 0;
+            return span;
+        }
+
         private void AdvanceAndGrow(ref int alreadyWritten, int minimumSize)
         {
             Debug.Assert(minimumSize >= 1 && minimumSize <= 128);
             Advance(alreadyWritten);
             GrowAndEnsure(minimumSize);
             alreadyWritten = 0;
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private Span<byte> AdvanceAndGrowGetSpan(ref int alreadyWritten, int minimumSize)
+        {
+            Debug.Assert(minimumSize >= 1 && minimumSize <= 128);
+            Advance(alreadyWritten);
+            Span<byte> span = GrowAndEnsureGetSpan(minimumSize);
+            alreadyWritten = 0;
+            return span;
         }
 
         private void CopyLoop(ReadOnlySpan<byte> span, ref int idx)
