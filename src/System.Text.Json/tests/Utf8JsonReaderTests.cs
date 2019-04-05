@@ -42,6 +42,30 @@ namespace System.Text.Json.Tests
             TestGetMethodsOnDefault();
         }
 
+        [Fact]
+        public static void ReadNull()
+        {
+            string jsonData = "null";
+            var json = new Utf8JsonReader(Encoding.UTF8.GetBytes(jsonData), isFinalBlock: false, state: default);
+            Assert.True(json.Read());
+            Assert.Equal(JsonTokenType.Null, json.TokenType);
+            Assert.Equal("null", Encoding.UTF8.GetString(json.ValueSpan));
+
+            Assert.False(json.Read());
+
+            jsonData = "nullblah";
+            json = new Utf8JsonReader(Encoding.UTF8.GetBytes(jsonData), isFinalBlock: false, state: default);
+
+            Assert.True(json.Read());
+            Assert.Equal(JsonTokenType.Null, json.TokenType);
+            Assert.Equal("null", Encoding.UTF8.GetString(json.ValueSpan));
+
+            var reader = new JsonTextReader(new StringReader(jsonData));
+            reader.Read();
+
+            //Assert.False(json.Read());
+        }
+
         private static void TestGetMethodsOnDefault()
         {
             Utf8JsonReader json = default;
