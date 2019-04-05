@@ -92,16 +92,17 @@ namespace System.Text.Json
         {
             int maxLengthRequired = (escapedValue.Length * 3) + 3;
 
-            if (maxLengthRequired > DefaultGrowthSize)
-            {
-                WriteStringMinimized(escapedValue, maxLengthRequired);
-                return;
-            }
+            //if (maxLengthRequired > DefaultGrowthSize)
+            //{
+            //    WriteStringMinimized(escapedValue, maxLengthRequired);
+            //    return;
+            //}
 
             if (_buffer.Length - _buffered < maxLengthRequired)
             {
-                int minLengthRequired = escapedValue.Length + 2;
-                GrowAndEnsure(minLengthRequired, maxLengthRequired);
+                //int minLengthRequired = escapedValue.Length + 2;
+                //GrowAndEnsure(minLengthRequired, maxLengthRequired);
+                GrowAndEnsure(maxLengthRequired);
             }
 
             Span<byte> output = _buffer.Span;
@@ -126,7 +127,8 @@ namespace System.Text.Json
 
             output[idx++] = JsonConstants.Quote;
 
-            Advance(idx);
+            _buffered = idx;
+            //Advance(idx);
         }
 
         private void WriteStringIndented(ReadOnlySpan<char> escapedValue)

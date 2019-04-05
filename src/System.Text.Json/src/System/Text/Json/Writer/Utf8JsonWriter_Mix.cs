@@ -284,24 +284,31 @@ namespace System.Text.Json
             output[_buffered++] = token;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private Span<byte> GetSpan()
         {
-            if (_output != null)
+            //if (_output != null)
+            //{
+            //    if (_buffer.Length - _buffered < 2)
+            //    {
+            //        GrowAndEnsureBW(1, 2);
+            //    }
+            //    return _buffer.Span;
+            //}
+            //else
+            //{
+            //    if (_array.Length - _buffered < 2)
+            //    {
+            //        GrowAndEnsure(2);
+            //    }
+            //    return _array;
+            //}
+
+            if (_array.Length - _buffered < 2)
             {
-                if (_buffer.Length - _buffered < 2)
-                {
-                    GrowAndEnsure(1, 2);
-                }
-                return _buffer.Span;
+                GrowAndEnsure(2);
             }
-            else
-            {
-                if (_array.Length - _buffered < 2)
-                {
-                    GrowAndEnsure(2);
-                }
-                return _array;
-            }
+            return _array;
         }
 
         private void WriteStartSlow(byte token)
@@ -736,24 +743,31 @@ namespace System.Text.Json
             output[_buffered++] = token;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private Span<byte> GetSpanOne()
         {
-            if (_output != null)
+            //if (_output != null)
+            //{
+            //    if (_buffer.Length <= _buffered)
+            //    {
+            //        GrowAndEnsureBW();
+            //    }
+            //    return _buffer.Span;
+            //}
+            //else
+            //{
+            //    if (_array.Length <= _buffered)
+            //    {
+            //        GrowAndEnsure();
+            //    }
+            //    return _array;
+            //}
+
+            if (_array.Length <= _buffered)
             {
-                if (_buffer.Length <= _buffered)
-                {
-                    GrowAndEnsure();
-                }
-                return _buffer.Span;
+                GrowAndEnsure();
             }
-            else
-            {
-                if (_array.Length <= _buffered)
-                {
-                    GrowAndEnsure();
-                }
-                return _array;
-            }
+            return _array;
         }
 
         private void WriteEndSlow(byte token)
@@ -888,73 +902,70 @@ namespace System.Text.Json
             }
         }
 
+        private void GrowAndEnsureBW()
+        {
+            Debug.Assert(_output != null);
+            Flush();
+            int previousSpanLength = _buffer.Length;
+            Debug.Assert(previousSpanLength < DefaultGrowthSize);
+            _buffer = _output.GetMemory(DefaultGrowthSize);
+            if (_buffer.Length <= previousSpanLength)
+            {
+                ThrowHelper.ThrowArgumentException(ExceptionResource.FailedToGetLargerSpan);
+            }
+        }
+
         private void GrowAndEnsure()
         {
-            if (_output != null)
-            {
-                Flush();
-                int previousSpanLength = _buffer.Length;
-                Debug.Assert(previousSpanLength < DefaultGrowthSize);
-                _buffer = _output.GetMemory(DefaultGrowthSize);
-                if (_buffer.Length <= previousSpanLength)
-                {
-                    ThrowHelper.ThrowArgumentException(ExceptionResource.FailedToGetLargerSpan);
-                }
-            }
-            else
-            {
-                var newBuffer = new byte[checked(_array.Length * 2)];
+            var newBuffer = new byte[checked(_array.Length * 2)];
 
-                Buffer.BlockCopy(_array, 0, newBuffer, 0, _buffered);
+            Buffer.BlockCopy(_array, 0, newBuffer, 0, _buffered);
 
-                _array = newBuffer;
+            _array = newBuffer;
+        }
+
+        private void GrowAndEnsureBW(int minimumSize)
+        {
+            Debug.Assert(_output != null);
+            Flush();
+            Debug.Assert(minimumSize < DefaultGrowthSize);
+            _buffer = _output.GetMemory(DefaultGrowthSize);
+            if (_buffer.Length < minimumSize)
+            {
+                ThrowHelper.ThrowArgumentException(ExceptionResource.FailedToGetMinimumSizeSpan, minimumSize);
             }
         }
 
         private void GrowAndEnsure(int minimumSize)
         {
-            if (_output != null)
-            {
-                Flush();
-                Debug.Assert(minimumSize < DefaultGrowthSize);
-                _buffer = _output.GetMemory(DefaultGrowthSize);
-                if (_buffer.Length < minimumSize)
-                {
-                    ThrowHelper.ThrowArgumentException(ExceptionResource.FailedToGetMinimumSizeSpan, minimumSize);
-                }
-            }
-            else
-            {
-                int newSize = checked(_array.Length + Math.Max(minimumSize, _array.Length));
-                var newBuffer = new byte[newSize];
+            int newSize = checked(_array.Length + Math.Max(minimumSize, _array.Length));
+            var newBuffer = new byte[newSize];
 
-                Buffer.BlockCopy(_array, 0, newBuffer, 0, _buffered);
+            Buffer.BlockCopy(_array, 0, newBuffer, 0, _buffered);
 
-                _array = newBuffer;
+            _array = newBuffer;
+        }
+
+        private void GrowAndEnsureBW(int minimumSizeRequired, int maximumSizeRequired)
+        {
+            Debug.Assert(_output != null);
+            Flush();
+            Debug.Assert(maximumSizeRequired < DefaultGrowthSize);
+            _buffer = _output.GetMemory(DefaultGrowthSize);
+            if (_buffer.Length < minimumSizeRequired)
+            {
+                ThrowHelper.ThrowArgumentException(ExceptionResource.FailedToGetMinimumSizeSpan, minimumSizeRequired);
             }
         }
 
         private void GrowAndEnsure(int minimumSizeRequired, int maximumSizeRequired)
         {
-            if (_output != null)
-            {
-                Flush();
-                Debug.Assert(maximumSizeRequired < DefaultGrowthSize);
-                _buffer = _output.GetMemory(DefaultGrowthSize);
-                if (_buffer.Length < minimumSizeRequired)
-                {
-                    ThrowHelper.ThrowArgumentException(ExceptionResource.FailedToGetMinimumSizeSpan, minimumSizeRequired);
-                }
-            }
-            else
-            {
-                int newSize = checked(_array.Length + Math.Max(maximumSizeRequired, _array.Length));
-                var newBuffer = new byte[newSize];
+            int newSize = checked(_array.Length + Math.Max(maximumSizeRequired, _array.Length));
+            var newBuffer = new byte[newSize];
 
-                Buffer.BlockCopy(_array, 0, newBuffer, 0, _buffered);
+            Buffer.BlockCopy(_array, 0, newBuffer, 0, _buffered);
 
-                _array = newBuffer;
-            }
+            _array = newBuffer;
         }
 
         private void AdvanceAndGrow(ref int alreadyWritten)

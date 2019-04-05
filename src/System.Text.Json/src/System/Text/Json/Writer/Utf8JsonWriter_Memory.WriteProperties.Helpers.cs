@@ -127,6 +127,7 @@ namespace System.Text.Json
             throw new NotImplementedException();
         }
 
+        [MethodImpl(MethodImplOptions.NoInlining)]
         private int WritePropertyNameMinimized(ReadOnlySpan<byte> escapedPropertyName, byte token)
         {
             int maxLengthRequired = escapedPropertyName.Length + 5;
@@ -341,15 +342,16 @@ namespace System.Text.Json
         {
             int maxLengthRequired = (escapedPropertyName.Length * 3) + 5;
 
-            if (maxLengthRequired > DefaultGrowthSize)
-            {
-                return WritePropertyNameMinimizedSlow(escapedPropertyName, token, maxLengthRequired);
-            }
+            //if (maxLengthRequired > DefaultGrowthSize)
+            //{
+            //    return WritePropertyNameMinimizedSlow(escapedPropertyName, token, maxLengthRequired);
+            //}
 
             if (_buffer.Length - _buffered < maxLengthRequired)
             {
-                int minLengthRequired = escapedPropertyName.Length + 4;
-                GrowAndEnsure(minLengthRequired, maxLengthRequired);
+                //int minLengthRequired = escapedPropertyName.Length + 4;
+                //GrowAndEnsure(minLengthRequired, maxLengthRequired);
+                GrowAndEnsure(maxLengthRequired);
             }
 
             Span<byte> output = _buffer.Span;
@@ -377,6 +379,7 @@ namespace System.Text.Json
             output[idx++] = JsonConstants.KeyValueSeperator;
             output[idx++] = token;
 
+            _buffered = idx;
             return idx;
         }
 

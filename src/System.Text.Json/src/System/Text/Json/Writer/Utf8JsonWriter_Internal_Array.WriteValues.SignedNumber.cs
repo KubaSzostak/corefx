@@ -73,6 +73,8 @@ namespace System.Text.Json
                 GrowAndEnsure();
             }
 
+            var local = _tempMemoryField.Span;
+
             if (_currentDepth < 0)
             {
                 _rentedBuffer[_index++] = JsonConstants.ListSeparator;

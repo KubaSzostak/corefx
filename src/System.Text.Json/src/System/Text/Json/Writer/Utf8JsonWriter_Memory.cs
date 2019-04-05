@@ -263,7 +263,8 @@ namespace System.Text.Json
         {
             if (_buffer.Length - _buffered < 2)
             {
-                GrowAndEnsure(1, 2);
+                //GrowAndEnsure(1, 2);
+                GrowAndEnsure();
             }
 
             //int idx = _buffered;
@@ -441,23 +442,27 @@ namespace System.Text.Json
         private void WriteStartByOptions(ReadOnlySpan<byte> utf8PropertyName, byte token)
         {
             ValidateWritingProperty(token);
-            int idx;
             if (_writerOptions.Indented)
             {
-                idx = WritePropertyNameIndented(utf8PropertyName);
-
-                if (1 > _buffer.Length - idx)
-                {
-                    AdvanceAndGrow(ref idx, 1);
-                }
-                Span<byte> output = _buffer.Span;
-                output[idx++] = token;
+                WriteStartIndented(utf8PropertyName, token);
             }
             else
             {
-                idx = WritePropertyNameMinimized(utf8PropertyName, token);
+                _buffered = WritePropertyNameMinimized(utf8PropertyName, token);
             }
+        }
 
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private void WriteStartIndented(ReadOnlySpan<byte> utf8PropertyName, byte token)
+        {
+            int idx = WritePropertyNameIndented(utf8PropertyName);
+
+            if (1 > _buffer.Length - idx)
+            {
+                AdvanceAndGrow(ref idx, 1);
+            }
+            Span<byte> output = _buffer.Span;
+            output[idx++] = token;
             Advance(idx);
         }
 
@@ -606,24 +611,28 @@ namespace System.Text.Json
         private void WriteStartByOptions(ReadOnlySpan<char> propertyName, byte token)
         {
             ValidateWritingProperty(token);
-            int idx;
+
             if (_writerOptions.Indented)
             {
-                idx = WritePropertyNameIndented(propertyName);
-
-                if (1 > _buffer.Length - idx)
-                {
-                    AdvanceAndGrow(ref idx, 1);
-                }
-                Span<byte> output = _buffer.Span;
-                output[idx++] = token;
-
+                WriteStartIndented(propertyName, token);
             }
             else
             {
-                idx = WritePropertyNameMinimized(propertyName, token);
+                WritePropertyNameMinimized(propertyName, token);
             }
+        }
 
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private void WriteStartIndented(ReadOnlySpan<char> propertyName, byte token)
+        {
+            int idx = WritePropertyNameIndented(propertyName);
+
+            if (1 > _buffer.Length - idx)
+            {
+                AdvanceAndGrow(ref idx, 1);
+            }
+            Span<byte> output = _buffer.Span;
+            output[idx++] = token;
             Advance(idx);
         }
 
@@ -849,13 +858,13 @@ namespace System.Text.Json
         private void GrowAndEnsure()
         {
             Flush();
-            int previousSpanLength = _buffer.Length;
-            Debug.Assert(previousSpanLength < DefaultGrowthSize);
+            //int previousSpanLength = _buffer.Length;
+            Debug.Assert(_buffer.Length < DefaultGrowthSize);
             _buffer = _output.GetMemory(DefaultGrowthSize);
-            if (_buffer.Length <= previousSpanLength)
-            {
-                ThrowHelper.ThrowArgumentException(ExceptionResource.FailedToGetLargerSpan);
-            }
+            //if (_buffer.Length <= previousSpanLength)
+            //{
+            //    ThrowHelper.ThrowArgumentException(ExceptionResource.FailedToGetLargerSpan);
+            //}
         }
 
         private void GrowAndEnsure(int minimumSize)
@@ -863,10 +872,10 @@ namespace System.Text.Json
             Flush();
             Debug.Assert(minimumSize < DefaultGrowthSize);
             _buffer = _output.GetMemory(DefaultGrowthSize);
-            if (_buffer.Length < minimumSize)
-            {
-                ThrowHelper.ThrowArgumentException(ExceptionResource.FailedToGetMinimumSizeSpan, minimumSize);
-            }
+            //if (_buffer.Length < minimumSize)
+            //{
+            //    ThrowHelper.ThrowArgumentException(ExceptionResource.FailedToGetMinimumSizeSpan, minimumSize);
+            //}
         }
 
         private void GrowAndEnsure(int minimumSizeRequired, int maximumSizeRequired)
@@ -874,10 +883,10 @@ namespace System.Text.Json
             Flush();
             Debug.Assert(maximumSizeRequired < DefaultGrowthSize);
             _buffer = _output.GetMemory(DefaultGrowthSize);
-            if (_buffer.Length < minimumSizeRequired)
-            {
-                ThrowHelper.ThrowArgumentException(ExceptionResource.FailedToGetMinimumSizeSpan, minimumSizeRequired);
-            }
+            //if (_buffer.Length < minimumSizeRequired)
+            //{
+            //    ThrowHelper.ThrowArgumentException(ExceptionResource.FailedToGetMinimumSizeSpan, minimumSizeRequired);
+            //}
         }
 
         private void AdvanceAndGrow(ref int alreadyWritten)

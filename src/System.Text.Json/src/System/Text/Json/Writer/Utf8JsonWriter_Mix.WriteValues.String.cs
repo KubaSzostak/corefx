@@ -258,27 +258,35 @@ namespace System.Text.Json
             Advance(idx);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private Span<byte> GetSpanValue(int maxLengthRequired, int escapedPropertyNameLength)
         {
-            if (_output != null)
-            {
-                if (_buffer.Length - _buffered < maxLengthRequired)
-                {
-                    int minLengthRequired = escapedPropertyNameLength + 2;
-                    GrowAndEnsure(minLengthRequired, maxLengthRequired);
-                }
+            //if (_output != null)
+            //{
+            //    if (_buffer.Length - _buffered < maxLengthRequired)
+            //    {
+            //        int minLengthRequired = escapedPropertyNameLength + 2;
+            //        GrowAndEnsureBW(minLengthRequired, maxLengthRequired);
+            //    }
 
-                return _buffer.Span;
-            }
-            else
-            {
-                if (_array.Length - _buffered < maxLengthRequired)
-                {
-                    GrowAndEnsure(maxLengthRequired);
-                }
+            //    return _buffer.Span;
+            //}
+            //else
+            //{
+            //    if (_array.Length - _buffered < maxLengthRequired)
+            //    {
+            //        GrowAndEnsure(maxLengthRequired);
+            //    }
 
-                return _array;
+            //    return _array;
+            //}
+
+            if (_array.Length - _buffered < maxLengthRequired)
+            {
+                GrowAndEnsure(maxLengthRequired);
             }
+
+            return _array;
         }
 
         private void WriteStringIndented(ReadOnlySpan<byte> escapedValue)

@@ -55,8 +55,9 @@ namespace System.Text.Json
 
             if (_buffer.Length - _buffered < maxLengthRequired)
             {
-                int minLengthRequired = 1;
-                GrowAndEnsure(minLengthRequired, maxLengthRequired);
+                //int minLengthRequired = 1;
+                //GrowAndEnsure(minLengthRequired, maxLengthRequired);
+                GrowAndEnsure();
             }
 
             Span<byte> output = _buffer.Span;
@@ -72,7 +73,8 @@ namespace System.Text.Json
 
             idx += bytesWritten;
 
-            Advance(idx);
+            //Advance(idx);
+            _buffered = idx;
         }
 
         private void WriteNumberValueIndented(long value)

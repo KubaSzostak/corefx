@@ -5,6 +5,7 @@
 using System.Buffers;
 using System.Buffers.Text;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 
 namespace System.Text.Json
 {
@@ -69,27 +70,35 @@ namespace System.Text.Json
             Advance(idx);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private Span<byte> GetSpan(int maxLengthRequired)
         {
-            if (_output != null)
-            {
-                if (_buffer.Length - _buffered < maxLengthRequired)
-                {
-                    int minLengthRequired = 1;
-                    GrowAndEnsure(minLengthRequired, maxLengthRequired);
-                }
+            //if (_output != null)
+            //{
+            //    if (_buffer.Length - _buffered < maxLengthRequired)
+            //    {
+            //        int minLengthRequired = 1;
+            //        GrowAndEnsureBW(minLengthRequired, maxLengthRequired);
+            //    }
 
-                return _buffer.Span;
-            }
-            else
-            {
-                if (_array.Length - _buffered < maxLengthRequired)
-                {
-                    GrowAndEnsure(maxLengthRequired);
-                }
+            //    return _buffer.Span;
+            //}
+            //else
+            //{
+            //    if (_array.Length - _buffered < maxLengthRequired)
+            //    {
+            //        GrowAndEnsure(maxLengthRequired);
+            //    }
 
-                return _array;
+            //    return _array;
+            //}
+
+            if (_array.Length - _buffered < maxLengthRequired)
+            {
+                GrowAndEnsure(maxLengthRequired);
             }
+
+            return _array;
         }
 
         private void WriteNumberValueIndented(long value)
