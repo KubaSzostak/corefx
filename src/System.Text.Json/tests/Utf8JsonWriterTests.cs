@@ -6,6 +6,7 @@ using Xunit;
 using System.IO;
 using Newtonsoft.Json;
 using System.Globalization;
+using System.Threading.Tasks;
 
 namespace System.Text.Json.Tests
 {
@@ -852,6 +853,142 @@ namespace System.Text.Json.Tests
                 Assert.True(false, "Expected InvalidOperationException to be thrown for depth >= 1000.");
             }
             catch (InvalidOperationException) { }
+
+            output.Dispose();
+        }
+
+        [Fact]
+        public void WriteLargeSyncIBW()
+        {
+            using var output = new ArrayBufferWriter<byte>();
+
+            var jsonUtf8 = new Utf8JsonWriter_Final(output, new JsonWriterOptions { Indented = false, SkipValidation = true });
+            byte[] utf8String = Encoding.UTF8.GetBytes("some string 1234");
+
+            //jsonUtf8.WriteStartArray();
+            //for (int i = 0; i < 200_000_000; i++)
+            //{
+            //    jsonUtf8.WriteStringValue(utf8String);  // integer overflow/OOM
+            //}
+            //jsonUtf8.WriteEndArray();
+            //jsonUtf8.Flush(isFinalBlock: true);
+
+            const int SyncWriteThreshold = 1_000_000;
+
+            jsonUtf8.WriteStartArray();
+            for (int i = 0; i < 200_000_000; i++)
+            {
+                jsonUtf8.WriteStringValue(utf8String);
+                if (jsonUtf8.BytesWritten > SyncWriteThreshold)
+                {
+                    jsonUtf8.Flush(isFinalBlock: false);
+                    // Write to some output stream, or advance pipe forward, etc.
+                    output.Clear();
+                    jsonUtf8.Clear(); // or reset, refresh, etc.
+                }
+            }
+            jsonUtf8.WriteEndArray();
+            jsonUtf8.Flush(isFinalBlock: true);
+        }
+
+        [Fact]
+        public void WriteLargeSyncStreamOverIBW()
+        {
+            const int SyncWriteThreshold = 1_000_000;
+
+            //using var stream = new MemoryStream();
+            //using var output = new ArrayBufferWriter<byte>();
+
+            //var jsonUtf8 = new Utf8JsonWriter_Final(output, new JsonWriterOptions { Indented = false, SkipValidation = true });
+            //byte[] utf8String = Encoding.UTF8.GetBytes("some string 1234");
+
+            //jsonUtf8.WriteStartArray();
+            //for (int i = 0; i < 200_000_000; i++)
+            //{
+            //    jsonUtf8.WriteStringValue(utf8String);
+            //    if (jsonUtf8.BytesWritten > SyncWriteThreshold)
+            //    {
+            //        jsonUtf8.Flush(isFinalBlock: false);
+            //        stream.Write(output.WrittenMemory.Span);
+            //        output.Clear();
+            //        jsonUtf8.Clear(); // or reset, refresh, etc.
+            //    }
+            //}
+            //jsonUtf8.WriteEndArray();
+            //jsonUtf8.Flush(isFinalBlock: true);
+
+            //stream.Write(output.WrittenMemory.Span);
+
+
+
+            string filePath = @"C:\Users\ahkha\Desktop\Temporary\WritingJson\output.json";
+            using var stream = new FileStream(filePath, FileMode.OpenOrCreate);
+
+            using var output = new ArrayBufferWriter<byte>();
+
+            var jsonUtf8 = new Utf8JsonWriter_Final(output, new JsonWriterOptions { Indented = false, SkipValidation = true });
+            byte[] utf8String = Encoding.UTF8.GetBytes("some string 1234");
+
+            jsonUtf8.WriteStartArray();
+            for (int i = 0; i < 200_000_000; i++)
+            {
+                jsonUtf8.WriteStringValue(utf8String);
+                if (jsonUtf8.BytesWritten > SyncWriteThreshold)
+                {
+                    jsonUtf8.Flush(isFinalBlock: false);
+                    stream.Write(output.WrittenMemory.Span);
+                    output.Clear();
+                    jsonUtf8.Clear(); // or reset, refresh, etc.
+                }
+            }
+            jsonUtf8.WriteEndArray();
+            jsonUtf8.Flush(isFinalBlock: true);
+
+            stream.Write(output.WrittenMemory.Span);
+            stream.Flush();
+            Assert.Equal(0, output.Capacity);
+        }
+
+        [Fact]
+        public async Task WriteLargeAsyncStreamOverIBW()
+        {
+            using var output = new ArrayBufferWriter<byte>();
+            using var stream = new MemoryStream();
+
+            var jsonUtf8 = new Utf8JsonWriter_Final(output, new JsonWriterOptions { Indented = false, SkipValidation = true });
+            byte[] utf8String = Encoding.UTF8.GetBytes("some string 1234");
+
+            jsonUtf8.WriteStartArray();
+            for (int i = 0; i < 100_000_000; i++)
+            {
+                jsonUtf8.WriteStringValue(utf8String);
+            }
+            jsonUtf8.WriteEndArray();
+            jsonUtf8.Flush(isFinalBlock: true);
+
+            Assert.Equal(1_000_000, output.WrittenMemory.Length);
+            await stream.WriteAsync(output.WrittenMemory);
+
+            output.Dispose();
+        }
+
+        [Fact]
+        public void WriteLargeSyncStream()
+        {
+            var output = new ArrayBufferWriter<byte>();
+
+            var jsonUtf8 = new Utf8JsonWriter_Final(output, new JsonWriterOptions { Indented = false, SkipValidation = true });
+            byte[] utf8String = Encoding.UTF8.GetBytes("some string 1234");
+
+            jsonUtf8.WriteStartArray();
+            for (int i = 0; i < 100_000_000; i++)
+            {
+                jsonUtf8.WriteStringValue(utf8String);
+            }
+            jsonUtf8.WriteEndArray();
+            jsonUtf8.Flush(isFinalBlock: true);
+
+            Assert.Equal(1_000_000, output.WrittenMemory.Length);
 
             output.Dispose();
         }
