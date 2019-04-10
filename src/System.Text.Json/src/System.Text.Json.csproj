@@ -150,6 +150,13 @@
     <Compile Include="System\Text\Json\Writer\Utf8JsonWriter_Memory.WriteValues.Helpers.cs" />
     <Compile Include="System\Text\Json\Writer\Utf8JsonWriter_Memory.WriteValues.SignedNumber.cs" />
     <Compile Include="System\Text\Json\Writer\Utf8JsonWriter_Memory.WriteValues.String.cs" />
+    <Compile Include="System\Text\Json\Writer\Utf8JsonWriter_Final.cs" />
+    <Compile Include="System\Text\Json\Writer\Utf8JsonWriter_Final.WriteProperties.Helpers.cs" />
+    <Compile Include="System\Text\Json\Writer\Utf8JsonWriter_Final.WriteProperties.SignedNumber.cs" />
+    <Compile Include="System\Text\Json\Writer\Utf8JsonWriter_Final.WriteProperties.String.cs" />
+    <Compile Include="System\Text\Json\Writer\Utf8JsonWriter_Final.WriteValues.Helpers.cs" />
+    <Compile Include="System\Text\Json\Writer\Utf8JsonWriter_Final.WriteValues.SignedNumber.cs" />
+    <Compile Include="System\Text\Json\Writer\Utf8JsonWriter_Final.WriteValues.String.cs" />
     <Compile Include="System\Text\Json\Writer\Utf8JsonWriter_Memory_TryGet.cs" />
     <Compile Include="System\Text\Json\Writer\Utf8JsonWriter_Memory_TryGet.WriteProperties.Helpers.cs" />
     <Compile Include="System\Text\Json\Writer\Utf8JsonWriter_Memory_TryGet.WriteProperties.SignedNumber.cs" />
