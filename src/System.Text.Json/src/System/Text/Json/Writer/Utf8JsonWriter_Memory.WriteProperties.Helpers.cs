@@ -127,7 +127,7 @@ namespace System.Text.Json
             throw new NotImplementedException();
         }
 
-        [MethodImpl(MethodImplOptions.NoInlining)]
+        //[MethodImpl(MethodImplOptions.NoInlining)]
         private int WritePropertyNameMinimized(ReadOnlySpan<byte> escapedPropertyName, byte token)
         {
             int maxLengthRequired = escapedPropertyName.Length + 5;

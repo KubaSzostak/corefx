@@ -38,7 +38,7 @@ namespace System.Text.Json
         private JsonTokenType _tokenType;
         private readonly JsonWriterOptions _writerOptions;
         private BitStack _bitStack;
-        private readonly Memory<byte> _tempMemoryField;
+        //private readonly Memory<byte> _tempMemoryField;
 
         // The highest order bit of _currentDepth is used to discern whether we are writing the first item in a list or not.
         // if (_currentDepth >> 31) == 1, add a list separator before writing the item
@@ -88,7 +88,7 @@ namespace System.Text.Json
 
             _currentDepth = state._currentDepth;
 
-            _tempMemoryField = _rentedBuffer;
+            //_tempMemoryField = _rentedBuffer;
         }
 
         public void Flush(Stream stream, bool isFinalBlock = true)
@@ -180,7 +180,7 @@ namespace System.Text.Json
                 GrowAndEnsure();
             }
 
-            var local = _tempMemoryField.Span;
+            //var local = _tempMemoryField.Span;
 
             if (_currentDepth < 0)
             {
@@ -619,7 +619,7 @@ namespace System.Text.Json
             {
                 GrowAndEnsure();
             }
-            var local = _tempMemoryField.Span;
+            //var local = _tempMemoryField.Span;
             _rentedBuffer[_index++] = token;
         }
 

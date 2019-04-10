@@ -160,32 +160,32 @@ namespace System.Text.Json
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private Span<byte> GetSpan(int maxLengthRequired, int escapedPropertyNameLength)
         {
-            //if (_output != null)
-            //{
-            //    if (_buffer.Length - _buffered < maxLengthRequired)
-            //    {
-            //        int minLengthRequired = escapedPropertyNameLength + 4;
-            //        GrowAndEnsureBW(minLengthRequired, maxLengthRequired);
-            //    }
-
-            //    return _buffer.Span;
-            //}
-            //else
-            //{
-            //    if (_array.Length - _buffered < maxLengthRequired)
-            //    {
-            //        GrowAndEnsure(maxLengthRequired);
-            //    }
-
-            //    return _array;
-            //}
-
-            if (_array.Length - _buffered < maxLengthRequired)
+            if (_output != null)
             {
-                GrowAndEnsure(maxLengthRequired);
+                if (_buffer.Length - _buffered < maxLengthRequired)
+                {
+                    int minLengthRequired = escapedPropertyNameLength + 4;
+                    GrowAndEnsureBW(minLengthRequired, maxLengthRequired);
+                }
+
+                return _buffer.Span;
+            }
+            else
+            {
+                if (_array.Length - _buffered < maxLengthRequired)
+                {
+                    GrowAndEnsure(maxLengthRequired);
+                }
+
+                return _array;
             }
 
-            return _array;
+            //if (_array.Length - _buffered < maxLengthRequired)
+            //{
+            //    GrowAndEnsure(maxLengthRequired);
+            //}
+
+            //return _array;
         }
 
         private int WritePropertyNameIndented(ReadOnlySpan<byte> escapedPropertyName)

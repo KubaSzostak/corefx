@@ -287,28 +287,28 @@ namespace System.Text.Json
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private Span<byte> GetSpan()
         {
-            //if (_output != null)
-            //{
-            //    if (_buffer.Length - _buffered < 2)
-            //    {
-            //        GrowAndEnsureBW(1, 2);
-            //    }
-            //    return _buffer.Span;
-            //}
-            //else
-            //{
-            //    if (_array.Length - _buffered < 2)
-            //    {
-            //        GrowAndEnsure(2);
-            //    }
-            //    return _array;
-            //}
-
-            if (_array.Length - _buffered < 2)
+            if (_output != null)
             {
-                GrowAndEnsure(2);
+                if (_buffer.Length - _buffered < 2)
+                {
+                    GrowAndEnsureBW(1, 2);
+                }
+                return _buffer.Span;
             }
-            return _array;
+            else
+            {
+                if (_array.Length - _buffered < 2)
+                {
+                    GrowAndEnsure(2);
+                }
+                return _array;
+            }
+
+            //if (_array.Length - _buffered < 2)
+            //{
+            //    GrowAndEnsure(2);
+            //}
+            //return _array;
         }
 
         private void WriteStartSlow(byte token)
@@ -746,28 +746,22 @@ namespace System.Text.Json
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private Span<byte> GetSpanOne()
         {
-            //if (_output != null)
-            //{
-            //    if (_buffer.Length <= _buffered)
-            //    {
-            //        GrowAndEnsureBW();
-            //    }
-            //    return _buffer.Span;
-            //}
-            //else
-            //{
-            //    if (_array.Length <= _buffered)
-            //    {
-            //        GrowAndEnsure();
-            //    }
-            //    return _array;
-            //}
-
-            if (_array.Length <= _buffered)
+            if (_output != null)
             {
-                GrowAndEnsure();
+                if (_buffer.Length <= _buffered)
+                {
+                    GrowAndEnsureBW();
+                }
+                return _buffer.Span;
             }
-            return _array;
+            else
+            {
+                if (_array.Length <= _buffered)
+                {
+                    GrowAndEnsure();
+                }
+                return _array;
+            }
         }
 
         private void WriteEndSlow(byte token)

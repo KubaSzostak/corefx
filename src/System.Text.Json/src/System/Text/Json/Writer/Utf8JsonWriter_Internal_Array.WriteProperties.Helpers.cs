@@ -84,7 +84,7 @@ namespace System.Text.Json
             _rentedBuffer[_index++] = JsonConstants.KeyValueSeperator;
         }
 
-        [MethodImpl(MethodImplOptions.NoInlining)]
+        //[MethodImpl(MethodImplOptions.NoInlining)]
         private void WritePropertyNameMinimized(ReadOnlySpan<byte> escapedPropertyName, byte token)
         {
             int maxLengthRequired = escapedPropertyName.Length + 5;
@@ -94,7 +94,7 @@ namespace System.Text.Json
                 GrowAndEnsure(maxLengthRequired);
             }
 
-            var local = _tempMemoryField.Span;
+            //var local = _tempMemoryField.Span;
 
             if (_currentDepth < 0)
             {
@@ -217,7 +217,7 @@ namespace System.Text.Json
                 GrowAndEnsure(maxLengthRequired);
             }
 
-            var local = _tempMemoryField.Span;
+            //var local = _tempMemoryField.Span;
 
             if (_currentDepth < 0)
             {
