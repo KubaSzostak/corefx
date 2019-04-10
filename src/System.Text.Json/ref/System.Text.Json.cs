@@ -375,6 +375,46 @@ namespace System.Text.Json
         public void WriteStringValue(System.ReadOnlySpan<char> value, bool escape = true) { }
         public void WriteStringValue(string value, bool escape = true) { }
     }
+    public partial class Utf8JsonWriter_Memory_TryGet
+    {
+        public Utf8JsonWriter_Memory_TryGet(System.Buffers.IBufferWriter<byte> bufferWriter, System.Text.Json.JsonWriterState state = default(System.Text.Json.JsonWriterState)) { throw null; }
+        public long BytesCommitted { get { throw null; } }
+        public long BytesWritten { get { throw null; } }
+        public int CurrentDepth { get { throw null; } }
+        public void Clear() { }
+        public void Flush(bool isFinalBlock = true) { }
+        public System.Text.Json.JsonWriterState GetCurrentState() { throw null; }
+        public void WriteEndArray() { }
+        public void WriteEndObject() { }
+        public void WriteNumber(System.ReadOnlySpan<char> propertyName, int value, bool escape = true) { }
+        public void WriteNumber(System.ReadOnlySpan<char> propertyName, long value, bool escape = true) { }
+        public void WriteNumber(System.ReadOnlySpan<byte> utf8PropertyName, int value, bool escape = true) { }
+        public void WriteNumber(System.ReadOnlySpan<byte> utf8PropertyName, long value, bool escape = true) { }
+        public void WriteNumber(string propertyName, int value, bool escape = true) { }
+        public void WriteNumber(string propertyName, long value, bool escape = true) { }
+        public void WriteNumberValue(int value) { }
+        public void WriteNumberValue(long value) { }
+        public void WriteStartArray() { }
+        public void WriteStartArray(System.ReadOnlySpan<byte> utf8PropertyName, bool escape = true) { }
+        public void WriteStartArray(System.ReadOnlySpan<char> propertyName, bool escape = true) { }
+        public void WriteStartArray(string propertyName, bool escape = true) { }
+        public void WriteStartObject() { }
+        public void WriteStartObject(System.ReadOnlySpan<byte> utf8PropertyName, bool escape = true) { }
+        public void WriteStartObject(System.ReadOnlySpan<char> propertyName, bool escape = true) { }
+        public void WriteStartObject(string propertyName, bool escape = true) { }
+        public void WriteString(System.ReadOnlySpan<byte> utf8PropertyName, System.ReadOnlySpan<byte> utf8Value, bool escape = true) { }
+        public void WriteString(System.ReadOnlySpan<byte> utf8PropertyName, System.ReadOnlySpan<char> value, bool escape = true) { }
+        public void WriteString(System.ReadOnlySpan<byte> utf8PropertyName, string value, bool escape = true) { }
+        public void WriteString(System.ReadOnlySpan<char> propertyName, System.ReadOnlySpan<byte> utf8Value, bool escape = true) { }
+        public void WriteString(System.ReadOnlySpan<char> propertyName, System.ReadOnlySpan<char> value, bool escape = true) { }
+        public void WriteString(System.ReadOnlySpan<char> propertyName, string value, bool escape = true) { }
+        public void WriteString(string propertyName, System.ReadOnlySpan<byte> utf8Value, bool escape = true) { }
+        public void WriteString(string propertyName, System.ReadOnlySpan<char> value, bool escape = true) { }
+        public void WriteString(string propertyName, string value, bool escape = true) { }
+        public void WriteStringValue(System.ReadOnlySpan<byte> utf8Value, bool escape = true) { }
+        public void WriteStringValue(System.ReadOnlySpan<char> value, bool escape = true) { }
+        public void WriteStringValue(string value, bool escape = true) { }
+    }
     public partial class Utf8JsonWriter_Mix
     {
         public Utf8JsonWriter_Mix(System.Buffers.IBufferWriter<byte> bufferWriter, System.Text.Json.JsonWriterState state = default(System.Text.Json.JsonWriterState)) { throw null; }
