@@ -91,7 +91,10 @@ namespace System.Buffers.Tests
                 WriteData(output, 2);
                 ReadOnlyMemory<T> previousMemory = output.WrittenMemory;
                 ReadOnlySpan<T> previousSpan = output.WrittenSpan;
-                Assert.True(previousSpan.SequenceEqual(previousMemory.Span));
+                string errorMessage = $"Span Length: {previousSpan.Length}, Memory Length: {previousMemory.Length}, " +
+                    $"MemorySpan Length: {previousMemory.Span.Length}, Span Value @ index 0, last: {previousSpan[0]}, {previousSpan[previousSpan.Length - 1]}, " +
+                    $"Memory Span Value @ index 0, last: {previousMemory.Span[0]}, {previousMemory.Span[previousMemory.Length - 1]}";
+                Assert.True(previousSpan.SequenceEqual(previousMemory.Span), errorMessage);
                 output.Advance(10);
                 Assert.False(previousMemory.Span.SequenceEqual(output.WrittenMemory.Span));
                 Assert.False(previousSpan.SequenceEqual(output.WrittenSpan));
