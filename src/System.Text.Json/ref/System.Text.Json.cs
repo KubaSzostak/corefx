@@ -162,6 +162,8 @@ namespace System.Text.Json
         private int _dummyPrimitive;
         public bool Indented { get { throw null; } set { } }
         public bool SkipValidation { get { throw null; } set { } }
+        [System.CLSCompliantAttribute(false)]
+        public System.Text.Encodings.Web.JavaScriptEncoder Encoder { get { throw null; } set { } }
     }
     public sealed class JsonEncodedText : IEquatable<JsonEncodedText>
     {
@@ -176,6 +178,10 @@ namespace System.Text.Json
         public JsonEncodedText(ReadOnlySpan<byte> utf8Value, System.Text.Encodings.Web.JavaScriptEncoder encoder) { throw null; }
         public byte[] EncodedUtf8String { get { throw null; } }
         public string EncodedString { get { throw null; } }
+        [CLSCompliant(false)]
+        public System.Text.Encodings.Web.JavaScriptEncoder Encoder { get { throw null; } }
+        [CLSCompliant(false)]
+        public bool IsAlreadyEncoded(System.Text.Encodings.Web.JavaScriptEncoder encoder) { throw null; }
         public bool Equals(JsonEncodedText other) { throw null; }
         public override string ToString() { throw null; }
     }
@@ -281,8 +287,8 @@ namespace System.Text.Json
         public void WriteNumber(string propertyName, ulong value) { }
         //public void WriteNumber(JsonEncodedText propertyName, decimal value) { }
         //public void WriteNumber(JsonEncodedText propertyName, double value) { }
-        //public void WriteNumber(JsonEncodedText propertyName, int value) { }
-        //public void WriteNumber(JsonEncodedText propertyName, long value) { }
+        public void WriteNumber(JsonEncodedText propertyName, int value) { }
+        public void WriteNumber(JsonEncodedText propertyName, long value) { }
         //public void WriteNumber(JsonEncodedText propertyName, float value) { }
         //[System.CLSCompliantAttribute(false)]
         //public void WriteNumber(JsonEncodedText propertyName, uint value) { }

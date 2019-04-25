@@ -151,6 +151,9 @@
     <Compile Include="System\Text\Encodings\Web\UnicodeRanges.generated.cs" />
     <Compile Include="System\Text\Encodings\Web\UrlEncoder.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\unicode8definedcharacters.bin" />
+  </ItemGroup>
   <ItemGroup Condition="'$(TargetsNETStandard)' == 'true'">
     <!-- Common or Common-branched source files -->
     <Compile Include="$(CommonPath)\System\Buffers\ArrayBufferWriter.cs">

@@ -6,6 +6,7 @@ using System.Buffers;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.CompilerServices;
+using System.Text.Encodings.Web;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -111,6 +112,11 @@ namespace System.Text.Json
             _isNotPrimitive = default;
             _tokenType = default;
             _currentDepth = default;
+
+            if (options.Encoder == null)
+            {
+                options.Encoder = JavaScriptEncoder.Default;
+            }
             Options = options;
 
             // Only allocate if the user writes a JSON payload beyond the depth that the _allocationFreeContainer can handle.
@@ -147,6 +153,11 @@ namespace System.Text.Json
             _isNotPrimitive = default;
             _tokenType = default;
             _currentDepth = default;
+
+            if (options.Encoder == null)
+            {
+                options.Encoder = JavaScriptEncoder.Default;
+            }
             Options = options;
 
             // Only allocate if the user writes a JSON payload beyond the depth that the _allocationFreeContainer can handle.
@@ -671,7 +682,16 @@ namespace System.Text.Json
             => WriteStartArray(propertyName.AsSpan());
 
         public void WriteStartArray(JsonEncodedText propertyName)
-            => WriteStartHelper(propertyName.EncodedUtf8String, JsonConstants.OpenBracket);
+        {
+            if (propertyName.IsAlreadyEncoded(Options.Encoder))
+            {
+                WriteStartHelper(propertyName.EncodedUtf8String, JsonConstants.OpenBracket);
+            }
+            else
+            {
+                WriteStartArray(propertyName.EncodedUtf8String);
+            }
+        }
 
         private void WriteStartHelper(ReadOnlySpan<byte> utf8PropertyName, byte token)
         {
@@ -705,7 +725,16 @@ namespace System.Text.Json
             => WriteStartObject(propertyName.AsSpan());
 
         public void WriteStartObject(JsonEncodedText propertyName)
-            => WriteStartHelper(propertyName.EncodedUtf8String, JsonConstants.OpenBracket);
+        {
+            if (propertyName.IsAlreadyEncoded(Options.Encoder))
+            {
+                WriteStartHelper(propertyName.EncodedUtf8String, JsonConstants.OpenBrace);
+            }
+            else
+            {
+                WriteStartObject(propertyName.EncodedUtf8String);
+            }
+        }
 
         /// <summary>
         /// Writes the beginning of a JSON array with a property name as the key.

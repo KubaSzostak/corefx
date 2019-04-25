@@ -2,6 +2,8 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using System.Text.Encodings.Web;
+
 namespace System.Text.Json
 {
     /// <summary>
@@ -13,6 +15,7 @@ namespace System.Text.Json
     public struct JsonWriterOptions
     {
         private int _optionsMask;
+        private JavaScriptEncoder _encoder;
 
         /// <summary>
         /// Defines whether the <see cref="Utf8JsonWriter"/> should pretty print the JSON which includes:
@@ -58,6 +61,19 @@ namespace System.Text.Json
                     _optionsMask |= SkipValidationBit;
                 else
                     _optionsMask &= ~SkipValidationBit;
+            }
+        }
+
+        [CLSCompliantAttribute(false)]
+        public JavaScriptEncoder Encoder
+        {
+            get
+            {
+                return _encoder;
+            }
+            set
+            {
+                _encoder = value ?? throw new ArgumentNullException(nameof(value));
             }
         }
 

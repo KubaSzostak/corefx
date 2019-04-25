@@ -20,7 +20,16 @@ namespace System.Text.Json
         /// Thrown if this would result in an invalid JSON to be written (while validation is enabled).
         /// </exception>
         public void WriteStringValue(JsonEncodedText value)
-           => WriteStringValueHelper(value.EncodedUtf8String);
+        {
+            if (value.IsAlreadyEncoded(Options.Encoder))
+            {
+                WriteStringValueHelper(value.EncodedUtf8String);
+            }
+            else
+            {
+                WriteStringValue(value.EncodedUtf8String);
+            }
+        }
 
         private void WriteStringValueHelper(ReadOnlySpan<byte> utf8Value)
         {

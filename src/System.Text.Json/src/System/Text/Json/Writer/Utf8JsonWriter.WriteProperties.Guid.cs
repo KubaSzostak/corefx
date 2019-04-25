@@ -31,7 +31,16 @@ namespace System.Text.Json
             => WriteString(propertyName.AsSpan(), value);
 
         public void WriteString(JsonEncodedText propertyName, Guid value)
-            => WriteStringHelper(propertyName.EncodedUtf8String, value);
+        {
+            if (propertyName.IsAlreadyEncoded(Options.Encoder))
+            {
+                WriteStringHelper(propertyName.EncodedUtf8String, value);
+            }
+            else
+            {
+                WriteString(propertyName.EncodedUtf8String, value);
+            }
+        }
 
         private void WriteStringHelper(ReadOnlySpan<byte> utf8PropertyName, Guid value)
         {

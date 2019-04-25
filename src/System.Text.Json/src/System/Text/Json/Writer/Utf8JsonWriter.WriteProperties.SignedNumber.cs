@@ -30,6 +30,30 @@ namespace System.Text.Json
         public void WriteNumber(string propertyName, long value)
             => WriteNumber(propertyName.AsSpan(), value);
 
+        public void WriteNumber(JsonEncodedText propertyName, long value)
+        {
+            if (propertyName.IsAlreadyEncoded(Options.Encoder))
+            {
+                WriteNumberHelper(propertyName.EncodedUtf8String, value);
+            }
+            else
+            {
+                WriteNumber(propertyName.EncodedUtf8String, value);
+            }
+        }
+
+        private void WriteNumberHelper(ReadOnlySpan<byte> utf8PropertyName, long value)
+        {
+            Debug.Assert(utf8PropertyName.Length <= JsonConstants.MaxTokenSize);
+
+            Debug.Assert(JsonWriterHelper.NeedsEscaping(utf8PropertyName) == -1);
+
+            WriteNumberByOptions(utf8PropertyName, value);
+
+            SetFlagToAddListSeparatorBeforeNextItem();
+            _tokenType = JsonTokenType.Number;
+        }
+
         /// <summary>
         /// Writes the property name and <see cref="long"/> value (as a JSON number) as part of a name/value pair of a JSON object.
         /// </summary>
@@ -103,6 +127,9 @@ namespace System.Text.Json
         /// </remarks>
         public void WriteNumber(string propertyName, int value)
             => WriteNumber(propertyName.AsSpan(), (long)value);
+
+        public void WriteNumber(JsonEncodedText propertyName, int value)
+            => WriteNumber(propertyName, (long)value);
 
         /// <summary>
         /// Writes the property name and <see cref="int"/> value (as a JSON number) as part of a name/value pair of a JSON object.

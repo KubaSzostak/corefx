@@ -19,6 +19,9 @@ namespace System.Text.Json
 
         public string EncodedString => _value;  // OR ROS<char>?
 
+        [CLSCompliant(false)]
+        public JavaScriptEncoder Encoder => _encoder;
+
         // Reject any invalid UTF-8 data rather than silently replacing.
         private static readonly UTF8Encoding s_utf8Encoding = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false, throwOnInvalidBytes: true);
 
@@ -268,6 +271,30 @@ namespace System.Text.Json
             }
 
             return escapedString;
+        }
+
+        [CLSCompliant(false)]
+        public bool IsAlreadyEncoded(JavaScriptEncoder encoder)
+        {
+            if (encoder == _encoder)
+            {
+                return true;
+            }
+
+            unsafe
+            {
+                fixed (char* strPtr = _value)
+                {
+                    int idx = _encoder.FindFirstCharacterToEncode(strPtr, _value.Length);
+
+                    if (idx != -1)
+                    {
+                        return _value.Equals(_encoder.Encode(_value));
+                    }
+                }
+            }
+
+            return true;
         }
 
         public bool Equals(JsonEncodedText other)

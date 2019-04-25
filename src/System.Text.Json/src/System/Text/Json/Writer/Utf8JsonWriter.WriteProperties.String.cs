@@ -40,7 +40,16 @@ namespace System.Text.Json
         /// Thrown if this would result in an invalid JSON to be written (while validation is enabled).
         /// </exception>
         public void WriteString(JsonEncodedText propertyName, JsonEncodedText value)
-            => WriteStringHelper(propertyName.EncodedUtf8String, value.EncodedUtf8String);
+        {
+            if (propertyName.IsAlreadyEncoded(Options.Encoder) && value.IsAlreadyEncoded(Options.Encoder))
+            {
+                WriteStringHelper(propertyName.EncodedUtf8String, value.EncodedUtf8String);
+            }
+            else
+            {
+                WriteString(propertyName.EncodedUtf8String, value.EncodedUtf8String);
+            }
+        }
 
         private void WriteStringHelper(ReadOnlySpan<byte> utf8PropertyName, ReadOnlySpan<byte> utf8Value)
         {
