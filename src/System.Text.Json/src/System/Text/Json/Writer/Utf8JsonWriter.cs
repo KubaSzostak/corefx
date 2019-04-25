@@ -670,6 +670,23 @@ namespace System.Text.Json
         public void WriteStartArray(string propertyName)
             => WriteStartArray(propertyName.AsSpan());
 
+        public void WriteStartArray(JsonEncodedText propertyName)
+            => WriteStartHelper(propertyName.EncodedUtf8String, JsonConstants.OpenBracket);
+
+        private void WriteStartHelper(ReadOnlySpan<byte> utf8PropertyName, byte token)
+        {
+            ValidatePropertyNameAndDepth(utf8PropertyName);
+
+            Debug.Assert(JsonWriterHelper.NeedsEscaping(utf8PropertyName) == -1);
+
+            WriteStartByOptions(utf8PropertyName, token);
+
+            _currentDepth &= JsonConstants.RemoveFlagsBitMask;
+            _currentDepth++;
+            _isNotPrimitive = true;
+            _tokenType = JsonTokenType.StartArray;
+        }
+
         /// <summary>
         /// Writes the beginning of a JSON object with a property name as the key.
         /// </summary>
@@ -686,6 +703,9 @@ namespace System.Text.Json
         /// </exception>
         public void WriteStartObject(string propertyName)
             => WriteStartObject(propertyName.AsSpan());
+
+        public void WriteStartObject(JsonEncodedText propertyName)
+            => WriteStartHelper(propertyName.EncodedUtf8String, JsonConstants.OpenBracket);
 
         /// <summary>
         /// Writes the beginning of a JSON array with a property name as the key.

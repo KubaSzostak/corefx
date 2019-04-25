@@ -29,6 +29,33 @@ namespace System.Text.Json
             => WriteString(propertyName.AsSpan(), value.AsSpan());
 
         /// <summary>
+        /// Writes the pre-encoded property name and string text value (as a JSON string) as part of a name/value pair of a JSON object.
+        /// </summary>
+        /// <param name="propertyName">The JSON encoded property name of the JSON object to be transcoded and written as UTF-8.</param>
+        /// <param name="value">The JSON encoded value to be written as a UTF-8 transcoded JSON string as part of the name/value pair.</param>
+        /// <remarks>
+        /// The property name and value should already be escaped.
+        /// </remarks>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown if this would result in an invalid JSON to be written (while validation is enabled).
+        /// </exception>
+        public void WriteString(JsonEncodedText propertyName, JsonEncodedText value)
+            => WriteStringHelper(propertyName.EncodedUtf8String, value.EncodedUtf8String);
+
+        private void WriteStringHelper(ReadOnlySpan<byte> utf8PropertyName, ReadOnlySpan<byte> utf8Value)
+        {
+            Debug.Assert(utf8PropertyName.Length <= JsonConstants.MaxTokenSize && utf8Value.Length <= JsonConstants.MaxTokenSize);
+
+            Debug.Assert(JsonWriterHelper.NeedsEscaping(utf8Value) == -1);
+            Debug.Assert(JsonWriterHelper.NeedsEscaping(utf8PropertyName) == -1);
+
+            WriteStringByOptions(utf8PropertyName, utf8Value);
+
+            SetFlagToAddListSeparatorBeforeNextItem();
+            _tokenType = JsonTokenType.String;
+        }
+
+        /// <summary>
         /// Writes the UTF-16 property name and UTF-16 text value (as a JSON string) as part of a name/value pair of a JSON object.
         /// </summary>
         /// <param name="propertyName">The UTF-16 encoded property name of the JSON object to be transcoded and written as UTF-8.</param>
@@ -191,6 +218,33 @@ namespace System.Text.Json
         /// </exception>
         public void WriteString(ReadOnlySpan<byte> utf8PropertyName, string value)
             => WriteString(utf8PropertyName, value.AsSpan());
+
+        /// <summary>
+        /// Writes the pre-encoded property name and string text value (as a JSON string) as part of a name/value pair of a JSON object.
+        /// </summary>
+        /// <param name="propertyName">The JSON encoded property name of the JSON object to be transcoded and written as UTF-8.</param>
+        /// <param name="value">The JSON encoded value to be written as a UTF-8 transcoded JSON string as part of the name/value pair.</param>
+        /// <remarks>
+        /// The property name and value should already be escaped.
+        /// </remarks>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown if this would result in an invalid JSON to be written (while validation is enabled).
+        /// </exception>
+        public void WriteString(JsonEncodedText propertyName, string value)
+            => WriteStringHelper(propertyName.EncodedUtf8String, value.AsSpan());
+
+        private void WriteStringHelper(ReadOnlySpan<byte> utf8PropertyName, ReadOnlySpan<char> value)
+        {
+            Debug.Assert(utf8PropertyName.Length <= JsonConstants.MaxTokenSize && value.Length <= JsonConstants.MaxCharacterTokenSize);
+
+            Debug.Assert(JsonWriterHelper.NeedsEscaping(value) == -1);
+            Debug.Assert(JsonWriterHelper.NeedsEscaping(utf8PropertyName) == -1);
+
+            WriteStringByOptions(utf8PropertyName, value);
+
+            SetFlagToAddListSeparatorBeforeNextItem();
+            _tokenType = JsonTokenType.String;
+        }
 
         private void WriteStringEscapeValueOnly(ReadOnlySpan<char> escapedPropertyName, ReadOnlySpan<char> value, int firstEscapeIndex)
         {

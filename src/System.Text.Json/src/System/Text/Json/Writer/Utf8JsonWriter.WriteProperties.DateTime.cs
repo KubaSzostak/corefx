@@ -30,6 +30,21 @@ namespace System.Text.Json
         public void WriteString(string propertyName, DateTime value)
             => WriteString(propertyName.AsSpan(), value);
 
+        public void WriteString(JsonEncodedText propertyName, DateTime value)
+            => WriteStringHelper(propertyName.EncodedUtf8String, value);
+
+        private void WriteStringHelper(ReadOnlySpan<byte> utf8PropertyName, DateTime value)
+        {
+            Debug.Assert(utf8PropertyName.Length <= JsonConstants.MaxTokenSize);
+
+            Debug.Assert(JsonWriterHelper.NeedsEscaping(utf8PropertyName) == -1);
+
+            WriteStringByOptions(utf8PropertyName, value);
+
+            SetFlagToAddListSeparatorBeforeNextItem();
+            _tokenType = JsonTokenType.String;
+        }
+
         /// <summary>
         /// Writes the property name and <see cref="DateTime"/> value (as a JSON string) as part of a name/value pair of a JSON object.
         /// </summary>

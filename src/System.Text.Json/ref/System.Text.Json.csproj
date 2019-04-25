@@ -2,6 +2,7 @@
   <PropertyGroup>
     <ProjectGuid>{6371299B-8F39-4A0A-A9CD-70F80FF205F6}</ProjectGuid>
     <Configurations>netcoreapp-Debug;netcoreapp-Release;uap-Debug;uap-Release</Configurations>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="System.Text.Json.cs" />
@@ -10,9 +11,12 @@
     <Compile Include="System.Text.Json.Manual.cs" />
     <ProjectReference Include="..\..\System.Memory\ref\System.Memory.csproj" />
     <ProjectReference Include="..\..\System.Runtime\ref\System.Runtime.csproj" />
+    <ProjectReference Include="..\..\System.Runtime.Extensions\ref\System.Runtime.Extensions.csproj" />
   </ItemGroup>
   <ItemGroup Condition="'$(TargetGroup)' == 'netstandard'">
     <Reference Include="System.Memory" />
     <Reference Include="System.Threading.Tasks.Extensions" />
+    <Reference Include="System.Runtime.Extensions" />
+    <Reference Include="System.Runtime" />
   </ItemGroup>
 </Project>
