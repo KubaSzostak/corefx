@@ -25,7 +25,7 @@ namespace System.Text.Json
 
         private void WriteStringHelper(ReadOnlySpan<byte> utf8PropertyName, ReadOnlySpan<byte> utf8Value)
         {
-            Debug.Assert(utf8PropertyName.Length <= JsonConstants.MaxTokenSize && utf8Value.Length <= JsonConstants.MaxTokenSize);
+            Debug.Assert(utf8PropertyName.Length <= JsonConstants.MaxEncodedTokenSize && utf8Value.Length <= JsonConstants.MaxEncodedTokenSize);
 
             WriteStringByOptions(utf8PropertyName, utf8Value);
 
@@ -151,7 +151,7 @@ namespace System.Text.Json
 
         private void WriteStringHelperEscapeValue(ReadOnlySpan<byte> utf8PropertyName, ReadOnlySpan<char> value)
         {
-            Debug.Assert(utf8PropertyName.Length <= JsonConstants.MaxTokenSize);
+            Debug.Assert(utf8PropertyName.Length <= JsonConstants.MaxEncodedTokenSize);
 
             JsonWriterHelper.ValidateValue(value);
 
@@ -232,7 +232,7 @@ namespace System.Text.Json
 
         private void WriteStringHelperEscapeValue(ReadOnlySpan<byte> utf8PropertyName, ReadOnlySpan<byte> utf8Value)
         {
-            Debug.Assert(utf8PropertyName.Length <= JsonConstants.MaxTokenSize);
+            Debug.Assert(utf8PropertyName.Length <= JsonConstants.MaxEncodedTokenSize);
 
             JsonWriterHelper.ValidateValue(utf8Value);
 
@@ -313,7 +313,7 @@ namespace System.Text.Json
 
         private void WriteStringHelperEscapeProperty(ReadOnlySpan<char> propertyName, ReadOnlySpan<byte> utf8Value)
         {
-            Debug.Assert(utf8Value.Length <= JsonConstants.MaxTokenSize);
+            Debug.Assert(utf8Value.Length <= JsonConstants.MaxEncodedTokenSize);
 
             JsonWriterHelper.ValidateProperty(propertyName);
 
@@ -370,7 +370,7 @@ namespace System.Text.Json
 
         private void WriteStringHelperEscapeProperty(ReadOnlySpan<byte> utf8PropertyName, ReadOnlySpan<byte> utf8Value)
         {
-            Debug.Assert(utf8Value.Length <= JsonConstants.MaxTokenSize);
+            Debug.Assert(utf8Value.Length <= JsonConstants.MaxEncodedTokenSize);
 
             JsonWriterHelper.ValidateProperty(utf8PropertyName);
 

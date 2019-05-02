@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using System.Buffers;
 using System.Collections.Generic;
 using Xunit;
 
@@ -291,6 +292,51 @@ namespace System.Text.Json.Tests
             Assert.Throws<ArgumentException>(() => JsonEncodedText.Encode(largeValueString));
             Assert.Throws<ArgumentException>(() => JsonEncodedText.Encode(largeValue));
             Assert.Throws<ArgumentException>(() => JsonEncodedText.Encode(utf8Value));
+        }
+
+        [Fact]
+        public static void ValidLargeEncode()
+        {
+            var encodedText = JsonEncodedText.Encode(new string('+', 60_000_000));
+
+            {
+                var output = new ArrayBufferWriter<byte>();
+                using var jsonUtf8 = new Utf8JsonWriter(output);
+                jsonUtf8.WriteStringValue(encodedText);
+                jsonUtf8.Flush();
+            }
+
+            {
+                var output = new ArrayBufferWriter<byte>();
+                using var jsonUtf8 = new Utf8JsonWriter(output);
+                jsonUtf8.WriteStartObject();
+                jsonUtf8.WriteStartObject(encodedText);
+                jsonUtf8.Flush();
+            }
+
+            {
+                var output = new ArrayBufferWriter<byte>();
+                using var jsonUtf8 = new Utf8JsonWriter(output);
+                jsonUtf8.WriteStartObject();
+                jsonUtf8.WriteStartArray(encodedText);
+                jsonUtf8.Flush();
+            }
+
+            {
+                var output = new ArrayBufferWriter<byte>();
+                using var jsonUtf8 = new Utf8JsonWriter(output);
+                jsonUtf8.WriteStartObject();
+                jsonUtf8.WriteString(encodedText, encodedText);
+                jsonUtf8.Flush();
+            }
+
+            {
+                var output = new ArrayBufferWriter<byte>();
+                using var jsonUtf8 = new Utf8JsonWriter(output);
+                jsonUtf8.WriteStartObject();
+                jsonUtf8.WriteNumber(encodedText, 1);
+                jsonUtf8.Flush();
+            }
         }
 
         public static IEnumerable<object[]> InvalidUTF8Strings

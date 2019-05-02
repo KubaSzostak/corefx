@@ -27,7 +27,7 @@ namespace System.Text.Json
 
         private void WriteLiteralHelper(ReadOnlySpan<byte> utf8PropertyName, ReadOnlySpan<byte> value)
         {
-            Debug.Assert(utf8PropertyName.Length <= JsonConstants.MaxTokenSize);
+            Debug.Assert(utf8PropertyName.Length <= JsonConstants.MaxEncodedTokenSize);
 
             WriteLiteralByOptions(utf8PropertyName, value);
 
