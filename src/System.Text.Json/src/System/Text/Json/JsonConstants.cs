@@ -57,9 +57,9 @@ namespace System.Text.Json
         // All other UTF-16 characters can be represented by either 1 or 2 UTF-8 bytes.
         public const int MaxExpansionFactorWhileTranscoding = 3;
 
-        public const int MaxEncodedTokenSize = 2_000_000_000;
-        public const int MaxTokenSize = MaxEncodedTokenSize / MaxExpansionFactorWhileEscaping;  // 357_913_941 bytes
-        public const int MaxCharacterTokenSize = MaxEncodedTokenSize / MaxExpansionFactorWhileEscaping; // 357_913_941 characters
+        public const int MaxEncodedTokenSize = 1_000_000_000;
+        public const int MaxTokenSize = MaxEncodedTokenSize / MaxExpansionFactorWhileEscaping;  // 166_666_666 bytes
+        public const int MaxCharacterTokenSize = MaxEncodedTokenSize / MaxExpansionFactorWhileEscaping; // 166_666_666 characters
 
         public const int MaximumFormatInt64Length = 20;   // 19 + sign (i.e. -9223372036854775808)
         public const int MaximumFormatUInt64Length = 20;  // i.e. 18446744073709551615

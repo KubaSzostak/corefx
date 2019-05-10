@@ -297,46 +297,117 @@ namespace System.Text.Json.Tests
         [Fact]
         public static void ValidLargeEncode()
         {
-            var encodedText = JsonEncodedText.Encode(new string('+', 60_000_000));
+            string largeString = new string('+', 60_000_000);
+            //byte[] largeUtf8 = Encoding.UTF8.GetBytes(largeString);
+            //var encodedText = JsonEncodedText.Encode(largeString);
 
-            {
-                var output = new ArrayBufferWriter<byte>();
-                using var jsonUtf8 = new Utf8JsonWriter(output);
-                jsonUtf8.WriteStringValue(encodedText);
-                jsonUtf8.Flush();
-            }
+            //{
+            //    var output = new ArrayBufferWriter<byte>();
+            //    using var jsonUtf8 = new Utf8JsonWriter(output);
+            //    jsonUtf8.WriteStringValue(encodedText);
+            //    jsonUtf8.Flush();
+            //}
+
+            //{
+            //    var output = new ArrayBufferWriter<byte>();
+            //    using var jsonUtf8 = new Utf8JsonWriter(output);
+            //    jsonUtf8.WriteStringValue(largeString);
+            //    jsonUtf8.Flush();
+            //}
+
+            //{
+            //    var output = new ArrayBufferWriter<byte>();
+            //    using var jsonUtf8 = new Utf8JsonWriter(output);
+            //    jsonUtf8.WriteStartObject();
+            //    jsonUtf8.WriteStartObject(encodedText);
+            //    jsonUtf8.Flush();
+            //}
+
+            //{
+            //    var output = new ArrayBufferWriter<byte>();
+            //    using var jsonUtf8 = new Utf8JsonWriter(output);
+            //    jsonUtf8.WriteStartObject();
+            //    jsonUtf8.WriteStartArray(encodedText);
+            //    jsonUtf8.Flush();
+            //}
+
+            //{
+            //    var output = new ArrayBufferWriter<byte>();
+            //    using var jsonUtf8 = new Utf8JsonWriter(output);
+            //    jsonUtf8.WriteStartObject();
+            //    jsonUtf8.WriteString(encodedText, encodedText);
+            //    jsonUtf8.Flush();
+            //}
 
             {
                 var output = new ArrayBufferWriter<byte>();
                 using var jsonUtf8 = new Utf8JsonWriter(output);
                 jsonUtf8.WriteStartObject();
-                jsonUtf8.WriteStartObject(encodedText);
+                jsonUtf8.WriteString(largeString, largeString);
                 jsonUtf8.Flush();
             }
 
-            {
-                var output = new ArrayBufferWriter<byte>();
-                using var jsonUtf8 = new Utf8JsonWriter(output);
-                jsonUtf8.WriteStartObject();
-                jsonUtf8.WriteStartArray(encodedText);
-                jsonUtf8.Flush();
-            }
+            //{
+            //    var output = new ArrayBufferWriter<byte>();
+            //    using var jsonUtf8 = new Utf8JsonWriter(output);
+            //    jsonUtf8.WriteStartObject();
+            //    jsonUtf8.WriteString(largeString, largeUtf8);
+            //    jsonUtf8.Flush();
+            //}
 
-            {
-                var output = new ArrayBufferWriter<byte>();
-                using var jsonUtf8 = new Utf8JsonWriter(output);
-                jsonUtf8.WriteStartObject();
-                jsonUtf8.WriteString(encodedText, encodedText);
-                jsonUtf8.Flush();
-            }
+            //{
+            //    var output = new ArrayBufferWriter<byte>();
+            //    using var jsonUtf8 = new Utf8JsonWriter(output);
+            //    jsonUtf8.WriteStartObject();
+            //    jsonUtf8.WriteString(largeUtf8, largeString);
+            //    jsonUtf8.Flush();
+            //}
 
-            {
-                var output = new ArrayBufferWriter<byte>();
-                using var jsonUtf8 = new Utf8JsonWriter(output);
-                jsonUtf8.WriteStartObject();
-                jsonUtf8.WriteNumber(encodedText, 1);
-                jsonUtf8.Flush();
-            }
+            //{
+            //    var output = new ArrayBufferWriter<byte>();
+            //    using var jsonUtf8 = new Utf8JsonWriter(output);
+            //    jsonUtf8.WriteStartObject();
+            //    jsonUtf8.WriteString(largeUtf8, largeUtf8);
+            //    jsonUtf8.Flush();
+            //}
+
+            //{
+            //    var output = new ArrayBufferWriter<byte>();
+            //    using var jsonUtf8 = new Utf8JsonWriter(output);
+            //    jsonUtf8.WriteStartObject();
+            //    jsonUtf8.WriteNumber(encodedText, 1);
+            //    jsonUtf8.Flush();
+            //}
+
+            //{
+            //    var output = new ArrayBufferWriter<byte>();
+            //    using var jsonUtf8 = new Utf8JsonWriter(output);
+            //    jsonUtf8.WriteStartObject();
+            //    jsonUtf8.WriteBoolean(encodedText, true);
+            //    jsonUtf8.Flush();
+            //}
+
+            //{
+            //    var output = new ArrayBufferWriter<byte>();
+            //    using var jsonUtf8 = new Utf8JsonWriter(output);
+            //    jsonUtf8.WriteStartObject();
+            //    jsonUtf8.WriteNull(encodedText);
+            //    jsonUtf8.Flush();
+            //}
+
+            //{
+            //    var output = new ArrayBufferWriter<byte>();
+            //    using var jsonUtf8 = new Utf8JsonWriter(output);
+            //    jsonUtf8.WriteStartObject();
+            //    jsonUtf8.WriteString(encodedText, DateTime.Now);
+            //    jsonUtf8.Flush();
+            //}
+
+            //{
+            //    var output = new ArrayBufferWriter<byte>();
+            //    using var jsonUtf8 = new Utf8JsonWriter(output);
+            //    Assert.Throws<ArgumentException>(() => jsonUtf8.WriteStringValue(new string('+', 400_000_000)));
+            //}
         }
 
         public static IEnumerable<object[]> InvalidUTF8Strings
