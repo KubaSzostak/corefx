@@ -343,6 +343,43 @@ namespace System.Text.Json
         public void WriteStringValue(string value) { }
         public void WriteStringValue(System.Text.Json.JsonEncodedText value) { }
     }
+    //public sealed partial class Utf8JsonWriter2 : System.IDisposable
+    //{
+    //    public Utf8JsonWriter2(System.Buffers.IBufferWriter<byte> bufferWriter, System.Text.Json.JsonWriterOptions options = default(System.Text.Json.JsonWriterOptions)) { }
+    //    public Utf8JsonWriter2(System.IO.Stream utf8Json, System.Text.Json.JsonWriterOptions options = default(System.Text.Json.JsonWriterOptions)) { }
+    //    public long BytesCommitted { get { throw null; } }
+    //    public int BytesPending { get { throw null; } }
+    //    public int CurrentDepth { get { throw null; } }
+    //    public System.Text.Json.JsonWriterOptions Options { get { throw null; } }
+    //    public void Dispose() { }
+    //    public void Flush() { }
+    //    public System.Threading.Tasks.Task FlushAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) { throw null; }
+    //    public void Reset() { }
+    //    public void Reset(System.Buffers.IBufferWriter<byte> bufferWriter) { }
+    //    public void Reset(System.IO.Stream utf8Json) { }
+    //    public void WriteBoolean(System.ReadOnlySpan<byte> utf8PropertyName, bool value) { }
+    //    public void WriteBooleanValue(bool value) { }
+    //    public void WriteEndArray() { }
+    //    public void WriteEndObject() { }
+    //    public void WriteNull(System.ReadOnlySpan<byte> utf8PropertyName) { }
+    //    public void WriteNullValue() { }
+    //    public void WriteNumber(System.ReadOnlySpan<byte> utf8PropertyName, int value) { }
+    //    public void WriteNumber(System.ReadOnlySpan<byte> utf8PropertyName, long value) { }
+    //    public void WriteNumberValue(int value) { }
+    //    public void WriteNumberValue(long value) { }
+    //    public void WriteStartArray() { }
+    //    public void WriteStartArray(System.ReadOnlySpan<byte> utf8PropertyName) { }
+    //    public void WriteStartObject() { }
+    //    public void WriteStartObject(System.ReadOnlySpan<byte> utf8PropertyName) { }
+    //    public void WriteString(System.ReadOnlySpan<byte> utf8PropertyName, System.DateTime value) { }
+    //    public void WriteString(System.ReadOnlySpan<byte> utf8PropertyName, System.DateTimeOffset value) { }
+    //    public void WriteString(System.ReadOnlySpan<byte> utf8PropertyName, System.Guid value) { }
+    //    public void WriteString(System.ReadOnlySpan<byte> utf8PropertyName, System.ReadOnlySpan<byte> utf8Value) { }
+    //    public void WriteStringValue(System.DateTime value) { }
+    //    public void WriteStringValue(System.DateTimeOffset value) { }
+    //    public void WriteStringValue(System.Guid value) { }
+    //    public void WriteStringValue(System.ReadOnlySpan<byte> utf8Value) { }
+    //}
 }
 namespace System.Text.Json.Serialization
 {

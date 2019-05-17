@@ -139,6 +139,25 @@
     <Compile Include="System\Text\Json\Writer\Utf8JsonWriter.WriteValues.SignedNumber.cs" />
     <Compile Include="System\Text\Json\Writer\Utf8JsonWriter.WriteValues.String.cs" />
     <Compile Include="System\Text\Json\Writer\Utf8JsonWriter.WriteValues.UnsignedNumber.cs" />
+    <!--<Compile Include="System\Text\Json\Writer2\JsonWriterHelper.cs" />
+    <Compile Include="System\Text\Json\Writer2\JsonWriterHelper.Date.cs" />
+    <Compile Include="System\Text\Json\Writer2\JsonWriterHelper.Escaping.cs" />
+    <Compile Include="System\Text\Json\Writer2\JsonWriterHelper.Transcoding.cs" />
+    <Compile Include="System\Text\Json\Writer2\Utf8JsonWriter.cs" />
+    <Compile Include="System\Text\Json\Writer2\Utf8JsonWriter.WriteProperties.DateTime.cs" />
+    <Compile Include="System\Text\Json\Writer2\Utf8JsonWriter.WriteProperties.DateTimeOffset.cs" />
+    <Compile Include="System\Text\Json\Writer2\Utf8JsonWriter.WriteProperties.Guid.cs" />
+    <Compile Include="System\Text\Json\Writer2\Utf8JsonWriter.WriteProperties.Helpers.cs" />
+    <Compile Include="System\Text\Json\Writer2\Utf8JsonWriter.WriteProperties.Literal.cs" />
+    <Compile Include="System\Text\Json\Writer2\Utf8JsonWriter.WriteProperties.SignedNumber.cs" />
+    <Compile Include="System\Text\Json\Writer2\Utf8JsonWriter.WriteProperties.String.cs" />
+    <Compile Include="System\Text\Json\Writer2\Utf8JsonWriter.WriteValues.DateTime.cs" />
+    <Compile Include="System\Text\Json\Writer2\Utf8JsonWriter.WriteValues.DateTimeOffset.cs" />
+    <Compile Include="System\Text\Json\Writer2\Utf8JsonWriter.WriteValues.Guid.cs" />
+    <Compile Include="System\Text\Json\Writer2\Utf8JsonWriter.WriteValues.Helpers.cs" />
+    <Compile Include="System\Text\Json\Writer2\Utf8JsonWriter.WriteValues.Literal.cs" />
+    <Compile Include="System\Text\Json\Writer2\Utf8JsonWriter.WriteValues.SignedNumber.cs" />
+    <Compile Include="System\Text\Json\Writer2\Utf8JsonWriter.WriteValues.String.cs" />-->
   </ItemGroup>
   <ItemGroup Condition="'$(TargetsNETStandard)' == 'true'">
     <!-- Common or Common-branched source files -->

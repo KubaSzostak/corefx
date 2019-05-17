@@ -240,6 +240,23 @@ namespace System.Text.Json.Tests
                 jsonString,
                 null,
                 bytes => JsonDocument.Parse(bytes.AsMemory()));
+
+            string content = "";
+            using (JsonDocument json = JsonDocument.Parse(content))
+            {
+                JsonElement root = json.RootElement;
+
+                DateTimeOffset? LastModified;
+
+                // optional property
+                if (root.TryGetProperty("last_modified", out var lastModified))
+                {
+                    string lastModifiedString = lastModified.GetString();
+                    LastModified = lastModifiedString != null ?
+                        (DateTimeOffset?)DateTimeOffset.Parse(lastModifiedString) :
+                        null;
+                }
+            }
         }
 
         [Theory]
