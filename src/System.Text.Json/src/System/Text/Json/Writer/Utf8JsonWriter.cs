@@ -449,9 +449,12 @@ namespace System.Text.Json
             if (CurrentDepth >= JsonConstants.MaxWriterDepth)
                 ThrowHelper.ThrowInvalidOperationException(ExceptionResource.DepthTooLarge, _currentDepth, token: default, tokenType: default);
 
-            if (Options.IndentedOrNotSkipValidation)
+            ValidateStart();
+            UpdateBitStackOnStart(token);
+
+            if (Options.Indented)
             {
-                WriteStartSlow(token);
+                WriteStartIndented(token);
             }
             else
             {
@@ -476,28 +479,6 @@ namespace System.Text.Json
                 output[BytesPending++] = JsonConstants.ListSeparator;
             }
             output[BytesPending++] = token;
-        }
-
-        private void WriteStartSlow(byte token)
-        {
-            Debug.Assert(Options.Indented || !Options.SkipValidation);
-
-            if (Options.Indented)
-            {
-                if (!Options.SkipValidation)
-                {
-                    ValidateStart();
-                    UpdateBitStackOnStart(token);
-                }
-                WriteStartIndented(token);
-            }
-            else
-            {
-                Debug.Assert(!Options.SkipValidation);
-                ValidateStart();
-                UpdateBitStackOnStart(token);
-                WriteStartMinimized(token);
-            }
         }
 
         private void ValidateStart()
@@ -865,9 +846,11 @@ namespace System.Text.Json
 
         private void WriteEnd(byte token)
         {
-            if (Options.IndentedOrNotSkipValidation)
+            ValidateEnd(token);
+
+            if (Options.Indented)
             {
-                WriteEndSlow(token);
+                WriteEndIndented(token);
             }
             else
             {
@@ -891,26 +874,6 @@ namespace System.Text.Json
 
             Span<byte> output = _memory.Span;
             output[BytesPending++] = token;
-        }
-
-        private void WriteEndSlow(byte token)
-        {
-            Debug.Assert(Options.Indented || !Options.SkipValidation);
-
-            if (Options.Indented)
-            {
-                if (!Options.SkipValidation)
-                {
-                    ValidateEnd(token);
-                }
-                WriteEndIndented(token);
-            }
-            else
-            {
-                Debug.Assert(!Options.SkipValidation);
-                ValidateEnd(token);
-                WriteEndMinimized(token);
-            }
         }
 
         private void ValidateEnd(byte token)

@@ -35,28 +35,22 @@ namespace System.Text.Json
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void ValidateWritingProperty()
         {
-            if (!Options.SkipValidation)
+            if (!_inObject)
             {
-                if (!_inObject)
-                {
-                    Debug.Assert(_tokenType != JsonTokenType.StartObject);
-                    ThrowHelper.ThrowInvalidOperationException(ExceptionResource.CannotWritePropertyWithinArray, currentDepth: default, token: default, _tokenType);
-                }
+                Debug.Assert(_tokenType != JsonTokenType.StartObject);
+                ThrowHelper.ThrowInvalidOperationException(ExceptionResource.CannotWritePropertyWithinArray, currentDepth: default, token: default, _tokenType);
             }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void ValidateWritingProperty(byte token)
         {
-            if (!Options.SkipValidation)
+            if (!_inObject)
             {
-                if (!_inObject)
-                {
-                    Debug.Assert(_tokenType != JsonTokenType.StartObject);
-                    ThrowHelper.ThrowInvalidOperationException(ExceptionResource.CannotWritePropertyWithinArray, currentDepth: default, token: default, _tokenType);
-                }
-                UpdateBitStackOnStart(token);
+                Debug.Assert(_tokenType != JsonTokenType.StartObject);
+                ThrowHelper.ThrowInvalidOperationException(ExceptionResource.CannotWritePropertyWithinArray, currentDepth: default, token: default, _tokenType);
             }
+            UpdateBitStackOnStart(token);
         }
 
         private void WritePropertyNameMinimized(ReadOnlySpan<byte> escapedPropertyName, byte token)
