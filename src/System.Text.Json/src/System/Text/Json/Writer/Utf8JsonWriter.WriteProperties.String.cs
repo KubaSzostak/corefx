@@ -865,6 +865,147 @@ namespace System.Text.Json
             }
         }
 
+        public void WritePropertyName(ReadOnlySpan<byte> utf8PropertyName)
+        {
+            int propertyIdx = JsonWriterHelper.NeedsEscaping(utf8PropertyName);
+
+            Debug.Assert(propertyIdx >= -1 && propertyIdx < utf8PropertyName.Length && propertyIdx < int.MaxValue / 2);
+
+            if (propertyIdx != -1)
+            {
+                WriteStringEscapeProperty(utf8PropertyName, propertyIdx);
+            }
+            else
+            {
+                WriteStringByOptionsPropertyName(utf8PropertyName);
+            }
+        }
+
+        private void WriteStringEscapeProperty(ReadOnlySpan<byte> utf8PropertyName, int firstEscapeIndexProp)
+        {
+            Debug.Assert(int.MaxValue / JsonConstants.MaxExpansionFactorWhileEscaping >= utf8PropertyName.Length);
+
+            byte[] propertyArray = null;
+
+            if (firstEscapeIndexProp != -1)
+            {
+                int length = JsonWriterHelper.GetMaxEscapedLength(utf8PropertyName.Length, firstEscapeIndexProp);
+
+                Span<byte> escapedPropertyName;
+                if (length > JsonConstants.StackallocThreshold)
+                {
+                    propertyArray = ArrayPool<byte>.Shared.Rent(length);
+                    escapedPropertyName = propertyArray;
+                }
+                else
+                {
+                    // Cannot create a span directly since it gets assigned to parameter and passed down.
+                    unsafe
+                    {
+                        byte* ptr = stackalloc byte[length];
+                        escapedPropertyName = new Span<byte>(ptr, length);
+                    }
+                }
+
+                JsonWriterHelper.EscapeString(utf8PropertyName, escapedPropertyName, firstEscapeIndexProp, out int written);
+                utf8PropertyName = escapedPropertyName.Slice(0, written);
+            }
+
+            WriteStringByOptionsPropertyName(utf8PropertyName);
+
+            if (propertyArray != null)
+            {
+                ArrayPool<byte>.Shared.Return(propertyArray);
+            }
+        }
+
+        private void WriteStringByOptionsPropertyName(ReadOnlySpan<byte> utf8PropertyName)
+        {
+            ValidateWritingProperty();
+            if (Options.Indented)
+            {
+                WriteStringIndentedPropertyName(utf8PropertyName);
+            }
+            else
+            {
+                WriteStringMinimizedPropertyName(utf8PropertyName);
+            }
+        }
+
+        private void WriteStringMinimizedPropertyName(ReadOnlySpan<byte> escapedPropertyName)
+        {
+            Debug.Assert(escapedPropertyName.Length <= JsonConstants.MaxTokenSize);
+            Debug.Assert(escapedPropertyName.Length < int.MaxValue - 4);
+
+            int minRequired = escapedPropertyName.Length + 3; // 2 quotes for property name, and 1 colon
+            int maxRequired = minRequired + 1; // Optionally, 1 list separator
+
+            if (_memory.Length - BytesPending < maxRequired)
+            {
+                Grow(maxRequired);
+            }
+
+            Span<byte> output = _memory.Span;
+
+            if (_currentDepth < 0)
+            {
+                output[BytesPending++] = JsonConstants.ListSeparator;
+            }
+            output[BytesPending++] = JsonConstants.Quote;
+
+            escapedPropertyName.CopyTo(output.Slice(BytesPending));
+            BytesPending += escapedPropertyName.Length;
+
+            output[BytesPending++] = JsonConstants.Quote;
+            output[BytesPending++] = JsonConstants.KeyValueSeperator;
+        }
+
+        private void WriteStringIndentedPropertyName(ReadOnlySpan<byte> escapedPropertyName)
+        {
+            int indent = Indentation;
+            Debug.Assert(indent <= 2 * JsonConstants.MaxWriterDepth);
+
+            Debug.Assert(escapedPropertyName.Length <= JsonConstants.MaxTokenSize);
+            Debug.Assert(escapedPropertyName.Length < int.MaxValue - indent - 5 - s_newLineLength);
+
+            int minRequired = indent + escapedPropertyName.Length + 4; // 2 quotes for property name, 1 colon, and 1 space
+            int maxRequired = minRequired + 1 + s_newLineLength; // Optionally, 1 list separator and 1-2 bytes for new line
+
+            if (_memory.Length - BytesPending < maxRequired)
+            {
+                Grow(maxRequired);
+            }
+
+            Span<byte> output = _memory.Span;
+
+            if (_currentDepth < 0)
+            {
+                output[BytesPending++] = JsonConstants.ListSeparator;
+            }
+
+            if (_tokenType != JsonTokenType.None)
+            {
+                WriteNewLine(output);
+            }
+
+            JsonWriterHelper.WriteIndentation(output.Slice(BytesPending), indent);
+            BytesPending += indent;
+
+            output[BytesPending++] = JsonConstants.Quote;
+
+            escapedPropertyName.CopyTo(output.Slice(BytesPending));
+            BytesPending += escapedPropertyName.Length;
+
+            output[BytesPending++] = JsonConstants.Quote;
+            output[BytesPending++] = JsonConstants.KeyValueSeperator;
+            output[BytesPending++] = JsonConstants.Space;
+        }
+
+        //public void WritePropertyName(System.ReadOnlySpan<char> propertyName) { }
+
+        //public void WritePropertyName(string propertyName)
+        //    => WritePropertyName(propertyName.AsSpan());
+
         private void WriteStringByOptions(ReadOnlySpan<byte> utf8PropertyName, ReadOnlySpan<byte> utf8Value)
         {
             ValidateWritingProperty();

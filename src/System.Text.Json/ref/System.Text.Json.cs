@@ -252,6 +252,9 @@ namespace System.Text.Json
         public void WriteCommentValue(string value) { }
         public void WriteEndArray() { }
         public void WriteEndObject() { }
+        public void WritePropertyName(System.ReadOnlySpan<byte> utf8PropertyName) { }
+        //public void WritePropertyName(System.ReadOnlySpan<char> propertyName) { }
+        //public void WritePropertyName(string propertyName) { }
         public void WriteNull(System.ReadOnlySpan<byte> utf8PropertyName) { }
         public void WriteNull(System.ReadOnlySpan<char> propertyName) { }
         public void WriteNull(string propertyName) { }
