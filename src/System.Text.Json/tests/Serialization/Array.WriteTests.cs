@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using System.Buffers.Text;
 using System.Collections.Generic;
 using Xunit;
 
@@ -9,6 +10,83 @@ namespace System.Text.Json.Serialization.Tests
 {
     public static partial class ArrayTests
     {
+        [Fact]
+        public static void WriteByteArray()
+        {
+            var input = new byte[] { 0, 1 };
+            string json = JsonSerializer.ToString(input);
+            Assert.Equal($"\"{Convert.ToBase64String(input)}\"", json);
+        }
+
+        [Fact]
+        public static void WriteByteArrayPropertyAndRoundTrip()
+        {
+            var array1 = new byte[5] { 1, 2, 3, 4, 5 };
+            var array2 = new byte[3] { 200, 147, 100 };
+
+            var array = new byte[2][];
+            array[0] = array1;
+            array[1] = array2;
+
+            var foo = new Foo
+            {
+                Array = array1
+            };
+
+            var utf8Output = new byte[15];
+            Base64.EncodeToUtf8(array1, utf8Output, out int _, out int written);
+            string expectedString1 = Encoding.UTF8.GetString(utf8Output.AsSpan(0, written));
+
+            string actual = JsonSerializer.ToString(foo);
+            Assert.Equal($"{{\"Array\":\"{expectedString1}\"}}", actual);
+
+            Foo fooRoundTrip = JsonSerializer.Parse<Foo>(actual);
+            Assert.Equal(array1, fooRoundTrip.Array);
+
+            var bar = new Bar
+            {
+                Array = array
+            };
+
+            Base64.EncodeToUtf8(array2, utf8Output, out int _, out written);
+            string expectedString2 = Encoding.UTF8.GetString(utf8Output.AsSpan(0, written));
+
+            actual = JsonSerializer.ToString(bar);
+            Assert.Equal($"{{\"Array\":[\"{expectedString1}\",\"{expectedString2}\"]}}", actual);
+
+            Bar barRoundTrip = JsonSerializer.Parse<Bar>(actual);
+            Assert.Equal(array, barRoundTrip.Array);
+
+            var baz = new Baz
+            {
+                Dictionary = new Dictionary<string, byte[][]>
+                {
+                    { "dictionary", array }
+                }
+            };
+
+            actual = JsonSerializer.ToString(baz);
+            Assert.Equal($"{{\"Dictionary\":{{\"dictionary\":[\"{expectedString1}\",\"{expectedString2}\"]}}}}", actual);
+
+            Baz bazRoundTrip = JsonSerializer.Parse<Baz>(actual);
+            Assert.Equal(array, bazRoundTrip.Dictionary.GetValueOrDefault("dictionary"));
+        }
+
+        public class Foo
+        {
+            public byte[] Array { get; set; }
+        }
+
+        public class Bar
+        {
+            public byte[][] Array { get; set; }
+        }
+
+        public class Baz
+        {
+            public Dictionary<string, byte[][]> Dictionary { get; set; }
+        }
+
         [Fact]
         public static void WritePrimitiveArray()
         {

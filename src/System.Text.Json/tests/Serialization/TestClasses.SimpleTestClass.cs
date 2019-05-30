@@ -274,7 +274,7 @@ namespace System.Text.Json.Serialization.Tests
             Assert.Equal((ushort)4, MyUInt16Array[0]);
             Assert.Equal((uint)5, MyUInt32Array[0]);
             Assert.Equal((ulong)6, MyUInt64Array[0]);
-            Assert.Equal((byte)7, MyByteArray[0]);
+            Assert.Equal(new byte[2] { 0, 1 }, MyByteArray);
             Assert.Equal((sbyte)8, MySByteArray[0]);
             Assert.Equal('a', MyCharArray[0]);
             Assert.Equal("Hello", MyStringArray[0]);

@@ -13,7 +13,8 @@ namespace System.Text.Json.Serialization.Converters
         {
             { typeof(DateTimeOffset), new JsonValueConverterDateTimeOffset() },
             { typeof(Guid), new JsonValueConverterGuid() },
-            { typeof(JsonElement), new JsonValueConverterJsonElement() }
+            { typeof(JsonElement), new JsonValueConverterJsonElement() },
+            { typeof(byte[]), new JsonValueConverterByteArray() }
         };
 
         internal static bool IsValueConvertable(Type type)

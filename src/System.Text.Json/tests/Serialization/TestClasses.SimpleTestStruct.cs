@@ -83,7 +83,7 @@ namespace System.Text.Json.Serialization.Tests
                 @"""MyUInt16Array"" : [4]," +
                 @"""MyUInt32Array"" : [5]," +
                 @"""MyUInt64Array"" : [6]," +
-                @"""MyByteArray"" : [7]," +
+                @"""MyByteArray"" : ""AAE=""," +
                 @"""MySByteArray"" : [8]," +
                 @"""MyCharArray"" : [""a""]," +
                 @"""MyStringArray"" : [""Hello""]," +
