@@ -38,9 +38,10 @@ namespace System.Text.Json.Tests
             Assert.False(json.Read());
 
             json = default;
-            JsonTestHelper.AssertThrows<InvalidOperationException>(json, (jsonReader) => jsonReader.TextEquals("".AsSpan()));
-            JsonTestHelper.AssertThrows<InvalidOperationException>(json, (jsonReader) => jsonReader.TextEquals(default(ReadOnlySpan<char>)));
-            JsonTestHelper.AssertThrows<InvalidOperationException>(json, (jsonReader) => jsonReader.TextEquals(default(ReadOnlySpan<byte>)));
+            JsonTestHelper.AssertThrows<InvalidOperationException>(json, (jsonReader) => jsonReader.ValueTextEquals(""));
+            JsonTestHelper.AssertThrows<InvalidOperationException>(json, (jsonReader) => jsonReader.ValueTextEquals("".AsSpan()));
+            JsonTestHelper.AssertThrows<InvalidOperationException>(json, (jsonReader) => jsonReader.ValueTextEquals(default(ReadOnlySpan<char>)));
+            JsonTestHelper.AssertThrows<InvalidOperationException>(json, (jsonReader) => jsonReader.ValueTextEquals(default(ReadOnlySpan<byte>)));
 
             TestGetMethodsOnDefault();
         }
@@ -3876,6 +3877,9 @@ namespace System.Text.Json.Tests
                     new object[] {"{}", 0},
                     new object[] {"12345", 0},
                     new object[] {"1", 0},
+                    new object[] {"-0", 0},
+                    new object[] {"0.0e-0", 0},
+                    new object[] {"0.0e+0", 0},
                     new object[] {"true", 0},
                     new object[] {"false", 0},
                     new object[] {"null", 0},
@@ -3886,6 +3890,9 @@ namespace System.Text.Json.Tests
                     new object[] {"  {}", 2},
                     new object[] {"  12345", 2},
                     new object[] {"  1", 2},
+                    new object[] {"  -0", 2},
+                    new object[] {"  0.0e-0", 2},
+                    new object[] {"  0.0e+0", 2},
                     new object[] {"  true", 2},
                     new object[] {"  false", 2},
                     new object[] {"  null", 2},
@@ -3896,6 +3903,9 @@ namespace System.Text.Json.Tests
                     new object[] {"  {}  ", 2},
                     new object[] {"  12345  ", 2},
                     new object[] {"  1  ", 2},
+                    new object[] {"  -0  ", 2},
+                    new object[] {"  0.0e-0  ", 2},
+                    new object[] {"  0.0e+0  ", 2},
                     new object[] {"  true  ", 2},
                     new object[] {"  false  ", 2},
                     new object[] {"  null  ", 2},
@@ -4138,11 +4148,17 @@ namespace System.Text.Json.Tests
                     new object[] {"\"\\u12$3\"", 0, 5},
                     new object[] {"\"\\u12\"", 0, 5},
                     new object[] {"\"\\u120\"", 0, 6},
+                    new object[] {"+0", 0, 0},
+                    new object[] {"+1", 0, 0},
+                    new object[] {"0e", 0, 2},
+                    new object[] {"0.", 0, 2},
+                    new object[] {"0.1e", 0, 4},
                     new object[] {"01", 0, 1},
                     new object[] {"1a", 0, 1},
                     new object[] {"-01", 0, 2},
                     new object[] {"10.5e", 0, 5},
                     new object[] {"10.5e-", 0, 6},
+                    new object[] {"10.5e+", 0, 6},
                     new object[] {"10.5e-0.2", 0, 7},
                     new object[] {"{\"age\":30, \"ints\":[1, 2, 3, 4, 5.1e7.3]}", 0, 36},
                     new object[] {"{\"age\":30, \r\n \"num\":-0.e, \r\n \"ints\":[1, 2, 3, 4, 5]}", 1, 10},

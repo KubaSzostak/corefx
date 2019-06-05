@@ -6,7 +6,7 @@ using System.Buffers;
 using System.Collections;
 using System.Diagnostics;
 
-namespace System.Text.Json.Serialization
+namespace System.Text.Json
 {
     public static partial class JsonSerializer
     {
@@ -20,10 +20,10 @@ namespace System.Text.Json.Serialization
                 return;
             }
 
-            Debug.Assert(state.Current.ReturnValue != default);
+            Debug.Assert(state.Current.ReturnValue != default || state.Current.TempDictionaryValues != default);
             Debug.Assert(state.Current.JsonClassInfo != default);
 
-            if (state.Current.IsProcessingDictionary)
+            if (state.Current.IsProcessingDictionary || state.Current.IsProcessingImmutableDictionary)
             {
                 if (ReferenceEquals(state.Current.JsonClassInfo.DataExtensionProperty, state.Current.JsonPropertyInfo))
                 {
@@ -47,13 +47,16 @@ namespace System.Text.Json.Serialization
                         keyName = options.DictionaryKeyPolicy.ConvertName(keyName);
                     }
 
-                    if (state.Current.IsDictionary)
+                    if (state.Current.IsDictionary || state.Current.IsImmutableDictionary)
                     {
                         state.Current.JsonPropertyInfo = state.Current.JsonClassInfo.GetPolicyProperty();
                     }
 
-                    Debug.Assert(state.Current.IsDictionary ||
-                        (state.Current.IsDictionaryProperty && state.Current.JsonPropertyInfo != null));
+                    Debug.Assert(
+                        state.Current.IsDictionary ||
+                        (state.Current.IsDictionaryProperty && state.Current.JsonPropertyInfo != null) ||
+                        state.Current.IsImmutableDictionary ||
+                        (state.Current.IsImmutableDictionaryProperty && state.Current.JsonPropertyInfo != null));
 
                     state.Current.KeyName = keyName;
                 }
@@ -84,6 +87,28 @@ namespace System.Text.Json.Serialization
                 }
                 else
                 {
+                    // Support JsonException.Path.
+                    Debug.Assert(
+                        state.Current.JsonPropertyInfo.JsonPropertyName == null ||
+                        options.PropertyNameCaseInsensitive ||
+                        propertyName.SequenceEqual(state.Current.JsonPropertyInfo.JsonPropertyName));
+
+                    if (state.Current.JsonPropertyInfo.JsonPropertyName == null)
+                    {
+                        byte[] propertyNameArray = propertyName.ToArray();
+                        if (options.PropertyNameCaseInsensitive)
+                        {
+                            // Each payload can have a different name here; remember the value on the temporary stack.
+                            state.Current.JsonPropertyName = propertyNameArray;
+                        }
+                        else
+                        {
+                            // Prevent future allocs by caching globally on the JsonPropertyInfo which is specific to a Type+PropertyName
+                            // so it will match the incoming payload except when case insensitivity is enabled (which is handled above).
+                            state.Current.JsonPropertyInfo.JsonPropertyName = propertyNameArray;
+                        }
+                    }
+
                     state.Current.PropertyIndex++;
                 }
             }
@@ -95,6 +120,9 @@ namespace System.Text.Json.Serialization
             ref Utf8JsonReader reader,
             ref ReadStack state)
         {
+            // Remember the property name to support Path.
+            state.Current.JsonPropertyName = unescapedPropertyName.ToArray();
+
             JsonPropertyInfo jsonPropertyInfo = state.Current.JsonClassInfo.DataExtensionProperty;
 
             Debug.Assert(jsonPropertyInfo != null);

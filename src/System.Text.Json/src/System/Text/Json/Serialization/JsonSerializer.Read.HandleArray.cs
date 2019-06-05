@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text.Json.Serialization.Policies;
 
-namespace System.Text.Json.Serialization
+namespace System.Text.Json
 {
     public static partial class JsonSerializer
     {
@@ -39,7 +39,7 @@ namespace System.Text.Json.Serialization
             Type arrayType = jsonPropertyInfo.RuntimePropertyType;
             if (!typeof(IEnumerable).IsAssignableFrom(arrayType) || (arrayType.IsArray && arrayType.GetArrayRank() > 1))
             {
-                ThrowHelper.ThrowJsonException_DeserializeUnableToConvertValue(arrayType, reader, state.PropertyPath);
+                ThrowHelper.ThrowJsonException_DeserializeUnableToConvertValue(arrayType, reader, state.JsonPath);
             }
 
             Debug.Assert(state.Current.IsProcessingEnumerableOrDictionary);
@@ -128,7 +128,7 @@ namespace System.Text.Json.Serialization
                     state.Current.ReturnValue = value;
                     return true;
                 }
-                else if (state.Current.IsEnumerable || state.Current.IsDictionary)
+                else if (state.Current.IsEnumerable || state.Current.IsDictionary || state.Current.IsImmutableDictionary)
                 {
                     // Returning a non-converted list.
                     return true;
@@ -199,7 +199,23 @@ namespace System.Text.Json.Serialization
                 }
                 else
                 {
-                    ThrowHelper.ThrowJsonException_DeserializeDuplicateKey(key, reader, state.PropertyPath);
+                    ThrowHelper.ThrowJsonException_DeserializeDuplicateKey(key, reader, state.JsonPath);
+                }
+            }
+            else if (state.Current.IsImmutableDictionary || (state.Current.IsImmutableDictionaryProperty && !setPropertyDirectly))
+            {
+                Debug.Assert(state.Current.TempDictionaryValues != null);
+                IDictionary dictionary = (IDictionary)state.Current.JsonPropertyInfo.GetValueAsObject(state.Current.TempDictionaryValues);
+
+                string key = state.Current.KeyName;
+                Debug.Assert(!string.IsNullOrEmpty(key));
+                if (!dictionary.Contains(key))
+                {
+                    dictionary.Add(key, value);
+                }
+                else
+                {
+                    ThrowHelper.ThrowJsonException_DeserializeDuplicateKey(key, reader, state.JsonPath);
                 }
             }
             else
@@ -262,7 +278,23 @@ namespace System.Text.Json.Serialization
                 }
                 else
                 {
-                    ThrowHelper.ThrowJsonException_DeserializeDuplicateKey(key, reader, state.PropertyPath);
+                    ThrowHelper.ThrowJsonException_DeserializeDuplicateKey(key, reader, state.JsonPath);
+                }
+            }
+            else if (state.Current.IsProcessingImmutableDictionary)
+            {
+                Debug.Assert(state.Current.TempDictionaryValues != null);
+                IDictionary<string, TProperty> dictionary = (IDictionary<string, TProperty>)state.Current.TempDictionaryValues;
+
+                string key = state.Current.KeyName;
+                Debug.Assert(!string.IsNullOrEmpty(key));
+                if (!dictionary.ContainsKey(key)) // The IDictionary.TryAdd extension method is not available in netstandard.
+                {
+                    dictionary.Add(key, value);
+                }
+                else
+                {
+                    ThrowHelper.ThrowJsonException_DeserializeDuplicateKey(key, reader, state.JsonPath);
                 }
             }
             else

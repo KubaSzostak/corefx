@@ -349,6 +349,12 @@ namespace System.Text.Json
                 case ExceptionResource.ExpectedJsonTokens:
                     message = SR.ExpectedJsonTokens;
                     break;
+                case ExceptionResource.NotEnoughData:
+                    message = SR.NotEnoughData;
+                    break;
+                case ExceptionResource.ExpectedOneCompleteToken:
+                    message = SR.ExpectedOneCompleteToken;
+                    break;
                 case ExceptionResource.InvalidCharacterAtStartOfComment:
                     message = SR.Format(SR.InvalidCharacterAtStartOfComment, character);
                     break;
@@ -517,6 +523,9 @@ namespace System.Text.Json
                 case DateType.DateTimeOffset:
                     message = SR.FormatDateTimeOffset;
                     break;
+                case DateType.Base64String:
+                    message = SR.CannotDecodeInvalidBase64;
+                    break;
                 default:
                     Debug.Fail($"The DateType enum value: {dateType} is not part of the switch. Add the appropriate case and exception message.");
                     break;
@@ -563,7 +572,9 @@ namespace System.Text.Json
         TrailingCommaNotAllowedBeforeArrayEnd,
         TrailingCommaNotAllowedBeforeObjectEnd,
         InvalidCharacterAtStartOfComment,
-        UnexpectedEndOfDataWhileReadingComment
+        UnexpectedEndOfDataWhileReadingComment,
+        ExpectedOneCompleteToken,
+        NotEnoughData
     }
 
     internal enum NumericType
@@ -580,6 +591,7 @@ namespace System.Text.Json
     internal enum DateType
     {
         DateTime,
-        DateTimeOffset
+        DateTimeOffset,
+        Base64String
     }
 }

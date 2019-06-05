@@ -271,8 +271,21 @@ namespace System.Text.Json
         /// Skips the children of the current JSON token.
         /// </summary>
         /// <exception cref="InvalidOperationException">
-        /// Thrown when the reader was given partial data with more data to follow (i.e. _isFinalBlock is false).
+        /// Thrown when the reader was given partial data with more data to follow (i.e. <see cref="IsFinalBlock"/> is false).
         /// </exception>
+        /// <exception cref="JsonException">
+        /// Thrown when an invalid JSON token is encountered while skipping, according to the JSON RFC,
+        /// or if the current depth exceeds the recursive limit set by the max depth.
+        /// </exception>
+        /// <remarks>
+        /// When <see cref="TokenType"/> is <see cref="JsonTokenType.PropertyName" />, the reader first moves to the property value.
+        /// When <see cref="TokenType"/> (originally, or after advancing) is <see cref="JsonTokenType.StartObject" /> or 
+        /// <see cref="JsonTokenType.StartArray" />, the reader advances to the matching
+        /// <see cref="JsonTokenType.EndObject" /> or <see cref="JsonTokenType.EndArray" />.
+        /// 
+        /// For all other token types, the reader does not move. After the next call to <see cref="Read"/>, the reader will be at
+        /// the next value (when in an array), the next property name (when in an object), or the end array/object token.
+        /// </remarks>
         public void Skip()
         {
             if (!_isFinalBlock)
@@ -314,9 +327,22 @@ namespace System.Text.Json
         /// Tries to skip the children of the current JSON token.
         /// </summary>
         /// <returns>True if there was enough data for the children to be skipped successfully, else false.</returns>
+        /// <exception cref="JsonException">
+        /// Thrown when an invalid JSON token is encountered while skipping, according to the JSON RFC,
+        /// or if the current depth exceeds the recursive limit set by the max depth.
+        /// </exception>
         /// <remarks>
         /// If the reader did not have enough data to completely skip the children of the current token,
         /// it will be reset to the state it was in before the method was called.
+        /// </remarks>
+        /// <remarks>
+        /// When <see cref="TokenType"/> is <see cref="JsonTokenType.PropertyName" />, the reader first moves to the property value.
+        /// When <see cref="TokenType"/> (originally, or after advancing) is <see cref="JsonTokenType.StartObject" /> or 
+        /// <see cref="JsonTokenType.StartArray" />, the reader advances to the matching
+        /// <see cref="JsonTokenType.EndObject" /> or <see cref="JsonTokenType.EndArray" />.
+        /// 
+        /// For all other token types, the reader does not move. After the next call to <see cref="Read"/>, the reader will be at
+        /// the next value (when in an array), the next property name (when in an object), or the end array/object token.
         /// </remarks>
         public bool TrySkip()
         {
@@ -366,7 +392,7 @@ namespace System.Text.Json
         /// <summary>
         /// Compares the UTF-8 encoded text to the unescaped JSON token value in the source and returns true if they match.
         /// </summary>
-        /// <param name="otherUtf8Text">The UTF-8 encoded text to compare against.</param>
+        /// <param name="utf8Text">The UTF-8 encoded text to compare against.</param>
         /// <returns>True if the JSON token value in the source matches the UTF-8 encoded look up text.</returns>
         /// <exception cref="InvalidOperationException">
         /// Thrown if trying to find a text match on a JSON token that is not a string
@@ -381,13 +407,36 @@ namespace System.Text.Json
         /// The comparison of the JSON token value in the source and the look up text is done by first unescaping the JSON value in source,
         /// if required. The look up text is matched as is, without any modifications to it.
         /// </remarks>
-        public bool TextEquals(ReadOnlySpan<byte> otherUtf8Text)
+        public bool ValueTextEquals(ReadOnlySpan<byte> utf8Text)
         {
             if (!IsTokenTypeString(TokenType))
             {
                 throw ThrowHelper.GetInvalidOperationException_ExpectedStringComparison(TokenType);
             }
-            return TextEqualsHelper(otherUtf8Text);
+            return TextEqualsHelper(utf8Text);
+        }
+
+        /// <summary>
+        /// Compares the string text to the unescaped JSON token value in the source and returns true if they match.
+        /// </summary>
+        /// <param name="utf8Text">The text to compare against.</param>
+        /// <returns>True if the JSON token value in the source matches the look up text.</returns>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown if trying to find a text match on a JSON token that is not a string
+        /// (i.e. other than <see cref="JsonTokenType.String"/> or <see cref="JsonTokenType.PropertyName"/>).
+        /// <seealso cref="TokenType" />
+        /// </exception>
+        /// <remarks>
+        /// If the look up text is invalid UTF-8 text, the method will return false since you cannot have 
+        /// invalid UTF-8 within the JSON payload.
+        /// </remarks>
+        /// <remarks>
+        /// The comparison of the JSON token value in the source and the look up text is done by first unescaping the JSON value in source,
+        /// if required. The look up text is matched as is, without any modifications to it.
+        /// </remarks>
+        public bool ValueTextEquals(string utf8Text)
+        {
+            return ValueTextEquals(utf8Text.AsSpan());
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -409,7 +458,7 @@ namespace System.Text.Json
         /// <summary>
         /// Compares the text to the unescaped JSON token value in the source and returns true if they match.
         /// </summary>
-        /// <param name="otherText">The text to compare against.</param>
+        /// <param name="text">The text to compare against.</param>
         /// <returns>True if the JSON token value in the source matches the look up text.</returns>
         /// <exception cref="InvalidOperationException">
         /// Thrown if trying to find a text match on a JSON token that is not a string
@@ -424,14 +473,14 @@ namespace System.Text.Json
         /// The comparison of the JSON token value in the source and the look up text is done by first unescaping the JSON value in source,
         /// if required. The look up text is matched as is, without any modifications to it.
         /// </remarks>
-        public bool TextEquals(ReadOnlySpan<char> otherText)
+        public bool ValueTextEquals(ReadOnlySpan<char> text)
         {
             if (!IsTokenTypeString(TokenType))
             {
                 throw ThrowHelper.GetInvalidOperationException_ExpectedStringComparison(TokenType);
             }
 
-            if (MatchNotPossible(otherText.Length))
+            if (MatchNotPossible(text.Length))
             {
                 return false;
             }
@@ -440,9 +489,8 @@ namespace System.Text.Json
 
             Span<byte> otherUtf8Text;
 
-            ReadOnlySpan<byte> utf16Text = MemoryMarshal.AsBytes(otherText);
+            int length = checked(text.Length * JsonConstants.MaxExpansionFactorWhileTranscoding);
 
-            int length = checked(utf16Text.Length * JsonConstants.MaxExpansionFactorWhileTranscoding);
             if (length > JsonConstants.StackallocThreshold)
             {
                 otherUtf8TextArray = ArrayPool<byte>.Shared.Rent(length);
@@ -458,6 +506,7 @@ namespace System.Text.Json
                 }
             }
 
+            ReadOnlySpan<byte> utf16Text = MemoryMarshal.AsBytes(text);
             OperationStatus status = JsonWriterHelper.ToUtf8(utf16Text, otherUtf8Text, out int consumed, out int written);
             Debug.Assert(status != OperationStatus.DestinationTooSmall);
             if (status > OperationStatus.DestinationTooSmall)   // Equivalent to: (status == NeedMoreData || status == InvalidData)

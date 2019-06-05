@@ -2,12 +2,13 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text.Json.Serialization.Policies;
 
-namespace System.Text.Json.Serialization
+namespace System.Text.Json
 {
     public static partial class JsonSerializer
     {
@@ -30,7 +31,7 @@ namespace System.Text.Json.Serialization
                     return true;
                 }
 
-                state.Current.Enumerator = enumerable.GetEnumerator();
+                state.Current.Enumerator = ((IDictionary)enumerable).GetEnumerator();
                 state.Current.WriteObjectOrArrayStart(ClassType.Dictionary, writer);
             }
 
@@ -112,6 +113,11 @@ namespace System.Text.Json.Serialization
                 value = (TProperty)polymorphicEnumerator.Current.Value;
                 key = polymorphicEnumerator.Current.Key;
             }
+            else if (current.IsImmutableDictionary || current.IsImmutableDictionaryProperty)
+            {
+                value = (TProperty)((DictionaryEntry)current.Enumerator.Current).Value;
+                key = (string)((DictionaryEntry)current.Enumerator.Current).Key;
+            }
             else
             {
                 // Todo: support non-generic Dictionary here (IDictionaryEnumerator)
@@ -124,37 +130,8 @@ namespace System.Text.Json.Serialization
             }
             else
             {
-                byte[] utf8Key = Encoding.UTF8.GetBytes(key);
-#if true
-                // temporary behavior until the writer can accept escaped string.
-                converter.Write(utf8Key, value, writer);
-#else
-                int valueIdx = JsonWriterHelper.NeedsEscaping(utf8Key);
-                if (valueIdx == -1)
-                {
-                    converter.Write(utf8Key, value, writer);
-                }
-                else
-                {
-                    byte[] pooledKey = null;
-                    int length = JsonWriterHelper.GetMaxEscapedLength(utf8Key.Length, valueIdx);
-
-                    Span<byte> escapedKey = length <= JsonConstants.StackallocThreshold ?
-                        stackalloc byte[length] :
-                        (pooledKey = ArrayPool<byte>.Shared.Rent(length));
-
-                    JsonWriterHelper.EscapeString(utf8Key, escapedKey, valueIdx, out int written);
-
-                    converter.Write(escapedKey.Slice(0, written), value, writer);
-
-                    if (pooledKey != null)
-                    {
-                        // We clear the array because it is "user data" (although a property name).
-                        new Span<byte>(pooledKey, 0, written).Clear();
-                        ArrayPool<byte>.Shared.Return(pooledKey);
-                    }
-                }
-#endif
+                JsonEncodedText escapedKey = JsonEncodedText.Encode(key);
+                converter.Write(escapedKey, value, writer);
             }
         }
 
@@ -166,7 +143,7 @@ namespace System.Text.Json.Serialization
                 Debug.Assert(entry.Key is string);
 
                 string propertyName = (string)entry.Key;
-                element.WriteAsProperty(propertyName, writer);
+                element.WriteProperty(propertyName, writer);
             }
             else
             {
