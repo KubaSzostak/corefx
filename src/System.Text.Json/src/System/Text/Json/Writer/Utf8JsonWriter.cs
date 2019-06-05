@@ -49,6 +49,7 @@ namespace System.Text.Json
 
         private bool _inObject;
         private bool _isNotPrimitive;
+        private bool _isProperty;
         private JsonTokenType _tokenType;
         private BitStack _bitStack;
 
@@ -429,6 +430,7 @@ namespace System.Text.Json
         {
             WriteStart(JsonConstants.OpenBracket);
             _tokenType = JsonTokenType.StartArray;
+            _isProperty = false;
         }
 
         /// <summary>
@@ -442,6 +444,7 @@ namespace System.Text.Json
         {
             WriteStart(JsonConstants.OpenBrace);
             _tokenType = JsonTokenType.StartObject;
+            _isProperty = false;
         }
 
         private void WriteStart(byte token)
@@ -504,11 +507,15 @@ namespace System.Text.Json
         {
             if (_inObject)
             {
-                Debug.Assert(_tokenType != JsonTokenType.None && _tokenType != JsonTokenType.StartArray);
-                ThrowHelper.ThrowInvalidOperationException(ExceptionResource.CannotStartObjectArrayWithoutProperty, currentDepth: default, token: default, _tokenType);
+                if (!_isProperty)
+                {
+                    Debug.Assert(_tokenType != JsonTokenType.None && _tokenType != JsonTokenType.StartArray);
+                    ThrowHelper.ThrowInvalidOperationException(ExceptionResource.CannotStartObjectArrayWithoutProperty, currentDepth: default, token: default, _tokenType);
+                }
             }
             else
             {
+                Debug.Assert(!_isProperty);
                 Debug.Assert(_tokenType != JsonTokenType.StartObject);
                 if (_tokenType != JsonTokenType.None && (!_isNotPrimitive || CurrentDepth == 0))
                 {
@@ -563,6 +570,7 @@ namespace System.Text.Json
         {
             WriteStartHelper(propertyName.EncodedUtf8Bytes, JsonConstants.OpenBracket);
             _tokenType = JsonTokenType.StartArray;
+            _isProperty = false;
         }
 
         /// <summary>
@@ -619,6 +627,7 @@ namespace System.Text.Json
             _currentDepth++;
             _isNotPrimitive = true;
             _tokenType = JsonTokenType.StartArray;
+            _isProperty = false;
         }
 
         /// <summary>
@@ -758,6 +767,7 @@ namespace System.Text.Json
             _currentDepth++;
             _isNotPrimitive = true;
             _tokenType = JsonTokenType.StartArray;
+            _isProperty = false;
         }
 
         /// <summary>
@@ -784,6 +794,7 @@ namespace System.Text.Json
             _currentDepth++;
             _isNotPrimitive = true;
             _tokenType = JsonTokenType.StartObject;
+            _isProperty = false;
         }
 
         private void WriteStartEscape(ReadOnlySpan<char> propertyName, byte token)
@@ -915,7 +926,7 @@ namespace System.Text.Json
 
         private void ValidateEnd(byte token)
         {
-            if (_bitStack.CurrentDepth <= 0)
+            if (_bitStack.CurrentDepth <= 0 || _isProperty)
                 ThrowHelper.ThrowInvalidOperationException(ExceptionResource.MismatchedObjectArray, currentDepth: default, token, tokenType: default);
 
             if (token == JsonConstants.CloseBracket)
