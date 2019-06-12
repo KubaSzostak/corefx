@@ -44,6 +44,42 @@ namespace System.Text.Json
             return true;
         }
 
+        private static bool WriteObject(
+            JsonSerializerOptions options,
+            Utf8JsonWriter writer,
+            JsonEncodedText utf8,
+            ref WriteStack state)
+        {
+            // Write the start.
+            if (!state.Current.StartObjectWritten)
+            {
+                state.Current.WriteObjectOrArrayStart(ClassType.Object, writer, utf8);
+            }
+
+            // Determine if we are done enumerating properties.
+            // If the ClassType is unknown, there will be a policy property applied. There is probably
+            // a better way to identify policy properties- maybe not put them in the normal property bag?
+            JsonClassInfo classInfo = state.Current.JsonClassInfo;
+            if (classInfo.ClassType != ClassType.Unknown && state.Current.PropertyIndex != classInfo.PropertyCount)
+            {
+                HandleObject(options, writer, ref state);
+                return false;
+            }
+
+            writer.WriteEndObject();
+
+            if (state.Current.PopStackOnEndObject)
+            {
+                state.Pop();
+            }
+            else
+            {
+                state.Current.EndObject();
+            }
+
+            return true;
+        }
+
         private static bool HandleObject(
                 JsonSerializerOptions options,
                 Utf8JsonWriter writer,

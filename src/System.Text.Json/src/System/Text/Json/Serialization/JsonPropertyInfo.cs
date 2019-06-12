@@ -307,6 +307,7 @@ namespace System.Text.Json
         public abstract void SetValueAsObject(object obj, object value);
 
         public abstract void Write(ref WriteStackFrame current, Utf8JsonWriter writer);
+        public abstract void Write(ref WriteStackFrame current, Utf8JsonWriter writer, JsonEncodedText utf8);
 
         public virtual void WriteDictionary(ref WriteStackFrame current, Utf8JsonWriter writer) { }
         public abstract void WriteEnumerable(ref WriteStackFrame current, Utf8JsonWriter writer);

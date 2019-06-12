@@ -98,6 +98,44 @@ namespace System.Text.Json
             }
         }
 
+        public override void Write(ref WriteStackFrame current, Utf8JsonWriter writer, JsonEncodedText utf8)
+        {
+            Debug.Assert(ShouldSerialize);
+
+            if (current.Enumerator != null)
+            {
+                // Forward the setter to the value-based JsonPropertyInfo.
+                JsonPropertyInfo propertyInfo = ElementClassInfo.GetPolicyProperty();
+                propertyInfo.WriteEnumerable(ref current, writer);
+            }
+            else
+            {
+                TProperty? value;
+                if (IsPropertyPolicy)
+                {
+                    value = (TProperty?)current.CurrentValue;
+                }
+                else
+                {
+                    value = Get(current.CurrentValue);
+                }
+
+                if (value == null)
+                {
+                    Debug.Assert(EscapedName.HasValue);
+
+                    if (!IgnoreNullValues)
+                    {
+                        writer.WriteNull(EscapedName.Value);
+                    }
+                }
+                else if (ValueConverter != null)
+                {
+                    ValueConverter.Write(utf8, value.GetValueOrDefault(), writer);
+                }
+            }
+        }
+
         public override void WriteEnumerable(ref WriteStackFrame current, Utf8JsonWriter writer)
         {
             Debug.Assert(ShouldSerialize);

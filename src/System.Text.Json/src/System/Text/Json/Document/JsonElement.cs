@@ -1126,6 +1126,16 @@ namespace System.Text.Json
         }
 
         /// <summary>
+        ///   Write the element into the provided writer as a named JSON object property.
+        /// </summary>
+        public void WriteProperty(JsonEncodedText propertyName, Utf8JsonWriter writer)
+        {
+            CheckValidInstance();
+
+            _parent.WriteElementTo(_idx, writer, propertyName);
+        }
+
+        /// <summary>
         ///   Write the element into the provided writer as a JSON value.
         /// </summary>
         /// <param name="writer">The writer.</param>

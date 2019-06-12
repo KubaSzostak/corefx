@@ -54,6 +54,35 @@ namespace System.Text.Json
             }
         }
 
+        public void WriteObjectOrArrayStart(ClassType classType, Utf8JsonWriter writer, JsonEncodedText utf8, bool writeNull = false)
+        {
+            if (JsonPropertyInfo?.EscapedName.HasValue == true)
+            {
+                WriteObjectOrArrayStart(classType, JsonPropertyInfo.EscapedName.Value, writer, writeNull);
+            }
+            else if (KeyName != null)
+            {
+                JsonEncodedText propertyName = JsonEncodedText.Encode(KeyName);
+                WriteObjectOrArrayStart(classType, propertyName, writer, writeNull);
+            }
+            else
+            {
+                Debug.Assert(writeNull == false);
+
+                // Write start without a property name.
+                if (classType == ClassType.Object || classType == ClassType.Dictionary || classType == ClassType.ImmutableDictionary)
+                {
+                    writer.WriteStartObject(utf8);
+                    StartObjectWritten = true;
+                }
+                else
+                {
+                    Debug.Assert(classType == ClassType.Enumerable);
+                    writer.WriteStartArray(utf8);
+                }
+            }
+        }
+
         public void WriteObjectOrArrayStart(ClassType classType, Utf8JsonWriter writer, bool writeNull = false)
         {
             if (JsonPropertyInfo?.EscapedName.HasValue == true)

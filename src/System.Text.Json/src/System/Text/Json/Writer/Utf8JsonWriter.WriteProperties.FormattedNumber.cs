@@ -39,6 +39,7 @@ namespace System.Text.Json
 
             SetFlagToAddListSeparatorBeforeNextItem();
             _tokenType = JsonTokenType.Number;
+            _isProperty = false;
         }
 
         /// <summary>
@@ -71,6 +72,19 @@ namespace System.Text.Json
 
             SetFlagToAddListSeparatorBeforeNextItem();
             _tokenType = JsonTokenType.Number;
+            _isProperty = false;
+        }
+
+        internal void WriteNumber(JsonEncodedText propertyName, ReadOnlySpan<byte> utf8FormattedNumber)
+        {
+            JsonWriterHelper.ValidateValue(utf8FormattedNumber);
+            JsonWriterHelper.ValidateNumber(utf8FormattedNumber);
+
+            WriteNumberByOptions(propertyName.EncodedUtf8Bytes, utf8FormattedNumber);
+
+            SetFlagToAddListSeparatorBeforeNextItem();
+            _tokenType = JsonTokenType.Number;
+            _isProperty = false;
         }
 
         private void WriteNumberEscape(ReadOnlySpan<char> propertyName, ReadOnlySpan<byte> value)

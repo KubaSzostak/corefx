@@ -868,6 +868,22 @@ namespace System.Text.Json
         /// <summary>
         /// Writes the property name and text value (as a JSON string) as part of a name/value pair of a JSON object.
         /// </summary>
+        public void WritePropertyName(JsonEncodedText utf8PropertyName)
+            => WritePropertyNameHelper(utf8PropertyName.EncodedUtf8Bytes);
+
+        private void WritePropertyNameHelper(ReadOnlySpan<byte> utf8PropertyName)
+        {
+            Debug.Assert(utf8PropertyName.Length <= JsonConstants.MaxTokenSize);
+
+            WriteStringByOptionsPropertyName(utf8PropertyName);
+
+            _tokenType = JsonTokenType.PropertyName;
+            _isProperty = true;
+        }
+
+        /// <summary>
+        /// Writes the property name and text value (as a JSON string) as part of a name/value pair of a JSON object.
+        /// </summary>
         public void WritePropertyName(ReadOnlySpan<byte> utf8PropertyName)
         {
             int propertyIdx = JsonWriterHelper.NeedsEscaping(utf8PropertyName);
@@ -882,7 +898,7 @@ namespace System.Text.Json
             {
                 WriteStringByOptionsPropertyName(utf8PropertyName);
             }
-
+            _tokenType = JsonTokenType.PropertyName;
             _isProperty = true;
         }
 

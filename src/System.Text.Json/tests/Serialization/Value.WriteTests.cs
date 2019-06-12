@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using System.IO;
 using Xunit;
 
 namespace System.Text.Json.Serialization.Tests
@@ -11,6 +12,34 @@ namespace System.Text.Json.Serialization.Tests
         [Fact]
         public static void WritePrimitives()
         {
+            {
+                Assert.Equal("\"AQID\"", JsonSerializer.ToString<byte[]>(new byte[] { 1, 2, 3 }));
+            }
+
+            {
+                var stream = new MemoryStream();
+                using var writer = new Utf8JsonWriter(stream);
+                writer.WriteStartObject();
+                writer.WritePropertyName(Encoding.UTF8.GetBytes("foo"));
+                JsonSerializer.WriteValue<byte[]>(writer, new byte[] { 1, 2, 3 });
+                writer.WriteEndObject();
+                writer.Flush();
+
+                Assert.Equal("{\"foo\":\"AQID\"}", Encoding.UTF8.GetString(stream.ToArray()));
+            }
+
+            {
+                var stream = new MemoryStream();
+                using var writer = new Utf8JsonWriter(stream);
+                writer.WriteStartObject();
+                JsonSerializer.WriteProperty<byte[]>(writer, JsonEncodedText.Encode(Encoding.UTF8.GetBytes("foo")), new byte[] { 1, 2, 3 });
+                writer.WriteEndObject();
+                writer.Flush();
+
+                Assert.Equal("{\"foo\":\"AQID\"}", Encoding.UTF8.GetString(stream.ToArray()));
+            }
+
+
             {
                 string json = JsonSerializer.ToString(1);
                 Assert.Equal("1", json);

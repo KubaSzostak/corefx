@@ -4125,22 +4125,6 @@ namespace System.Text.Json.Tests
             WriteStringHelper(text, "\"\"");
         }
 
-        [Fact]
-        public static void TestNewtonSoft()
-        {
-            var foo = new Foo();
-            foo.Array = new byte[4] { 1, 2, 3, 4 };
-            foo.IntArray = new int[4] { 1, 2, 3, 4 };
-
-            Assert.Equal("", JsonConvert.SerializeObject(foo));
-        }
-
-        public class Foo
-        {
-            public byte[] Array { get; set; }
-            public int[] IntArray { get; set; }
-        }
-
         [Theory]
         [MemberData(nameof(JsonEncodedTextStrings))]
         public static void WriteStringDateAndGuid_JsonEncodedText(string message, string expectedMessage)

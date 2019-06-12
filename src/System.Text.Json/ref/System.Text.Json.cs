@@ -78,6 +78,7 @@ namespace System.Text.Json
         public bool ValueEquals(string text) { throw null; }
         public void WriteProperty(System.ReadOnlySpan<byte> utf8PropertyName, System.Text.Json.Utf8JsonWriter writer) { }
         public void WriteProperty(System.ReadOnlySpan<char> propertyName, System.Text.Json.Utf8JsonWriter writer) { }
+        public void WriteProperty(JsonEncodedText propertyName, System.Text.Json.Utf8JsonWriter writer) { }
         public void WriteProperty(string propertyName, System.Text.Json.Utf8JsonWriter writer) { }
         public void WriteValue(System.Text.Json.Utf8JsonWriter writer) { }
         public partial struct ArrayEnumerator : System.Collections.Generic.IEnumerable<System.Text.Json.JsonElement>, System.Collections.Generic.IEnumerator<System.Text.Json.JsonElement>, System.Collections.IEnumerable, System.Collections.IEnumerator, System.IDisposable
@@ -171,6 +172,10 @@ namespace System.Text.Json
         public static System.Threading.Tasks.ValueTask<TValue> ReadAsync<TValue>(System.IO.Stream utf8Json, System.Text.Json.JsonSerializerOptions options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) { throw null; }
         public static object ReadValue(ref System.Text.Json.Utf8JsonReader reader, System.Type returnType, System.Text.Json.JsonSerializerOptions options = null) { throw null; }
         public static TValue ReadValue<TValue>(ref System.Text.Json.Utf8JsonReader reader, System.Text.Json.JsonSerializerOptions options = null) { throw null; }
+        public static void WriteValue(Utf8JsonWriter writer, object value, Type type, JsonSerializerOptions options = null) { throw null; }
+        public static void WriteValue<TValue>(Utf8JsonWriter writer, TValue value, JsonSerializerOptions options = null) { throw null; }
+        public static void WriteProperty(Utf8JsonWriter writer, JsonEncodedText utf8PropertyName, object value, Type type, JsonSerializerOptions options = null) { throw null; }
+        public static void WriteProperty<TValue>(Utf8JsonWriter writer, JsonEncodedText utf8PropertyName, TValue value, JsonSerializerOptions options = null) { throw null; }
         public static string ToString(object value, System.Type type, System.Text.Json.JsonSerializerOptions options = null) { throw null; }
         public static string ToString<TValue>(TValue value, System.Text.Json.JsonSerializerOptions options = null) { throw null; }
         public static byte[] ToUtf8Bytes(object value, System.Type type, System.Text.Json.JsonSerializerOptions options = null) { throw null; }
@@ -305,6 +310,7 @@ namespace System.Text.Json
         public void WriteCommentValue(string value) { }
         public void WriteEndArray() { }
         public void WriteEndObject() { }
+        public void WritePropertyName(JsonEncodedText utf8PropertyName) { }
         public void WritePropertyName(System.ReadOnlySpan<byte> utf8PropertyName) { }
         //public void WritePropertyName(System.ReadOnlySpan<char> propertyName) { }
         //public void WritePropertyName(string propertyName) { }
