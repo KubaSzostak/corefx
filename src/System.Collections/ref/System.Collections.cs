@@ -51,146 +51,6 @@ namespace System.Collections.Generic
         public static bool Remove<TKey, TValue>(this System.Collections.Generic.IDictionary<TKey, TValue> dictionary, TKey key, [System.Diagnostics.CodeAnalysis.MaybeNullWhenAttribute(false)] out TValue value) where TKey : notnull { throw null; }
         public static bool TryAdd<TKey, TValue>(this System.Collections.Generic.IDictionary<TKey, TValue> dictionary, TKey key, TValue value) where TKey : notnull { throw null; }
     }
-    public abstract partial class Comparer<T> : System.Collections.Generic.IComparer<T>, System.Collections.IComparer
-    {
-        protected Comparer() { }
-        public static System.Collections.Generic.Comparer<T> Default { get { throw null; } }
-        public abstract int Compare([System.Diagnostics.CodeAnalysis.AllowNullAttribute] T x, [System.Diagnostics.CodeAnalysis.AllowNullAttribute] T y);
-        public static System.Collections.Generic.Comparer<T> Create(System.Comparison<T> comparison) { throw null; }
-        int System.Collections.IComparer.Compare(object x, object y) { throw null; }
-    }
-    public partial class Dictionary<TKey, TValue> : System.Collections.Generic.ICollection<System.Collections.Generic.KeyValuePair<TKey, TValue>>, System.Collections.Generic.IDictionary<TKey, TValue>, System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<TKey, TValue>>, System.Collections.Generic.IReadOnlyCollection<System.Collections.Generic.KeyValuePair<TKey, TValue>>, System.Collections.Generic.IReadOnlyDictionary<TKey, TValue>, System.Collections.ICollection, System.Collections.IDictionary, System.Collections.IEnumerable, System.Runtime.Serialization.IDeserializationCallback, System.Runtime.Serialization.ISerializable where TKey : notnull
-    {
-        public Dictionary() { }
-        public Dictionary(System.Collections.Generic.IDictionary<TKey, TValue> dictionary) { }
-        public Dictionary(System.Collections.Generic.IDictionary<TKey, TValue> dictionary, System.Collections.Generic.IEqualityComparer<TKey>? comparer) { }
-        public Dictionary(System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<TKey, TValue>> collection) { }
-        public Dictionary(System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<TKey, TValue>> collection, System.Collections.Generic.IEqualityComparer<TKey>? comparer) { }
-        public Dictionary(System.Collections.Generic.IEqualityComparer<TKey>? comparer) { }
-        public Dictionary(int capacity) { }
-        public Dictionary(int capacity, System.Collections.Generic.IEqualityComparer<TKey>? comparer) { }
-        protected Dictionary(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context) { }
-        public System.Collections.Generic.IEqualityComparer<TKey> Comparer { get { throw null; } }
-        public int Count { get { throw null; } }
-        public TValue this[TKey key] { get { throw null; } set { } }
-        public System.Collections.Generic.Dictionary<TKey, TValue>.KeyCollection Keys { get { throw null; } }
-        bool System.Collections.Generic.ICollection<System.Collections.Generic.KeyValuePair<TKey, TValue>>.IsReadOnly { get { throw null; } }
-        System.Collections.Generic.ICollection<TKey> System.Collections.Generic.IDictionary<TKey, TValue>.Keys { get { throw null; } }
-        System.Collections.Generic.ICollection<TValue> System.Collections.Generic.IDictionary<TKey, TValue>.Values { get { throw null; } }
-        System.Collections.Generic.IEnumerable<TKey> System.Collections.Generic.IReadOnlyDictionary<TKey, TValue>.Keys { get { throw null; } }
-        System.Collections.Generic.IEnumerable<TValue> System.Collections.Generic.IReadOnlyDictionary<TKey, TValue>.Values { get { throw null; } }
-        bool System.Collections.ICollection.IsSynchronized { get { throw null; } }
-        object System.Collections.ICollection.SyncRoot { get { throw null; } }
-        bool System.Collections.IDictionary.IsFixedSize { get { throw null; } }
-        bool System.Collections.IDictionary.IsReadOnly { get { throw null; } }
-        object? System.Collections.IDictionary.this[object key] { get { throw null; } set { } }
-        System.Collections.ICollection System.Collections.IDictionary.Keys { get { throw null; } }
-        System.Collections.ICollection System.Collections.IDictionary.Values { get { throw null; } }
-        public System.Collections.Generic.Dictionary<TKey, TValue>.ValueCollection Values { get { throw null; } }
-        public void Add(TKey key, TValue value) { }
-        public void Clear() { }
-        public bool ContainsKey(TKey key) { throw null; }
-        public bool ContainsValue(TValue value) { throw null; }
-        public int EnsureCapacity(int capacity) { throw null; }
-        public System.Collections.Generic.Dictionary<TKey, TValue>.Enumerator GetEnumerator() { throw null; }
-        public virtual void GetObjectData(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context) { }
-        public virtual void OnDeserialization(object? sender) { }
-        public bool Remove(TKey key) { throw null; }
-        public bool Remove(TKey key, [System.Diagnostics.CodeAnalysis.MaybeNullWhenAttribute(false)] out TValue value) { throw null; }
-        void System.Collections.Generic.ICollection<System.Collections.Generic.KeyValuePair<TKey, TValue>>.Add(System.Collections.Generic.KeyValuePair<TKey, TValue> keyValuePair) { }
-        bool System.Collections.Generic.ICollection<System.Collections.Generic.KeyValuePair<TKey, TValue>>.Contains(System.Collections.Generic.KeyValuePair<TKey, TValue> keyValuePair) { throw null; }
-        void System.Collections.Generic.ICollection<System.Collections.Generic.KeyValuePair<TKey, TValue>>.CopyTo(System.Collections.Generic.KeyValuePair<TKey, TValue>[] array, int index) { }
-        bool System.Collections.Generic.ICollection<System.Collections.Generic.KeyValuePair<TKey, TValue>>.Remove(System.Collections.Generic.KeyValuePair<TKey, TValue> keyValuePair) { throw null; }
-        System.Collections.Generic.IEnumerator<System.Collections.Generic.KeyValuePair<TKey, TValue>> System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<TKey, TValue>>.GetEnumerator() { throw null; }
-        void System.Collections.ICollection.CopyTo(System.Array array, int index) { }
-        void System.Collections.IDictionary.Add(object key, object value) { }
-        bool System.Collections.IDictionary.Contains(object key) { throw null; }
-        System.Collections.IDictionaryEnumerator System.Collections.IDictionary.GetEnumerator() { throw null; }
-        void System.Collections.IDictionary.Remove(object key) { }
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() { throw null; }
-        public void TrimExcess() { }
-        public void TrimExcess(int capacity) { }
-        public bool TryAdd(TKey key, TValue value) { throw null; }
-        public bool TryGetValue(TKey key, [System.Diagnostics.CodeAnalysis.MaybeNullWhenAttribute(false)] out TValue value) { throw null; }
-        public partial struct Enumerator : System.Collections.Generic.IEnumerator<System.Collections.Generic.KeyValuePair<TKey, TValue>>, System.Collections.IDictionaryEnumerator, System.Collections.IEnumerator, System.IDisposable
-        {
-            private object _dummy;
-            private int _dummyPrimitive;
-            public System.Collections.Generic.KeyValuePair<TKey, TValue> Current { get { throw null; } }
-            System.Collections.DictionaryEntry System.Collections.IDictionaryEnumerator.Entry { get { throw null; } }
-            object System.Collections.IDictionaryEnumerator.Key { get { throw null; } }
-            object? System.Collections.IDictionaryEnumerator.Value { get { throw null; } }
-            object? System.Collections.IEnumerator.Current { get { throw null; } }
-            public void Dispose() { }
-            public bool MoveNext() { throw null; }
-            void System.Collections.IEnumerator.Reset() { }
-        }
-        public sealed partial class KeyCollection : System.Collections.Generic.ICollection<TKey>, System.Collections.Generic.IEnumerable<TKey>, System.Collections.Generic.IReadOnlyCollection<TKey>, System.Collections.ICollection, System.Collections.IEnumerable
-        {
-            public KeyCollection(System.Collections.Generic.Dictionary<TKey, TValue> dictionary) { }
-            public int Count { get { throw null; } }
-            bool System.Collections.Generic.ICollection<TKey>.IsReadOnly { get { throw null; } }
-            bool System.Collections.ICollection.IsSynchronized { get { throw null; } }
-            object System.Collections.ICollection.SyncRoot { get { throw null; } }
-            public void CopyTo(TKey[] array, int index) { }
-            public System.Collections.Generic.Dictionary<TKey, TValue>.KeyCollection.Enumerator GetEnumerator() { throw null; }
-            void System.Collections.Generic.ICollection<TKey>.Add(TKey item) { }
-            void System.Collections.Generic.ICollection<TKey>.Clear() { }
-            bool System.Collections.Generic.ICollection<TKey>.Contains(TKey item) { throw null; }
-            bool System.Collections.Generic.ICollection<TKey>.Remove(TKey item) { throw null; }
-            System.Collections.Generic.IEnumerator<TKey> System.Collections.Generic.IEnumerable<TKey>.GetEnumerator() { throw null; }
-            void System.Collections.ICollection.CopyTo(System.Array array, int index) { }
-            System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() { throw null; }
-            public partial struct Enumerator : System.Collections.Generic.IEnumerator<TKey>, System.Collections.IEnumerator, System.IDisposable
-            {
-                private TKey _currentKey;
-                private object _dummy;
-                private int _dummyPrimitive;
-                public TKey Current { get { throw null; } }
-                object? System.Collections.IEnumerator.Current { get { throw null; } }
-                public void Dispose() { }
-                public bool MoveNext() { throw null; }
-                void System.Collections.IEnumerator.Reset() { }
-            }
-        }
-        public sealed partial class ValueCollection : System.Collections.Generic.ICollection<TValue>, System.Collections.Generic.IEnumerable<TValue>, System.Collections.Generic.IReadOnlyCollection<TValue>, System.Collections.ICollection, System.Collections.IEnumerable
-        {
-            public ValueCollection(System.Collections.Generic.Dictionary<TKey, TValue> dictionary) { }
-            public int Count { get { throw null; } }
-            bool System.Collections.Generic.ICollection<TValue>.IsReadOnly { get { throw null; } }
-            bool System.Collections.ICollection.IsSynchronized { get { throw null; } }
-            object System.Collections.ICollection.SyncRoot { get { throw null; } }
-            public void CopyTo(TValue[] array, int index) { }
-            public System.Collections.Generic.Dictionary<TKey, TValue>.ValueCollection.Enumerator GetEnumerator() { throw null; }
-            void System.Collections.Generic.ICollection<TValue>.Add(TValue item) { }
-            void System.Collections.Generic.ICollection<TValue>.Clear() { }
-            bool System.Collections.Generic.ICollection<TValue>.Contains(TValue item) { throw null; }
-            bool System.Collections.Generic.ICollection<TValue>.Remove(TValue item) { throw null; }
-            System.Collections.Generic.IEnumerator<TValue> System.Collections.Generic.IEnumerable<TValue>.GetEnumerator() { throw null; }
-            void System.Collections.ICollection.CopyTo(System.Array array, int index) { }
-            System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() { throw null; }
-            public partial struct Enumerator : System.Collections.Generic.IEnumerator<TValue>, System.Collections.IEnumerator, System.IDisposable
-            {
-                private TValue _currentValue;
-                private object _dummy;
-                private int _dummyPrimitive;
-                public TValue Current { get { throw null; } }
-                object? System.Collections.IEnumerator.Current { get { throw null; } }
-                public void Dispose() { }
-                public bool MoveNext() { throw null; }
-                void System.Collections.IEnumerator.Reset() { }
-            }
-        }
-    }
-    public abstract partial class EqualityComparer<T> : System.Collections.Generic.IEqualityComparer<T>, System.Collections.IEqualityComparer
-    {
-        protected EqualityComparer() { }
-        public static System.Collections.Generic.EqualityComparer<T> Default { get { throw null; } }
-        public abstract bool Equals([System.Diagnostics.CodeAnalysis.AllowNullAttribute] T x, [System.Diagnostics.CodeAnalysis.AllowNullAttribute] T y);
-        public abstract int GetHashCode([System.Diagnostics.CodeAnalysis.DisallowNullAttribute] T obj);
-        bool System.Collections.IEqualityComparer.Equals(object x, object y) { throw null; }
-        int System.Collections.IEqualityComparer.GetHashCode(object obj) { throw null; }
-    }
     public partial class HashSet<T> : System.Collections.Generic.ICollection<T>, System.Collections.Generic.IEnumerable<T>, System.Collections.Generic.IReadOnlyCollection<T>, System.Collections.Generic.ISet<T>, System.Collections.IEnumerable, System.Runtime.Serialization.IDeserializationCallback, System.Runtime.Serialization.ISerializable
     {
         public HashSet() { }
@@ -300,88 +160,6 @@ namespace System.Collections.Generic
             void System.Runtime.Serialization.ISerializable.GetObjectData(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context) { }
         }
     }
-    public partial class List<T> : System.Collections.Generic.ICollection<T>, System.Collections.Generic.IEnumerable<T>, System.Collections.Generic.IList<T>, System.Collections.Generic.IReadOnlyCollection<T>, System.Collections.Generic.IReadOnlyList<T>, System.Collections.ICollection, System.Collections.IEnumerable, System.Collections.IList
-    {
-        public List() { }
-        public List(System.Collections.Generic.IEnumerable<T> collection) { }
-        public List(int capacity) { }
-        public int Capacity { get { throw null; } set { } }
-        public int Count { get { throw null; } }
-        public T this[int index] { get { throw null; } set { } }
-        bool System.Collections.Generic.ICollection<T>.IsReadOnly { get { throw null; } }
-        bool System.Collections.ICollection.IsSynchronized { get { throw null; } }
-        object System.Collections.ICollection.SyncRoot { get { throw null; } }
-        bool System.Collections.IList.IsFixedSize { get { throw null; } }
-        bool System.Collections.IList.IsReadOnly { get { throw null; } }
-        object? System.Collections.IList.this[int index] { get { throw null; } set { } }
-        public void Add(T item) { }
-        public void AddRange(System.Collections.Generic.IEnumerable<T> collection) { }
-        public System.Collections.ObjectModel.ReadOnlyCollection<T> AsReadOnly() { throw null; }
-        public int BinarySearch(int index, int count, T item, System.Collections.Generic.IComparer<T>? comparer) { throw null; }
-        public int BinarySearch(T item) { throw null; }
-        public int BinarySearch(T item, System.Collections.Generic.IComparer<T>? comparer) { throw null; }
-        public void Clear() { }
-        public bool Contains(T item) { throw null; }
-        public System.Collections.Generic.List<TOutput> ConvertAll<TOutput>(System.Converter<T, TOutput> converter) { throw null; }
-        public void CopyTo(int index, T[] array, int arrayIndex, int count) { }
-        public void CopyTo(T[] array) { }
-        public void CopyTo(T[] array, int arrayIndex) { }
-        public bool Exists(System.Predicate<T> match) { throw null; }
-        [return: System.Diagnostics.CodeAnalysis.MaybeNullAttribute]
-        public T Find(System.Predicate<T> match) { throw null; }
-        public System.Collections.Generic.List<T> FindAll(System.Predicate<T> match) { throw null; }
-        public int FindIndex(int startIndex, int count, System.Predicate<T> match) { throw null; }
-        public int FindIndex(int startIndex, System.Predicate<T> match) { throw null; }
-        public int FindIndex(System.Predicate<T> match) { throw null; }
-        [return: System.Diagnostics.CodeAnalysis.MaybeNullAttribute]
-        public T FindLast(System.Predicate<T> match) { throw null; }
-        public int FindLastIndex(int startIndex, int count, System.Predicate<T> match) { throw null; }
-        public int FindLastIndex(int startIndex, System.Predicate<T> match) { throw null; }
-        public int FindLastIndex(System.Predicate<T> match) { throw null; }
-        public void ForEach(System.Action<T> action) { }
-        public System.Collections.Generic.List<T>.Enumerator GetEnumerator() { throw null; }
-        public System.Collections.Generic.List<T> GetRange(int index, int count) { throw null; }
-        public int IndexOf(T item) { throw null; }
-        public int IndexOf(T item, int index) { throw null; }
-        public int IndexOf(T item, int index, int count) { throw null; }
-        public void Insert(int index, T item) { }
-        public void InsertRange(int index, System.Collections.Generic.IEnumerable<T> collection) { }
-        public int LastIndexOf(T item) { throw null; }
-        public int LastIndexOf(T item, int index) { throw null; }
-        public int LastIndexOf(T item, int index, int count) { throw null; }
-        public bool Remove(T item) { throw null; }
-        public int RemoveAll(System.Predicate<T> match) { throw null; }
-        public void RemoveAt(int index) { }
-        public void RemoveRange(int index, int count) { }
-        public void Reverse() { }
-        public void Reverse(int index, int count) { }
-        public void Sort() { }
-        public void Sort(System.Collections.Generic.IComparer<T>? comparer) { }
-        public void Sort(System.Comparison<T> comparison) { }
-        public void Sort(int index, int count, System.Collections.Generic.IComparer<T>? comparer) { }
-        System.Collections.Generic.IEnumerator<T> System.Collections.Generic.IEnumerable<T>.GetEnumerator() { throw null; }
-        void System.Collections.ICollection.CopyTo(System.Array array, int arrayIndex) { }
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() { throw null; }
-        int System.Collections.IList.Add(object item) { throw null; }
-        bool System.Collections.IList.Contains(object item) { throw null; }
-        int System.Collections.IList.IndexOf(object item) { throw null; }
-        void System.Collections.IList.Insert(int index, object item) { }
-        void System.Collections.IList.Remove(object item) { }
-        public T[] ToArray() { throw null; }
-        public void TrimExcess() { }
-        public bool TrueForAll(System.Predicate<T> match) { throw null; }
-        public partial struct Enumerator : System.Collections.Generic.IEnumerator<T>, System.Collections.IEnumerator, System.IDisposable
-        {
-            private T _current;
-            private object _dummy;
-            private int _dummyPrimitive;
-            public T Current { get { throw null; } }
-            object? System.Collections.IEnumerator.Current { get { throw null; } }
-            public void Dispose() { }
-            public bool MoveNext() { throw null; }
-            void System.Collections.IEnumerator.Reset() { }
-        }
-    }
     public partial class Queue<T> : System.Collections.Generic.IEnumerable<T>, System.Collections.Generic.IReadOnlyCollection<T>, System.Collections.ICollection, System.Collections.IEnumerable
     {
         public Queue() { }
@@ -460,7 +238,6 @@ namespace System.Collections.Generic
         public partial struct Enumerator : System.Collections.Generic.IEnumerator<System.Collections.Generic.KeyValuePair<TKey, TValue>>, System.Collections.IDictionaryEnumerator, System.Collections.IEnumerator, System.IDisposable
         {
             private object _dummy;
-            private int _dummyPrimitive;
             public System.Collections.Generic.KeyValuePair<TKey, TValue> Current { get { throw null; } }
             System.Collections.DictionaryEntry System.Collections.IDictionaryEnumerator.Entry { get { throw null; } }
             object System.Collections.IDictionaryEnumerator.Key { get { throw null; } }
@@ -495,6 +272,11 @@ namespace System.Collections.Generic
                 public bool MoveNext() { throw null; }
                 void System.Collections.IEnumerator.Reset() { }
             }
+        }
+        public sealed partial class KeyValuePairComparer : System.Collections.Generic.Comparer<System.Collections.Generic.KeyValuePair<TKey, TValue>>
+        {
+            public KeyValuePairComparer(System.Collections.Generic.IComparer<TKey>? keyComparer) { }
+            public override int Compare(System.Collections.Generic.KeyValuePair<TKey, TValue> x, System.Collections.Generic.KeyValuePair<TKey, TValue> y) { throw null; }
         }
         public sealed partial class ValueCollection : System.Collections.Generic.ICollection<TValue>, System.Collections.Generic.IEnumerable<TValue>, System.Collections.Generic.IReadOnlyCollection<TValue>, System.Collections.ICollection, System.Collections.IEnumerable
         {
@@ -563,7 +345,7 @@ namespace System.Collections.Generic
         void System.Collections.Generic.ICollection<System.Collections.Generic.KeyValuePair<TKey, TValue>>.CopyTo(System.Collections.Generic.KeyValuePair<TKey, TValue>[] array, int arrayIndex) { }
         bool System.Collections.Generic.ICollection<System.Collections.Generic.KeyValuePair<TKey, TValue>>.Remove(System.Collections.Generic.KeyValuePair<TKey, TValue> keyValuePair) { throw null; }
         System.Collections.Generic.IEnumerator<System.Collections.Generic.KeyValuePair<TKey, TValue>> System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<TKey, TValue>>.GetEnumerator() { throw null; }
-        void System.Collections.ICollection.CopyTo(System.Array array, int arrayIndex) { }
+        void System.Collections.ICollection.CopyTo(System.Array array, int index) { }
         void System.Collections.IDictionary.Add(object key, object value) { }
         bool System.Collections.IDictionary.Contains(object key) { throw null; }
         System.Collections.IDictionaryEnumerator System.Collections.IDictionary.GetEnumerator() { throw null; }
@@ -571,6 +353,46 @@ namespace System.Collections.Generic
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() { throw null; }
         public void TrimExcess() { }
         public bool TryGetValue(TKey key, [System.Diagnostics.CodeAnalysis.MaybeNullWhenAttribute(false)] out TValue value) { throw null; }
+        public sealed partial class KeyList : System.Collections.Generic.ICollection<TKey>, System.Collections.Generic.IEnumerable<TKey>, System.Collections.Generic.IList<TKey>, System.Collections.ICollection, System.Collections.IEnumerable
+        {
+            internal KeyList() { }
+            public int Count { get { throw null; } }
+            public bool IsReadOnly { get { throw null; } }
+            public TKey this[int index] { get { throw null; } set { } }
+            bool System.Collections.ICollection.IsSynchronized { get { throw null; } }
+            object System.Collections.ICollection.SyncRoot { get { throw null; } }
+            public void Add(TKey key) { }
+            public void Clear() { }
+            public bool Contains(TKey key) { throw null; }
+            public void CopyTo(TKey[] array, int arrayIndex) { }
+            public System.Collections.Generic.IEnumerator<TKey> GetEnumerator() { throw null; }
+            public int IndexOf(TKey key) { throw null; }
+            public void Insert(int index, TKey value) { }
+            public bool Remove(TKey key) { throw null; }
+            public void RemoveAt(int index) { }
+            void System.Collections.ICollection.CopyTo(System.Array array, int arrayIndex) { }
+            System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() { throw null; }
+        }
+        public sealed partial class ValueList : System.Collections.Generic.ICollection<TValue>, System.Collections.Generic.IEnumerable<TValue>, System.Collections.Generic.IList<TValue>, System.Collections.ICollection, System.Collections.IEnumerable
+        {
+            internal ValueList() { }
+            public int Count { get { throw null; } }
+            public bool IsReadOnly { get { throw null; } }
+            public TValue this[int index] { get { throw null; } set { } }
+            bool System.Collections.ICollection.IsSynchronized { get { throw null; } }
+            object System.Collections.ICollection.SyncRoot { get { throw null; } }
+            public void Add(TValue key) { }
+            public void Clear() { }
+            public bool Contains(TValue value) { throw null; }
+            public void CopyTo(TValue[] array, int arrayIndex) { }
+            public System.Collections.Generic.IEnumerator<TValue> GetEnumerator() { throw null; }
+            public int IndexOf(TValue value) { throw null; }
+            public void Insert(int index, TValue value) { }
+            public bool Remove(TValue value) { throw null; }
+            public void RemoveAt(int index) { }
+            void System.Collections.ICollection.CopyTo(System.Array array, int index) { }
+            System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() { throw null; }
+        }
     }
     public partial class SortedSet<T> : System.Collections.Generic.ICollection<T>, System.Collections.Generic.IEnumerable<T>, System.Collections.Generic.IReadOnlyCollection<T>, System.Collections.Generic.ISet<T>, System.Collections.ICollection, System.Collections.IEnumerable, System.Runtime.Serialization.IDeserializationCallback, System.Runtime.Serialization.ISerializable
     {
@@ -623,7 +445,6 @@ namespace System.Collections.Generic
         public partial struct Enumerator : System.Collections.Generic.IEnumerator<T>, System.Collections.IEnumerator, System.IDisposable, System.Runtime.Serialization.IDeserializationCallback, System.Runtime.Serialization.ISerializable
         {
             private object _dummy;
-            private int _dummyPrimitive;
             public T Current { get { throw null; } }
             object? System.Collections.IEnumerator.Current { get { throw null; } }
             public void Dispose() { }
@@ -666,5 +487,10 @@ namespace System.Collections.Generic
             public bool MoveNext() { throw null; }
             void System.Collections.IEnumerator.Reset() { }
         }
+    }
+    public sealed partial class TreeSet<T> : System.Collections.Generic.SortedSet<T>
+    {
+        public TreeSet() { }
+        public TreeSet(System.Collections.Generic.IComparer<T>? comparer) { }
     }
 }

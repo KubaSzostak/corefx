@@ -23,35 +23,36 @@ namespace Microsoft.VisualBasic
         Let = 4,
         Set = 8,
     }
-    public sealed partial class Collection : System.Collections.ICollection, System.Collections.IEnumerable, System.Collections.IList
+    public sealed partial class Collection : System.Collections.ICollection, System.Collections.IList
     {
         public Collection() { }
         public int Count { get { throw null; } }
+        int ICollectionCount { get { throw null; } }
+        bool ICollectionIsSynchronized { get { throw null; } }
+        object ICollectionSyncRoot { get { throw null; } }
+        bool IListIsFixedSize { get { throw null; } }
+        bool IListIsReadOnly { get { throw null; } }
+        [System.Runtime.CompilerServices.IndexerName("IListItem")]
+        object this[int index] { get { throw null; } set { } }
         public object this[int Index] { get { throw null; } }
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
         public object this[object Index] { get { throw null; } }
         public object this[string Key] { get { throw null; } }
-        int System.Collections.ICollection.Count { get { throw null; } }
-        bool System.Collections.ICollection.IsSynchronized { get { throw null; } }
-        object System.Collections.ICollection.SyncRoot { get { throw null; } }
-        bool System.Collections.IList.IsFixedSize { get { throw null; } }
-        bool System.Collections.IList.IsReadOnly { get { throw null; } }
-        object System.Collections.IList.this[int index] { get { throw null; } set { } }
         public void Add(object Item, string Key = null, object Before = null, object After = null) { }
         public void Clear() { }
         public bool Contains(string Key) { throw null; }
         public System.Collections.IEnumerator GetEnumerator() { throw null; }
+        void ICollectionCopyTo(System.Array array, int index) { }
+        System.Collections.IEnumerator ICollectionGetEnumerator() { throw null; }
+        int IListAdd(object value) { throw null; }
+        void IListClear() { }
+        bool IListContains(object value) { throw null; }
+        int IListIndexOf(object value) { throw null; }
+        void IListInsert(int index, object value) { }
+        void IListRemove(object value) { }
+        void IListRemoveAt(int index) { }
         public void Remove(int Index) { }
         public void Remove(string Key) { }
-        void System.Collections.ICollection.CopyTo(System.Array array, int index) { }
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() { throw null; }
-        int System.Collections.IList.Add(object value) { throw null; }
-        void System.Collections.IList.Clear() { }
-        bool System.Collections.IList.Contains(object value) { throw null; }
-        int System.Collections.IList.IndexOf(object value) { throw null; }
-        void System.Collections.IList.Insert(int index, object value) { }
-        void System.Collections.IList.Remove(object value) { }
-        void System.Collections.IList.RemoveAt(int index) { }
     }
     [System.AttributeUsageAttribute(System.AttributeTargets.Class, Inherited=false, AllowMultiple=false)]
     public sealed partial class ComClassAttribute : System.Attribute
@@ -76,7 +77,7 @@ namespace Microsoft.VisualBasic
         internal Constants() { }
         public const Microsoft.VisualBasic.MsgBoxResult vbAbort = Microsoft.VisualBasic.MsgBoxResult.Abort;
         public const Microsoft.VisualBasic.MsgBoxStyle vbAbortRetryIgnore = Microsoft.VisualBasic.MsgBoxStyle.AbortRetryIgnore;
-        public const Microsoft.VisualBasic.MsgBoxStyle vbApplicationModal = Microsoft.VisualBasic.MsgBoxStyle.ApplicationModal;
+        public const Microsoft.VisualBasic.MsgBoxStyle vbApplicationModal = Microsoft.VisualBasic.MsgBoxStyle.OkOnly;
         public const Microsoft.VisualBasic.FileAttribute vbArchive = Microsoft.VisualBasic.FileAttribute.Archive;
         public const Microsoft.VisualBasic.VariantType vbArray = Microsoft.VisualBasic.VariantType.Array;
         public const string vbBack = "\b";
@@ -90,7 +91,7 @@ namespace Microsoft.VisualBasic
         public const Microsoft.VisualBasic.VariantType vbCurrency = Microsoft.VisualBasic.VariantType.Currency;
         public const Microsoft.VisualBasic.VariantType vbDate = Microsoft.VisualBasic.VariantType.Date;
         public const Microsoft.VisualBasic.VariantType vbDecimal = Microsoft.VisualBasic.VariantType.Decimal;
-        public const Microsoft.VisualBasic.MsgBoxStyle vbDefaultButton1 = Microsoft.VisualBasic.MsgBoxStyle.ApplicationModal;
+        public const Microsoft.VisualBasic.MsgBoxStyle vbDefaultButton1 = Microsoft.VisualBasic.MsgBoxStyle.OkOnly;
         public const Microsoft.VisualBasic.MsgBoxStyle vbDefaultButton2 = Microsoft.VisualBasic.MsgBoxStyle.DefaultButton2;
         public const Microsoft.VisualBasic.MsgBoxStyle vbDefaultButton3 = Microsoft.VisualBasic.MsgBoxStyle.DefaultButton3;
         public const Microsoft.VisualBasic.FileAttribute vbDirectory = Microsoft.VisualBasic.FileAttribute.Directory;
@@ -128,8 +129,8 @@ namespace Microsoft.VisualBasic
         public const Microsoft.VisualBasic.MsgBoxStyle vbMsgBoxRight = Microsoft.VisualBasic.MsgBoxStyle.MsgBoxRight;
         public const Microsoft.VisualBasic.MsgBoxStyle vbMsgBoxRtlReading = Microsoft.VisualBasic.MsgBoxStyle.MsgBoxRtlReading;
         public const Microsoft.VisualBasic.MsgBoxStyle vbMsgBoxSetForeground = Microsoft.VisualBasic.MsgBoxStyle.MsgBoxSetForeground;
-        [System.ObsoleteAttribute("For a carriage return and line feed, use vbCrLf.  For the current platform's newline, use System.Environment.NewLine.")]
         public const Microsoft.VisualBasic.VbStrConv vbNarrow = Microsoft.VisualBasic.VbStrConv.Narrow;
+        [System.ObsoleteAttribute("For a carriage return and line feed, use vbCrLf.  For the current platform's newline, use System.Environment.NewLine.")]
         public const string vbNewLine = "\r\n";
         public const Microsoft.VisualBasic.MsgBoxResult vbNo = Microsoft.VisualBasic.MsgBoxResult.No;
         public const Microsoft.VisualBasic.FileAttribute vbNormal = Microsoft.VisualBasic.FileAttribute.Normal;
@@ -142,7 +143,7 @@ namespace Microsoft.VisualBasic
         public const int vbObjectError = -2147221504;
         public const Microsoft.VisualBasic.MsgBoxResult vbOK = Microsoft.VisualBasic.MsgBoxResult.Ok;
         public const Microsoft.VisualBasic.MsgBoxStyle vbOKCancel = Microsoft.VisualBasic.MsgBoxStyle.OkCancel;
-        public const Microsoft.VisualBasic.MsgBoxStyle vbOKOnly = Microsoft.VisualBasic.MsgBoxStyle.ApplicationModal;
+        public const Microsoft.VisualBasic.MsgBoxStyle vbOKOnly = Microsoft.VisualBasic.MsgBoxStyle.OkOnly;
         public const Microsoft.VisualBasic.VbStrConv vbProperCase = Microsoft.VisualBasic.VbStrConv.ProperCase;
         public const Microsoft.VisualBasic.MsgBoxStyle vbQuestion = Microsoft.VisualBasic.MsgBoxStyle.Question;
         public const Microsoft.VisualBasic.FileAttribute vbReadOnly = Microsoft.VisualBasic.FileAttribute.ReadOnly;
@@ -369,7 +370,7 @@ namespace Microsoft.VisualBasic
         public static void FilePut(int FileNumber, string Value, long RecordNumber = (long)-1, bool StringIsFixedLength = false) { }
         public static void FilePut(int FileNumber, System.ValueType Value, long RecordNumber = (long)-1) { }
         [System.ObsoleteAttribute("This member has been deprecated. Please use FilePutObject to write Object types, or coerce FileNumber and RecordNumber to Integer for writing non-Object types. http://go.microsoft.com/fwlink/?linkid=14202")]
-        public static void FilePut(object FileNumber, object Value, object RecordNumber) { }
+        public static void FilePut(object FileNumber, object Value, object RecordNumber = -1) { }
         public static void FilePutObject(int FileNumber, object Value, long RecordNumber = (long)-1) { }
         public static void FileWidth(int FileNumber, int RecordWidth) { }
         public static int FreeFile() { throw null; }
@@ -576,7 +577,7 @@ namespace Microsoft.VisualBasic
         public static string FormatNumber(object Expression, int NumDigitsAfterDecimal = -1, Microsoft.VisualBasic.TriState IncludeLeadingDigit = Microsoft.VisualBasic.TriState.UseDefault, Microsoft.VisualBasic.TriState UseParensForNegativeNumbers = Microsoft.VisualBasic.TriState.UseDefault, Microsoft.VisualBasic.TriState GroupDigits = Microsoft.VisualBasic.TriState.UseDefault) { throw null; }
         public static string FormatPercent(object Expression, int NumDigitsAfterDecimal = -1, Microsoft.VisualBasic.TriState IncludeLeadingDigit = Microsoft.VisualBasic.TriState.UseDefault, Microsoft.VisualBasic.TriState UseParensForNegativeNumbers = Microsoft.VisualBasic.TriState.UseDefault, Microsoft.VisualBasic.TriState GroupDigits = Microsoft.VisualBasic.TriState.UseDefault) { throw null; }
         public static char GetChar(string str, int Index) { throw null; }
-        public static int InStr(int StartPos, string String1, string String2, [Microsoft.VisualBasic.CompilerServices.OptionCompareAttribute] Microsoft.VisualBasic.CompareMethod Compare = Microsoft.VisualBasic.CompareMethod.Binary) { throw null; }
+        public static int InStr(int Start, string String1, string String2, [Microsoft.VisualBasic.CompilerServices.OptionCompareAttribute] Microsoft.VisualBasic.CompareMethod Compare = Microsoft.VisualBasic.CompareMethod.Binary) { throw null; }
         public static int InStr(string String1, string String2, [Microsoft.VisualBasic.CompilerServices.OptionCompareAttribute] Microsoft.VisualBasic.CompareMethod Compare = Microsoft.VisualBasic.CompareMethod.Binary) { throw null; }
         public static int InStrRev(string StringCheck, string StringMatch, int Start = -1, [Microsoft.VisualBasic.CompilerServices.OptionCompareAttribute] Microsoft.VisualBasic.CompareMethod Compare = Microsoft.VisualBasic.CompareMethod.Binary) { throw null; }
         public static string Join(object[] SourceArray, string Delimiter = " ") { throw null; }
@@ -614,7 +615,7 @@ namespace Microsoft.VisualBasic
         public static string RTrim(string str) { throw null; }
         public static string Space(int Number) { throw null; }
         public static string[] Split(string Expression, string Delimiter = " ", int Limit = -1, [Microsoft.VisualBasic.CompilerServices.OptionCompareAttribute] Microsoft.VisualBasic.CompareMethod Compare = Microsoft.VisualBasic.CompareMethod.Binary) { throw null; }
-        public static int StrComp(string String1, string String2, Microsoft.VisualBasic.CompareMethod Compare = Microsoft.VisualBasic.CompareMethod.Binary) { throw null; }
+        public static int StrComp(string String1, string String2, [Microsoft.VisualBasic.CompilerServices.OptionCompareAttribute] Microsoft.VisualBasic.CompareMethod Compare = Microsoft.VisualBasic.CompareMethod.Binary) { throw null; }
         public static string StrConv(string str, Microsoft.VisualBasic.VbStrConv Conversion, int LocaleID = 0) { throw null; }
         public static string StrDup(int Number, char Character) { throw null; }
         public static object StrDup(int Number, object Character) { throw null; }
@@ -912,26 +913,12 @@ namespace Microsoft.VisualBasic.CompilerServices
     public sealed partial class LateBinding
     {
         internal LateBinding() { }
-        [System.Diagnostics.DebuggerHiddenAttribute]
-        [System.Diagnostics.DebuggerStepThroughAttribute]
         public static void LateCall(object o, System.Type objType, string name, object[] args, string[] paramnames, bool[] CopyBack) { }
-        [System.Diagnostics.DebuggerHiddenAttribute]
-        [System.Diagnostics.DebuggerStepThroughAttribute]
         public static object LateGet(object o, System.Type objType, string name, object[] args, string[] paramnames, bool[] CopyBack) { throw null; }
-        [System.Diagnostics.DebuggerHiddenAttribute]
-        [System.Diagnostics.DebuggerStepThroughAttribute]
         public static object LateIndexGet(object o, object[] args, string[] paramnames) { throw null; }
-        [System.Diagnostics.DebuggerHiddenAttribute]
-        [System.Diagnostics.DebuggerStepThroughAttribute]
         public static void LateIndexSet(object o, object[] args, string[] paramnames) { }
-        [System.Diagnostics.DebuggerHiddenAttribute]
-        [System.Diagnostics.DebuggerStepThroughAttribute]
         public static void LateIndexSetComplex(object o, object[] args, string[] paramnames, bool OptimisticSet, bool RValueBase) { }
-        [System.Diagnostics.DebuggerHiddenAttribute]
-        [System.Diagnostics.DebuggerStepThroughAttribute]
         public static void LateSet(object o, System.Type objType, string name, object[] args, string[] paramnames) { }
-        [System.Diagnostics.DebuggerHiddenAttribute]
-        [System.Diagnostics.DebuggerStepThroughAttribute]
         public static void LateSetComplex(object o, System.Type objType, string name, object[] args, string[] paramnames, bool OptimisticSet, bool RValueBase) { }
     }
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Never)]
@@ -1104,6 +1091,14 @@ namespace Microsoft.VisualBasic.CompilerServices
         public static float FromString(string Value) { throw null; }
         public static float FromString(string Value, System.Globalization.NumberFormatInfo NumberFormat) { throw null; }
     }
+    public delegate object SiteDelegate0(System.Runtime.CompilerServices.CallSite site, object instance);
+    public delegate object SiteDelegate1(System.Runtime.CompilerServices.CallSite site, object instance, ref object arg0);
+    public delegate object SiteDelegate2(System.Runtime.CompilerServices.CallSite site, object instance, ref object arg0, ref object arg1);
+    public delegate object SiteDelegate3(System.Runtime.CompilerServices.CallSite site, object instance, ref object arg0, ref object arg1, ref object arg2);
+    public delegate object SiteDelegate4(System.Runtime.CompilerServices.CallSite site, object instance, ref object arg0, ref object arg1, ref object arg2, ref object arg3);
+    public delegate object SiteDelegate5(System.Runtime.CompilerServices.CallSite site, object instance, ref object arg0, ref object arg1, ref object arg2, ref object arg3, ref object arg4);
+    public delegate object SiteDelegate6(System.Runtime.CompilerServices.CallSite site, object instance, ref object arg0, ref object arg1, ref object arg2, ref object arg3, ref object arg4, ref object arg5);
+    public delegate object SiteDelegate7(System.Runtime.CompilerServices.CallSite site, object instance, ref object arg0, ref object arg1, ref object arg2, ref object arg3, ref object arg4, ref object arg5, ref object arg6);
     [System.AttributeUsageAttribute(System.AttributeTargets.Class, Inherited=false, AllowMultiple=false)]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Never)]
     public sealed partial class StandardModuleAttribute : System.Attribute
@@ -1345,6 +1340,7 @@ namespace Microsoft.VisualBasic.FileIO
         public TextFieldParser(string path) { }
         public TextFieldParser(string path, System.Text.Encoding defaultEncoding) { }
         public TextFieldParser(string path, System.Text.Encoding defaultEncoding, bool detectEncoding) { }
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
         public string[] CommentTokens { get { throw null; } set { } }
         public string[] Delimiters { get { throw null; } set { } }
         public bool EndOfData { get { throw null; } }
@@ -1357,8 +1353,8 @@ namespace Microsoft.VisualBasic.FileIO
         public long LineNumber { get { throw null; } }
         public Microsoft.VisualBasic.FileIO.FieldType TextFieldType { get { throw null; } set { } }
         public bool TrimWhiteSpace { get { throw null; } set { } }
-        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
         public void Close() { }
+        void Dispose() { }
         protected virtual void Dispose(bool disposing) { }
         ~TextFieldParser() { }
         public string PeekChars(int numberOfChars) { throw null; }
@@ -1369,7 +1365,6 @@ namespace Microsoft.VisualBasic.FileIO
         public string ReadToEnd() { throw null; }
         public void SetDelimiters(params string[] delimiters) { }
         public void SetFieldWidths(params int[] fieldWidths) { }
-        void System.IDisposable.Dispose() { }
     }
     public enum UICancelOption
     {

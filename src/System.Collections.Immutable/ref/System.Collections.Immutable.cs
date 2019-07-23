@@ -118,10 +118,8 @@ namespace System.Collections.Immutable
         public System.Collections.Immutable.ImmutableArray<T> Add(T item) { throw null; }
         public System.Collections.Immutable.ImmutableArray<T> AddRange(System.Collections.Generic.IEnumerable<T> items) { throw null; }
         public System.Collections.Immutable.ImmutableArray<T> AddRange(System.Collections.Immutable.ImmutableArray<T> items) { throw null; }
-#if !NETSTANDARD10
         public System.ReadOnlyMemory<T> AsMemory() { throw null; }
         public System.ReadOnlySpan<T> AsSpan() { throw null; }
-#endif
         public System.Collections.Immutable.ImmutableArray<TOther> As<TOther>() where TOther : class { throw null; }
         public System.Collections.Immutable.ImmutableArray<TOther> CastArray<TOther>() where TOther : class { throw null; }
         public static System.Collections.Immutable.ImmutableArray<T> CastUp<TDerived>(System.Collections.Immutable.ImmutableArray<TDerived> items) where TDerived : class, T { throw null; }
@@ -142,9 +140,7 @@ namespace System.Collections.Immutable
         public System.Collections.Immutable.ImmutableArray<T> Insert(int index, T item) { throw null; }
         public System.Collections.Immutable.ImmutableArray<T> InsertRange(int index, System.Collections.Generic.IEnumerable<T> items) { throw null; }
         public System.Collections.Immutable.ImmutableArray<T> InsertRange(int index, System.Collections.Immutable.ImmutableArray<T> items) { throw null; }
-#if !NETSTANDARD10
         public ref readonly T ItemRef(int index) { throw null; }
-#endif
         public int LastIndexOf(T item) { throw null; }
         public int LastIndexOf(T item, int startIndex) { throw null; }
         public int LastIndexOf(T item, int startIndex, int count) { throw null; }
@@ -227,9 +223,7 @@ namespace System.Collections.Immutable
             public int IndexOf(T item, int startIndex, int count) { throw null; }
             public int IndexOf(T item, int startIndex, int count, System.Collections.Generic.IEqualityComparer<T> equalityComparer) { throw null; }
             public void Insert(int index, T item) { }
-#if !NETSTANDARD10
             public ref readonly T ItemRef(int index) { throw null; }
-#endif
             public int LastIndexOf(T item) { throw null; }
             public int LastIndexOf(T item, int startIndex) { throw null; }
             public int LastIndexOf(T item, int startIndex, int count) { throw null; }
@@ -578,9 +572,7 @@ namespace System.Collections.Immutable
         public int IndexOf(T item, int index, int count, System.Collections.Generic.IEqualityComparer<T> equalityComparer) { throw null; }
         public System.Collections.Immutable.ImmutableList<T> Insert(int index, T item) { throw null; }
         public System.Collections.Immutable.ImmutableList<T> InsertRange(int index, System.Collections.Generic.IEnumerable<T> items) { throw null; }
-#if !NETSTANDARD10
         public ref readonly T ItemRef(int index) { throw null; }
-#endif
         public int LastIndexOf(T item, int index, int count, System.Collections.Generic.IEqualityComparer<T> equalityComparer) { throw null; }
         public System.Collections.Immutable.ImmutableList<T> Remove(T value) { throw null; }
         public System.Collections.Immutable.ImmutableList<T> Remove(T value, System.Collections.Generic.IEqualityComparer<T> equalityComparer) { throw null; }
@@ -668,9 +660,7 @@ namespace System.Collections.Immutable
             public int IndexOf(T item, int index, int count, System.Collections.Generic.IEqualityComparer<T> equalityComparer) { throw null; }
             public void Insert(int index, T item) { }
             public void InsertRange(int index, System.Collections.Generic.IEnumerable<T> items) { }
-#if !NETSTANDARD10
             public ref readonly T ItemRef(int index) { throw null; }
-#endif
             public int LastIndexOf(T item) { throw null; }
             public int LastIndexOf(T item, int startIndex) { throw null; }
             public int LastIndexOf(T item, int startIndex, int count) { throw null; }
@@ -727,9 +717,7 @@ namespace System.Collections.Immutable
         public System.Collections.Immutable.ImmutableQueue<T> Enqueue(T value) { throw null; }
         public System.Collections.Immutable.ImmutableQueue<T>.Enumerator GetEnumerator() { throw null; }
         public T Peek() { throw null; }
-#if !NETSTANDARD10
         public ref readonly T PeekRef() { throw null; }
-#endif
         System.Collections.Generic.IEnumerator<T> System.Collections.Generic.IEnumerable<T>.GetEnumerator() { throw null; }
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() { throw null; }
         System.Collections.Immutable.IImmutableQueue<T> System.Collections.Immutable.IImmutableQueue<T>.Clear() { throw null; }
@@ -819,9 +807,7 @@ namespace System.Collections.Immutable
         public System.Collections.Immutable.ImmutableSortedDictionary<TKey, TValue>.Builder ToBuilder() { throw null; }
         public bool TryGetKey(TKey equalKey, out TKey actualKey) { throw null; }
         public bool TryGetValue(TKey key, out TValue value) { throw null; }
-#if !NETSTANDARD10
         public ref readonly TValue ValueRef(TKey key) { throw null; }
-#endif
         public System.Collections.Immutable.ImmutableSortedDictionary<TKey, TValue> WithComparers(System.Collections.Generic.IComparer<TKey> keyComparer) { throw null; }
         public System.Collections.Immutable.ImmutableSortedDictionary<TKey, TValue> WithComparers(System.Collections.Generic.IComparer<TKey> keyComparer, System.Collections.Generic.IEqualityComparer<TValue> valueComparer) { throw null; }
         public sealed partial class Builder : System.Collections.Generic.ICollection<System.Collections.Generic.KeyValuePair<TKey, TValue>>, System.Collections.Generic.IDictionary<TKey, TValue>, System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<TKey, TValue>>, System.Collections.Generic.IReadOnlyCollection<System.Collections.Generic.KeyValuePair<TKey, TValue>>, System.Collections.Generic.IReadOnlyDictionary<TKey, TValue>, System.Collections.ICollection, System.Collections.IDictionary, System.Collections.IEnumerable
@@ -867,9 +853,7 @@ namespace System.Collections.Immutable
             public System.Collections.Immutable.ImmutableSortedDictionary<TKey, TValue> ToImmutable() { throw null; }
             public bool TryGetKey(TKey equalKey, out TKey actualKey) { throw null; }
             public bool TryGetValue(TKey key, out TValue value) { throw null; }
-#if !NETSTANDARD10
             public ref readonly TValue ValueRef(TKey key) { throw null; }
-#endif
         }
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
         public partial struct Enumerator : System.Collections.Generic.IEnumerator<System.Collections.Generic.KeyValuePair<TKey, TValue>>, System.Collections.IEnumerator, System.IDisposable
@@ -927,9 +911,7 @@ namespace System.Collections.Immutable
         public bool IsProperSupersetOf(System.Collections.Generic.IEnumerable<T> other) { throw null; }
         public bool IsSubsetOf(System.Collections.Generic.IEnumerable<T> other) { throw null; }
         public bool IsSupersetOf(System.Collections.Generic.IEnumerable<T> other) { throw null; }
-#if !NETSTANDARD10
         public ref readonly T ItemRef(int index) { throw null; }
-#endif
         public bool Overlaps(System.Collections.Generic.IEnumerable<T> other) { throw null; }
         public System.Collections.Immutable.ImmutableSortedSet<T> Remove(T value) { throw null; }
         public System.Collections.Generic.IEnumerable<T> Reverse() { throw null; }
@@ -988,9 +970,7 @@ namespace System.Collections.Immutable
             public bool IsProperSupersetOf(System.Collections.Generic.IEnumerable<T> other) { throw null; }
             public bool IsSubsetOf(System.Collections.Generic.IEnumerable<T> other) { throw null; }
             public bool IsSupersetOf(System.Collections.Generic.IEnumerable<T> other) { throw null; }
-#if !NETSTANDARD10
             public ref readonly T ItemRef(int index) { throw null; }
-#endif
             public bool Overlaps(System.Collections.Generic.IEnumerable<T> other) { throw null; }
             public bool Remove(T item) { throw null; }
             public System.Collections.Generic.IEnumerable<T> Reverse() { throw null; }
@@ -1032,9 +1012,7 @@ namespace System.Collections.Immutable
         public System.Collections.Immutable.ImmutableStack<T> Clear() { throw null; }
         public System.Collections.Immutable.ImmutableStack<T>.Enumerator GetEnumerator() { throw null; }
         public T Peek() { throw null; }
-#if !NETSTANDARD10
         public ref readonly T PeekRef() { throw null; }
-#endif
         public System.Collections.Immutable.ImmutableStack<T> Pop() { throw null; }
         public System.Collections.Immutable.ImmutableStack<T> Pop(out T value) { throw null; }
         public System.Collections.Immutable.ImmutableStack<T> Push(T value) { throw null; }

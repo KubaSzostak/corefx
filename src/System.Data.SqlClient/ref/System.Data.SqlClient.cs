@@ -26,6 +26,7 @@ namespace Microsoft.SqlServer.Server
     public sealed partial class InvalidUdtException : System.SystemException
     {
         internal InvalidUdtException() { }
+        public override void GetObjectData(System.Runtime.Serialization.SerializationInfo si, System.Runtime.Serialization.StreamingContext context) { }
     }
     public partial class SqlDataRecord : System.Data.IDataRecord
     {
@@ -112,6 +113,16 @@ namespace Microsoft.SqlServer.Server
         public virtual void SetValue(int ordinal, object value) { }
         public virtual int SetValues(params object[] values) { throw null; }
         System.Data.IDataReader System.Data.IDataRecord.GetData(int ordinal) { throw null; }
+    }
+    [System.AttributeUsageAttribute(System.AttributeTargets.Field | System.AttributeTargets.Parameter | System.AttributeTargets.Property | System.AttributeTargets.ReturnValue, AllowMultiple=false, Inherited=false)]
+    public partial class SqlFacetAttribute : System.Attribute
+    {
+        public SqlFacetAttribute() { }
+        public bool IsFixedLength { get { throw null; } set { } }
+        public bool IsNullable { get { throw null; } set { } }
+        public int MaxSize { get { throw null; } set { } }
+        public int Precision { get { throw null; } set { } }
+        public int Scale { get { throw null; } set { } }
     }
     [System.AttributeUsageAttribute(System.AttributeTargets.Method, AllowMultiple=false, Inherited=false)]
     public partial class SqlFunctionAttribute : System.Attribute
@@ -259,6 +270,12 @@ namespace System.Data.SqlClient
         ReadOnly = 1,
     }
     public delegate void OnChangeEventHandler(object sender, System.Data.SqlClient.SqlNotificationEventArgs e);
+    public enum PoolBlockingPeriod
+    {
+        Auto = 0,
+        AlwaysBlock = 1,
+        NeverBlock = 2,
+    }
     public enum SortOrder
     {
         Unspecified = -1,
@@ -394,6 +411,7 @@ namespace System.Data.SqlClient
         public System.Data.SqlClient.SqlCommand Clone() { throw null; }
         protected override System.Data.Common.DbParameter CreateDbParameter() { throw null; }
         public new System.Data.SqlClient.SqlParameter CreateParameter() { throw null; }
+        protected override void Dispose(bool disposing) { }
         public int EndExecuteNonQuery(System.IAsyncResult asyncResult) { throw null; }
         public System.Data.SqlClient.SqlDataReader EndExecuteReader(System.IAsyncResult asyncResult) { throw null; }
         public System.Xml.XmlReader EndExecuteXmlReader(System.IAsyncResult asyncResult) { throw null; }
@@ -455,6 +473,7 @@ namespace System.Data.SqlClient
         public System.Data.SqlClient.SqlCredential Credential { get { throw null; } set { } }
         public override string Database { get { throw null; } }
         public override string DataSource { get { throw null; } }
+        protected override System.Data.Common.DbProviderFactory DbProviderFactory { get { throw null; } }
         public bool FireInfoMessageEventOnUserErrors { get { throw null; } set { } }
         public int PacketSize { get { throw null; } }
         public override string ServerVersion { get { throw null; } }
@@ -468,16 +487,19 @@ namespace System.Data.SqlClient
         public System.Data.SqlClient.SqlTransaction BeginTransaction(System.Data.IsolationLevel iso, string transactionName) { throw null; }
         public System.Data.SqlClient.SqlTransaction BeginTransaction(string transactionName) { throw null; }
         public override void ChangeDatabase(string database) { }
-        public static void ChangePassword(string connectionString, System.Data.SqlClient.SqlCredential credential, System.Security.SecureString newPassword) { }
+        public static void ChangePassword(string connectionString, System.Data.SqlClient.SqlCredential credential, System.Security.SecureString newSecurePassword) { }
         public static void ChangePassword(string connectionString, string newPassword) { }
         public static void ClearAllPools() { }
         public static void ClearPool(System.Data.SqlClient.SqlConnection connection) { }
         public override void Close() { }
         public new System.Data.SqlClient.SqlCommand CreateCommand() { throw null; }
         protected override System.Data.Common.DbCommand CreateDbCommand() { throw null; }
+        protected override void Dispose(bool disposing) { }
+        public override void EnlistTransaction(System.Transactions.Transaction transaction) { }
         public override System.Data.DataTable GetSchema() { throw null; }
         public override System.Data.DataTable GetSchema(string collectionName) { throw null; }
         public override System.Data.DataTable GetSchema(string collectionName, string[] restrictionValues) { throw null; }
+        protected override void OnStateChange(System.Data.StateChangeEventArgs stateChange) { }
         public override void Open() { }
         public override System.Threading.Tasks.Task OpenAsync(System.Threading.CancellationToken cancellationToken) { throw null; }
         public void ResetStatistics() { }
@@ -511,6 +533,7 @@ namespace System.Data.SqlClient
         public int PacketSize { get { throw null; } set { } }
         public string Password { get { throw null; } set { } }
         public bool PersistSecurityInfo { get { throw null; } set { } }
+        public System.Data.SqlClient.PoolBlockingPeriod PoolBlockingPeriod { get { throw null; } set { } }
         public bool Pooling { get { throw null; } set { } }
         public bool Replication { get { throw null; } set { } }
         public string TransactionBinding { get { throw null; } set { } }
@@ -549,11 +572,20 @@ namespace System.Data.SqlClient
         public new System.Data.SqlClient.SqlCommand UpdateCommand { get { throw null; } set { } }
         public event System.Data.SqlClient.SqlRowUpdatedEventHandler RowUpdated { add { } remove { } }
         public event System.Data.SqlClient.SqlRowUpdatingEventHandler RowUpdating { add { } remove { } }
+        protected override int AddToBatch(System.Data.IDbCommand command) { throw null; }
+        protected override void ClearBatch() { }
+        protected override System.Data.Common.RowUpdatedEventArgs CreateRowUpdatedEvent(System.Data.DataRow dataRow, System.Data.IDbCommand command, System.Data.StatementType statementType, System.Data.Common.DataTableMapping tableMapping) { throw null; }
+        protected override System.Data.Common.RowUpdatingEventArgs CreateRowUpdatingEvent(System.Data.DataRow dataRow, System.Data.IDbCommand command, System.Data.StatementType statementType, System.Data.Common.DataTableMapping tableMapping) { throw null; }
+        protected override int ExecuteBatch() { throw null; }
+        protected override System.Data.IDataParameter GetBatchedParameter(int commandIdentifier, int parameterIndex) { throw null; }
+        protected override bool GetBatchedRecordsAffected(int commandIdentifier, out int recordsAffected, out System.Exception error) { throw null; }
+        protected override void InitializeBatching() { }
         protected override void OnRowUpdated(System.Data.Common.RowUpdatedEventArgs value) { }
         protected override void OnRowUpdating(System.Data.Common.RowUpdatingEventArgs value) { }
         object System.ICloneable.Clone() { throw null; }
+        protected override void TerminateBatching() { }
     }
-    public partial class SqlDataReader : System.Data.Common.DbDataReader, System.IDisposable
+    public partial class SqlDataReader : System.Data.Common.DbDataReader, System.Data.Common.IDbColumnSchemaGenerator, System.Data.IDataReader, System.Data.IDataRecord, System.IDisposable
     {
         internal SqlDataReader() { }
         protected System.Data.SqlClient.SqlConnection Connection { get { throw null; } }
@@ -565,11 +597,14 @@ namespace System.Data.SqlClient
         public override object this[string name] { get { throw null; } }
         public override int RecordsAffected { get { throw null; } }
         public override int VisibleFieldCount { get { throw null; } }
+        public override void Close() { }
+        protected override void Dispose(bool disposing) { }
         public override bool GetBoolean(int i) { throw null; }
         public override byte GetByte(int i) { throw null; }
         public override long GetBytes(int i, long dataIndex, byte[] buffer, int bufferIndex, int length) { throw null; }
         public override char GetChar(int i) { throw null; }
         public override long GetChars(int i, long dataIndex, char[] buffer, int bufferIndex, int length) { throw null; }
+        public System.Collections.ObjectModel.ReadOnlyCollection<System.Data.Common.DbColumn> GetColumnSchema() { throw null; }
         public override string GetDataTypeName(int i) { throw null; }
         public override System.DateTime GetDateTime(int i) { throw null; }
         public virtual System.DateTimeOffset GetDateTimeOffset(int i) { throw null; }
@@ -734,7 +769,7 @@ namespace System.Data.SqlClient
         Change = 0,
         Subscribe = 1,
     }
-    public sealed partial class SqlParameter : System.Data.Common.DbParameter, System.ICloneable
+    public sealed partial class SqlParameter : System.Data.Common.DbParameter, System.Data.IDataParameter, System.Data.IDbDataParameter, System.ICloneable
     {
         public SqlParameter() { }
         public SqlParameter(string parameterName, System.Data.SqlDbType dbType) { }
@@ -750,16 +785,20 @@ namespace System.Data.SqlClient
         public int LocaleId { get { throw null; } set { } }
         public int Offset { get { throw null; } set { } }
         public override string ParameterName { get { throw null; } set { } }
+        [System.ComponentModel.DefaultValueAttribute((byte)0)]
         public new byte Precision { get { throw null; } set { } }
+        [System.ComponentModel.DefaultValueAttribute((byte)0)]
         public new byte Scale { get { throw null; } set { } }
         public override int Size { get { throw null; } set { } }
         public override string SourceColumn { get { throw null; } set { } }
         public override bool SourceColumnNullMapping { get { throw null; } set { } }
         public override System.Data.DataRowVersion SourceVersion { get { throw null; } set { } }
+        [System.Data.Common.DbProviderSpecificTypePropertyAttribute(true)]
         public System.Data.SqlDbType SqlDbType { get { throw null; } set { } }
         public object SqlValue { get { throw null; } set { } }
         public string TypeName { get { throw null; } set { } }
         public string UdtTypeName { get { throw null; } set { } }
+        [System.ComponentModel.TypeConverterAttribute(typeof(System.ComponentModel.StringConverter))]
         public override object Value { get { throw null; } set { } }
         public string XmlSchemaCollectionDatabase { get { throw null; } set { } }
         public string XmlSchemaCollectionName { get { throw null; } set { } }
@@ -838,5 +877,36 @@ namespace System.Data.SqlClient
         public override void Rollback() { }
         public void Rollback(string transactionName) { }
         public void Save(string savePointName) { }
+    }
+}
+namespace System.Data.SqlTypes
+{
+    public sealed partial class SqlFileStream : System.IO.Stream
+    {
+        public SqlFileStream(string path, byte[] transactionContext, System.IO.FileAccess access) { }
+        public SqlFileStream(string path, byte[] transactionContext, System.IO.FileAccess access, System.IO.FileOptions options, long allocationSize) { }
+        public override bool CanRead { get { throw null; } }
+        public override bool CanSeek { get { throw null; } }
+        public override bool CanTimeout { get { throw null; } }
+        public override bool CanWrite { get { throw null; } }
+        public override long Length { get { throw null; } }
+        public string Name { get { throw null; } }
+        public override long Position { get { throw null; } set { } }
+        public override int ReadTimeout { get { throw null; } set { } }
+        public byte[] TransactionContext { get { throw null; } }
+        public override int WriteTimeout { get { throw null; } set { } }
+        public override System.IAsyncResult BeginRead(byte[] buffer, int offset, int count, System.AsyncCallback callback, object state) { throw null; }
+        public override System.IAsyncResult BeginWrite(byte[] buffer, int offset, int count, System.AsyncCallback callback, object state) { throw null; }
+        protected override void Dispose(bool disposing) { }
+        public override int EndRead(System.IAsyncResult asyncResult) { throw null; }
+        public override void EndWrite(System.IAsyncResult asyncResult) { }
+        ~SqlFileStream() { }
+        public override void Flush() { }
+        public override int Read(byte[] buffer, int offset, int count) { throw null; }
+        public override int ReadByte() { throw null; }
+        public override long Seek(long offset, System.IO.SeekOrigin origin) { throw null; }
+        public override void SetLength(long value) { }
+        public override void Write(byte[] buffer, int offset, int count) { }
+        public override void WriteByte(byte value) { }
     }
 }

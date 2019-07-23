@@ -124,26 +124,6 @@ namespace System.Collections.Concurrent
         public bool TryRemove(TKey key, [System.Diagnostics.CodeAnalysis.MaybeNullWhenAttribute(false)] out TValue value) { throw null; }
         public bool TryUpdate(TKey key, TValue newValue, TValue comparisonValue) { throw null; }
     }
-    public partial class ConcurrentQueue<T> : System.Collections.Concurrent.IProducerConsumerCollection<T>, System.Collections.Generic.IEnumerable<T>, System.Collections.Generic.IReadOnlyCollection<T>, System.Collections.ICollection, System.Collections.IEnumerable
-    {
-        public ConcurrentQueue() { }
-        public ConcurrentQueue(System.Collections.Generic.IEnumerable<T> collection) { }
-        public int Count { get { throw null; } }
-        public bool IsEmpty { get { throw null; } }
-        bool System.Collections.ICollection.IsSynchronized { get { throw null; } }
-        object System.Collections.ICollection.SyncRoot { get { throw null; } }
-        public void Clear() { }
-        public void CopyTo(T[] array, int index) { }
-        public void Enqueue(T item) { }
-        public System.Collections.Generic.IEnumerator<T> GetEnumerator() { throw null; }
-        bool System.Collections.Concurrent.IProducerConsumerCollection<T>.TryAdd(T item) { throw null; }
-        bool System.Collections.Concurrent.IProducerConsumerCollection<T>.TryTake(out T item) { throw null; }
-        void System.Collections.ICollection.CopyTo(System.Array array, int index) { }
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() { throw null; }
-        public T[] ToArray() { throw null; }
-        public bool TryDequeue([System.Diagnostics.CodeAnalysis.MaybeNullWhenAttribute(false)] out T result) { throw null; }
-        public bool TryPeek([System.Diagnostics.CodeAnalysis.MaybeNullWhenAttribute(false)] out T result) { throw null; }
-    }
     public partial class ConcurrentStack<T> : System.Collections.Concurrent.IProducerConsumerCollection<T>, System.Collections.Generic.IEnumerable<T>, System.Collections.Generic.IReadOnlyCollection<T>, System.Collections.ICollection, System.Collections.IEnumerable
     {
         public ConcurrentStack() { }
@@ -173,13 +153,6 @@ namespace System.Collections.Concurrent
     {
         None = 0,
         NoBuffering = 1,
-    }
-    public partial interface IProducerConsumerCollection<T> : System.Collections.Generic.IEnumerable<T>, System.Collections.ICollection, System.Collections.IEnumerable
-    {
-        void CopyTo(T[] array, int index);
-        T[] ToArray();
-        bool TryAdd(T item);
-        bool TryTake([System.Diagnostics.CodeAnalysis.MaybeNullWhenAttribute(false)] out T item);
     }
     public abstract partial class OrderablePartitioner<TSource> : System.Collections.Concurrent.Partitioner<TSource>
     {

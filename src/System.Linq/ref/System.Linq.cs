@@ -192,6 +192,24 @@ namespace System.Linq
         public static System.Collections.Generic.IEnumerable<(TFirst First, TSecond Second)> Zip<TFirst, TSecond>(this System.Collections.Generic.IEnumerable<TFirst> first, System.Collections.Generic.IEnumerable<TSecond> second) { throw null; }
         public static System.Collections.Generic.IEnumerable<TResult> Zip<TFirst, TSecond, TResult>(this System.Collections.Generic.IEnumerable<TFirst> first, System.Collections.Generic.IEnumerable<TSecond> second, System.Func<TFirst, TSecond, TResult> resultSelector) { throw null; }
     }
+    public partial class Grouping<TKey, TElement> : System.Collections.Generic.ICollection<TElement>, System.Collections.Generic.IEnumerable<TElement>, System.Collections.Generic.IList<TElement>, System.Collections.IEnumerable, System.Linq.IGrouping<TKey, TElement>
+    {
+        internal Grouping() { }
+        public TKey Key { get { throw null; } }
+        int System.Collections.Generic.ICollection<TElement>.Count { get { throw null; } }
+        bool System.Collections.Generic.ICollection<TElement>.IsReadOnly { get { throw null; } }
+        TElement System.Collections.Generic.IList<TElement>.this[int index] { get { throw null; } set { } }
+        public System.Collections.Generic.IEnumerator<TElement> GetEnumerator() { throw null; }
+        void System.Collections.Generic.ICollection<TElement>.Add(TElement item) { }
+        void System.Collections.Generic.ICollection<TElement>.Clear() { }
+        bool System.Collections.Generic.ICollection<TElement>.Contains(TElement item) { throw null; }
+        void System.Collections.Generic.ICollection<TElement>.CopyTo(TElement[] array, int arrayIndex) { }
+        bool System.Collections.Generic.ICollection<TElement>.Remove(TElement item) { throw null; }
+        int System.Collections.Generic.IList<TElement>.IndexOf(TElement item) { throw null; }
+        void System.Collections.Generic.IList<TElement>.Insert(int index, TElement item) { }
+        void System.Collections.Generic.IList<TElement>.RemoveAt(int index) { }
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() { throw null; }
+    }
     public partial interface IGrouping<out TKey, out TElement> : System.Collections.Generic.IEnumerable<TElement>, System.Collections.IEnumerable
     {
         TKey Key { get; }

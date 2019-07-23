@@ -153,6 +153,9 @@ namespace System.Text.RegularExpressions
         public System.TimeSpan MatchTimeout { get { throw null; } }
         public System.Text.RegularExpressions.RegexOptions Options { get { throw null; } }
         public bool RightToLeft { get { throw null; } }
+        public static void CompileToAssembly(System.Text.RegularExpressions.RegexCompilationInfo[] regexinfos, System.Reflection.AssemblyName assemblyname) { }
+        public static void CompileToAssembly(System.Text.RegularExpressions.RegexCompilationInfo[] regexinfos, System.Reflection.AssemblyName assemblyname, System.Reflection.Emit.CustomAttributeBuilder[] attributes) { }
+        public static void CompileToAssembly(System.Text.RegularExpressions.RegexCompilationInfo[] regexinfos, System.Reflection.AssemblyName assemblyname, System.Reflection.Emit.CustomAttributeBuilder[] attributes, string resourceFile) { }
         public static string Escape(string str) { throw null; }
         public string[] GetGroupNames() { throw null; }
         public int[] GetGroupNumbers() { throw null; }
@@ -197,7 +200,7 @@ namespace System.Text.RegularExpressions
         public override string ToString() { throw null; }
         public static string Unescape(string str) { throw null; }
         protected bool UseOptionC() { throw null; }
-        protected bool UseOptionR() { throw null; }
+        protected internal bool UseOptionR() { throw null; }
         protected internal static void ValidateMatchTimeout(System.TimeSpan matchTimeout) { }
     }
     public partial class RegexCompilationInfo
@@ -221,7 +224,7 @@ namespace System.Text.RegularExpressions
         public string Input { get { throw null; } }
         public System.TimeSpan MatchTimeout { get { throw null; } }
         public string Pattern { get { throw null; } }
-        void System.Runtime.Serialization.ISerializable.GetObjectData(System.Runtime.Serialization.SerializationInfo si, System.Runtime.Serialization.StreamingContext context) { }
+        void System.Runtime.Serialization.ISerializable.GetObjectData(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context) { }
     }
     [System.FlagsAttribute]
     public enum RegexOptions
@@ -234,6 +237,7 @@ namespace System.Text.RegularExpressions
         Singleline = 16,
         IgnorePatternWhitespace = 32,
         RightToLeft = 64,
+        Debug = 128,
         ECMAScript = 256,
         CultureInvariant = 512,
     }

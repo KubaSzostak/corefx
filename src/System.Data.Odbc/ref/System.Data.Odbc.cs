@@ -7,6 +7,17 @@
 
 namespace System.Data.Odbc
 {
+    public static partial class ODBC32
+    {
+        public enum RETCODE
+        {
+            INVALID_HANDLE = -2,
+            ERROR = -1,
+            SUCCESS = 0,
+            SUCCESS_WITH_INFO = 1,
+            NO_DATA = 100,
+        }
+    }
     public sealed partial class OdbcCommand : System.Data.Common.DbCommand, System.ICloneable
     {
         public OdbcCommand() { }
@@ -99,6 +110,9 @@ namespace System.Data.Odbc
         public new System.Data.Odbc.OdbcCommand CreateCommand() { throw null; }
         protected override System.Data.Common.DbCommand CreateDbCommand() { throw null; }
         protected override void Dispose(bool disposing) { }
+        public override System.Data.DataTable GetSchema() { throw null; }
+        public override System.Data.DataTable GetSchema(string collectionName) { throw null; }
+        public override System.Data.DataTable GetSchema(string collectionName, string[] restrictionValues) { throw null; }
         public override void Open() { }
         public static void ReleaseObjectPool() { }
         object System.ICloneable.Clone() { throw null; }
@@ -259,6 +273,7 @@ namespace System.Data.Odbc
         [System.ComponentModel.DefaultValueAttribute(System.Data.Odbc.OdbcType.NChar)]
         [System.Data.Common.DbProviderSpecificTypePropertyAttribute(true)]
         public System.Data.Odbc.OdbcType OdbcType { get { throw null; } set { } }
+        public int Offset { get { throw null; } set { } }
         public override string ParameterName { get { throw null; } set { } }
         public new byte Precision { get { throw null; } set { } }
         public new byte Scale { get { throw null; } set { } }

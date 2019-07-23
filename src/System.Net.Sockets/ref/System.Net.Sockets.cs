@@ -47,6 +47,7 @@ namespace System.Net.Sockets
     public partial struct IPPacketInformation
     {
         private object _dummy;
+        private int _dummyPrimitive;
         public System.Net.IPAddress Address { get { throw null; } }
         public int Interface { get { throw null; } }
         public override bool Equals(object comparand) { throw null; }
@@ -113,14 +114,14 @@ namespace System.Net.Sockets
         public override int Read(byte[] buffer, int offset, int size) { throw null; }
         public override int Read(System.Span<byte> buffer) { throw null; }
         public override System.Threading.Tasks.Task<int> ReadAsync(byte[] buffer, int offset, int size, System.Threading.CancellationToken cancellationToken) { throw null; }
-        public override System.Threading.Tasks.ValueTask<int> ReadAsync(System.Memory<byte> buffer, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) { throw null; }
+        public override System.Threading.Tasks.ValueTask<int> ReadAsync(System.Memory<byte> buffer, System.Threading.CancellationToken cancellationToken) { throw null; }
         public override int ReadByte() { throw null; }
         public override long Seek(long offset, System.IO.SeekOrigin origin) { throw null; }
         public override void SetLength(long value) { }
         public override void Write(byte[] buffer, int offset, int size) { }
         public override void Write(System.ReadOnlySpan<byte> buffer) { }
         public override System.Threading.Tasks.Task WriteAsync(byte[] buffer, int offset, int size, System.Threading.CancellationToken cancellationToken) { throw null; }
-        public override System.Threading.Tasks.ValueTask WriteAsync(System.ReadOnlyMemory<byte> buffer, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) { throw null; }
+        public override System.Threading.Tasks.ValueTask WriteAsync(System.ReadOnlyMemory<byte> buffer, System.Threading.CancellationToken cancellationToken) { throw null; }
         public override void WriteByte(byte value) { }
     }
     public enum ProtocolFamily
@@ -191,6 +192,7 @@ namespace System.Net.Sockets
     public sealed partial class SafeSocketHandle : Microsoft.Win32.SafeHandles.SafeHandleMinusOneIsInvalid
     {
         public SafeSocketHandle(System.IntPtr preexistingHandle, bool ownsHandle) : base (default(bool)) { }
+        public override bool IsInvalid { get { throw null; } }
         protected override bool ReleaseHandle() { throw null; }
     }
     public enum SelectMode
@@ -420,8 +422,9 @@ namespace System.Net.Sockets
     public partial struct SocketInformation
     {
         private object _dummy;
-        public System.Net.Sockets.SocketInformationOptions Options { get { throw null; } set { } }
-        public byte[] ProtocolInformation { get { throw null; } set { } }
+        private int _dummyPrimitive;
+        public System.Net.Sockets.SocketInformationOptions Options { readonly get { throw null; } set { } }
+        public byte[] ProtocolInformation { readonly get { throw null; } set { } }
     }
     [System.FlagsAttribute]
     public enum SocketInformationOptions
@@ -664,5 +667,9 @@ namespace System.Net.Sockets
     public sealed partial class UnixDomainSocketEndPoint : System.Net.EndPoint
     {
         public UnixDomainSocketEndPoint(string path) { }
+        public override System.Net.Sockets.AddressFamily AddressFamily { get { throw null; } }
+        public override System.Net.EndPoint Create(System.Net.SocketAddress socketAddress) { throw null; }
+        public override System.Net.SocketAddress Serialize() { throw null; }
+        public override string ToString() { throw null; }
     }
 }

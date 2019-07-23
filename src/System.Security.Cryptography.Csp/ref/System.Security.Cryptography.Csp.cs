@@ -104,6 +104,8 @@ namespace System.Security.Cryptography
         protected override byte[] HashData(byte[] data, int offset, int count, System.Security.Cryptography.HashAlgorithmName hashAlgorithm) { throw null; }
         protected override byte[] HashData(System.IO.Stream data, System.Security.Cryptography.HashAlgorithmName hashAlgorithm) { throw null; }
         public void ImportCspBlob(byte[] keyBlob) { }
+        public override void ImportEncryptedPkcs8PrivateKey(System.ReadOnlySpan<byte> passwordBytes, System.ReadOnlySpan<byte> source, out int bytesRead) { throw null; }
+        public override void ImportEncryptedPkcs8PrivateKey(System.ReadOnlySpan<char> password, System.ReadOnlySpan<byte> source, out int bytesRead) { throw null; }
         public override void ImportParameters(System.Security.Cryptography.DSAParameters parameters) { }
         public byte[] SignData(byte[] buffer) { throw null; }
         public byte[] SignData(byte[] buffer, int offset, int count) { throw null; }
@@ -151,10 +153,8 @@ namespace System.Security.Cryptography
         public byte[] Salt { get { throw null; } set { } }
         public byte[] CryptDeriveKey(string algname, string alghashname, int keySize, byte[] rgbIV) { throw null; }
         protected override void Dispose(bool disposing) { }
-#pragma warning disable 0809
         [System.ObsoleteAttribute("Rfc2898DeriveBytes replaces PasswordDeriveBytes for deriving key material from a password and is preferred in new applications.")]
         public override byte[] GetBytes(int cb) { throw null; }
-#pragma warning restore 0809
         public override void Reset() { }
     }
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Never)]
@@ -208,6 +208,8 @@ namespace System.Security.Cryptography
         protected override byte[] HashData(byte[] data, int offset, int count, System.Security.Cryptography.HashAlgorithmName hashAlgorithm) { throw null; }
         protected override byte[] HashData(System.IO.Stream data, System.Security.Cryptography.HashAlgorithmName hashAlgorithm) { throw null; }
         public void ImportCspBlob(byte[] keyBlob) { }
+        public override void ImportEncryptedPkcs8PrivateKey(System.ReadOnlySpan<byte> passwordBytes, System.ReadOnlySpan<byte> source, out int bytesRead) { throw null; }
+        public override void ImportEncryptedPkcs8PrivateKey(System.ReadOnlySpan<char> password, System.ReadOnlySpan<byte> source, out int bytesRead) { throw null; }
         public override void ImportParameters(System.Security.Cryptography.RSAParameters parameters) { }
         public byte[] SignData(byte[] buffer, int offset, int count, object halg) { throw null; }
         public byte[] SignData(byte[] buffer, object halg) { throw null; }

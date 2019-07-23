@@ -347,7 +347,6 @@ namespace System.DirectoryServices
         public System.DirectoryServices.DirectoryVirtualListViewContext DirectoryVirtualListViewContext { get { throw null; } set { } }
         [System.ComponentModel.DefaultValueAttribute(0)]
         public int Offset { get { throw null; } set { } }
-        [System.ComponentModel.DefaultValueAttribute("")]
         public string Target { get { throw null; } set { } }
         [System.ComponentModel.DefaultValueAttribute(0)]
         public int TargetPercentage { get { throw null; } set { } }
@@ -637,7 +636,7 @@ namespace System.DirectoryServices.ActiveDirectory
     {
         public ActiveDirectorySchedule() { }
         public ActiveDirectorySchedule(System.DirectoryServices.ActiveDirectory.ActiveDirectorySchedule schedule) { }
-        public bool[,,] RawSchedule { get { throw null; } set { } }
+        public bool[] RawSchedule { get { throw null; } set { } }
         public void ResetSchedule() { }
         public void SetDailySchedule(System.DirectoryServices.ActiveDirectory.HourOfDay fromHour, System.DirectoryServices.ActiveDirectory.MinuteOfHour fromMinute, System.DirectoryServices.ActiveDirectory.HourOfDay toHour, System.DirectoryServices.ActiveDirectory.MinuteOfHour toMinute) { }
         public void SetSchedule(System.DayOfWeek day, System.DirectoryServices.ActiveDirectory.HourOfDay fromHour, System.DirectoryServices.ActiveDirectory.MinuteOfHour fromMinute, System.DirectoryServices.ActiveDirectory.HourOfDay toHour, System.DirectoryServices.ActiveDirectory.MinuteOfHour toMinute) { }

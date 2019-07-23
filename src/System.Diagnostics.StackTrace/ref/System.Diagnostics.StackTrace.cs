@@ -7,23 +7,6 @@
 
 namespace System.Diagnostics
 {
-    public partial class StackFrame
-    {
-        public const int OFFSET_UNKNOWN = -1;
-        public StackFrame() { }
-        public StackFrame(bool fNeedFileInfo) { }
-        public StackFrame(int skipFrames) { }
-        public StackFrame(int skipFrames, bool fNeedFileInfo) { }
-        public StackFrame(string? fileName, int lineNumber) { }
-        public StackFrame(string? fileName, int lineNumber, int colNumber) { }
-        public virtual int GetFileColumnNumber() { throw null; }
-        public virtual int GetFileLineNumber() { throw null; }
-        public virtual string? GetFileName() { throw null; }
-        public virtual int GetILOffset() { throw null; }
-        public virtual System.Reflection.MethodBase? GetMethod() { throw null; }
-        public virtual int GetNativeOffset() { throw null; }
-        public override string ToString() { throw null; }
-    }
     public static partial class StackFrameExtensions
     {
         public static System.IntPtr GetNativeImageBase(this System.Diagnostics.StackFrame stackFrame) { throw null; }
@@ -32,23 +15,6 @@ namespace System.Diagnostics
         public static bool HasMethod(this System.Diagnostics.StackFrame stackFrame) { throw null; }
         public static bool HasNativeImage(this System.Diagnostics.StackFrame stackFrame) { throw null; }
         public static bool HasSource(this System.Diagnostics.StackFrame stackFrame) { throw null; }
-    }
-    public partial class StackTrace
-    {
-        public const int METHODS_TO_SKIP = 0;
-        public StackTrace() { }
-        public StackTrace(bool fNeedFileInfo) { }
-        public StackTrace(System.Diagnostics.StackFrame frame) { }
-        public StackTrace(System.Exception e) { }
-        public StackTrace(System.Exception e, bool fNeedFileInfo) { }
-        public StackTrace(System.Exception e, int skipFrames) { }
-        public StackTrace(System.Exception e, int skipFrames, bool fNeedFileInfo) { }
-        public StackTrace(int skipFrames) { }
-        public StackTrace(int skipFrames, bool fNeedFileInfo) { }
-        public virtual int FrameCount { get { throw null; } }
-        public virtual System.Diagnostics.StackFrame? GetFrame(int index) { throw null; }
-        public virtual System.Diagnostics.StackFrame?[] GetFrames() { throw null; }
-        public override string ToString() { throw null; }
     }
 }
 namespace System.Diagnostics.SymbolStore
@@ -74,11 +40,6 @@ namespace System.Diagnostics.SymbolStore
         int FindClosestLine(int line);
         byte[] GetCheckSum();
         byte[] GetSourceRange(int startLine, int startColumn, int endLine, int endColumn);
-    }
-    public partial interface ISymbolDocumentWriter
-    {
-        void SetCheckSum(System.Guid algorithmId, byte[] checkSum);
-        void SetSource(byte[] source);
     }
     public partial interface ISymbolMethod
     {
@@ -172,7 +133,7 @@ namespace System.Diagnostics.SymbolStore
     }
     public readonly partial struct SymbolToken
     {
-        private readonly int _dummyPrimitive;
+        private readonly object _dummy;
         public SymbolToken(int val) { throw null; }
         public bool Equals(System.Diagnostics.SymbolStore.SymbolToken obj) { throw null; }
         public override bool Equals(object? obj) { throw null; }

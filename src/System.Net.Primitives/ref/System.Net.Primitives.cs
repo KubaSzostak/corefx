@@ -88,6 +88,14 @@ namespace System.Net
         public override void GetObjectData(System.Runtime.Serialization.SerializationInfo serializationInfo, System.Runtime.Serialization.StreamingContext streamingContext) { }
         void System.Runtime.Serialization.ISerializable.GetObjectData(System.Runtime.Serialization.SerializationInfo serializationInfo, System.Runtime.Serialization.StreamingContext streamingContext) { }
     }
+    public enum CookieVariant
+    {
+        Unknown = 0,
+        Plain = 1,
+        Default = 2,
+        Rfc2109 = 2,
+        Rfc2965 = 3,
+    }
     public partial class CredentialCache : System.Collections.IEnumerable, System.Net.ICredentials, System.Net.ICredentialsByHost
     {
         public CredentialCache() { }
@@ -247,11 +255,11 @@ namespace System.Net
         public static short NetworkToHostOrder(short network) { throw null; }
         public static int NetworkToHostOrder(int network) { throw null; }
         public static long NetworkToHostOrder(long network) { throw null; }
-        public static System.Net.IPAddress Parse(System.ReadOnlySpan<char> ipString) { throw null; }
+        public static System.Net.IPAddress Parse(System.ReadOnlySpan<char> ipSpan) { throw null; }
         public static System.Net.IPAddress Parse(string ipString) { throw null; }
         public override string ToString() { throw null; }
         public bool TryFormat(System.Span<char> destination, out int charsWritten) { throw null; }
-        public static bool TryParse(System.ReadOnlySpan<char> ipString, out System.Net.IPAddress address) { throw null; }
+        public static bool TryParse(System.ReadOnlySpan<char> ipSpan, out System.Net.IPAddress address) { throw null; }
         public static bool TryParse(string ipString, out System.Net.IPAddress address) { throw null; }
         public bool TryWriteBytes(System.Span<byte> destination, out int bytesWritten) { throw null; }
     }
@@ -295,7 +303,11 @@ namespace System.Net
         public System.Security.SecureString SecurePassword { get { throw null; } set { } }
         public string UserName { get { throw null; } set { } }
         public System.Net.NetworkCredential GetCredential(string host, int port, string authenticationType) { throw null; }
-        public System.Net.NetworkCredential GetCredential(System.Uri uri, string authType) { throw null; }
+        public System.Net.NetworkCredential GetCredential(System.Uri uri, string authenticationType) { throw null; }
+    }
+    public sealed partial class PathList
+    {
+        public PathList() { }
     }
     public partial class SocketAddress
     {
@@ -502,12 +514,9 @@ namespace System.Security.Authentication
     public enum SslProtocols
     {
         None = 0,
-        [System.ObsoleteAttribute("This value has been deprecated.  It is no longer supported. https://go.microsoft.com/fwlink/?linkid=14202")]
         Ssl2 = 12,
-        [System.ObsoleteAttribute("This value has been deprecated.  It is no longer supported. https://go.microsoft.com/fwlink/?linkid=14202")]
         Ssl3 = 48,
         Tls = 192,
-        [System.ObsoleteAttribute("This value has been deprecated.  It is no longer supported. https://go.microsoft.com/fwlink/?linkid=14202")]
         Default = 240,
         Tls11 = 768,
         Tls12 = 3072,

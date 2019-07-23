@@ -85,6 +85,13 @@ namespace System.Collections.Specialized
         public System.Collections.IDictionaryEnumerator GetEnumerator() { throw null; }
         public void Remove(object key) { }
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() { throw null; }
+        public partial class DictionaryNode
+        {
+            public object key;
+            public System.Collections.Specialized.ListDictionary.DictionaryNode next;
+            public object value;
+            public DictionaryNode() { }
+        }
     }
     public abstract partial class NameObjectCollectionBase : System.Collections.ICollection, System.Collections.IEnumerable, System.Runtime.Serialization.IDeserializationCallback, System.Runtime.Serialization.ISerializable
     {

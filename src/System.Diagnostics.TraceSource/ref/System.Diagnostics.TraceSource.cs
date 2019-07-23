@@ -56,7 +56,7 @@ namespace System.Diagnostics
         Warning = 7,
         Information = 15,
         Verbose = 31,
-        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        [System.ComponentModel.EditorBrowsableAttribute(2)]
         ActivityTracing = 65280,
     }
     public partial class SourceSwitch : System.Diagnostics.Switch
@@ -76,11 +76,11 @@ namespace System.Diagnostics
         public string DisplayName { get { throw null; } }
         protected int SwitchSetting { get { throw null; } set { } }
         protected string Value { get { throw null; } set { } }
-        protected virtual string[] GetSupportedAttributes() { throw null; }
+        protected internal virtual string[] GetSupportedAttributes() { throw null; }
         protected virtual void OnSwitchSettingChanged() { }
         protected virtual void OnValueChanged() { }
     }
-    [System.AttributeUsageAttribute(System.AttributeTargets.Assembly | System.AttributeTargets.Class | System.AttributeTargets.Constructor | System.AttributeTargets.Event | System.AttributeTargets.Method | System.AttributeTargets.Property)]
+    [System.AttributeUsageAttribute(741)]
     public sealed partial class SwitchAttribute : System.Attribute
     {
         public SwitchAttribute(string switchName, System.Type switchType) { }
@@ -89,7 +89,7 @@ namespace System.Diagnostics
         public System.Type SwitchType { get { throw null; } set { } }
         public static System.Diagnostics.SwitchAttribute[] GetAll(System.Reflection.Assembly assembly) { throw null; }
     }
-    [System.AttributeUsageAttribute(System.AttributeTargets.Class)]
+    [System.AttributeUsageAttribute(4)]
     public sealed partial class SwitchLevelAttribute : System.Attribute
     {
         public SwitchLevelAttribute(System.Type switchLevelType) { }
@@ -222,7 +222,7 @@ namespace System.Diagnostics
         public virtual void Fail(string message) { }
         public virtual void Fail(string message, string detailMessage) { }
         public virtual void Flush() { }
-        protected virtual string[] GetSupportedAttributes() { throw null; }
+        protected internal virtual string[] GetSupportedAttributes() { throw null; }
         public virtual void TraceData(System.Diagnostics.TraceEventCache eventCache, string source, System.Diagnostics.TraceEventType eventType, int id, object data) { }
         public virtual void TraceData(System.Diagnostics.TraceEventCache eventCache, string source, System.Diagnostics.TraceEventType eventType, int id, params object[] data) { }
         public virtual void TraceEvent(System.Diagnostics.TraceEventCache eventCache, string source, System.Diagnostics.TraceEventType eventType, int id) { }
@@ -290,7 +290,7 @@ namespace System.Diagnostics
         public System.Diagnostics.SourceSwitch Switch { get { throw null; } set { } }
         public void Close() { }
         public void Flush() { }
-        protected virtual string[] GetSupportedAttributes() { throw null; }
+        protected internal virtual string[] GetSupportedAttributes() { throw null; }
         [System.Diagnostics.ConditionalAttribute("TRACE")]
         public void TraceData(System.Diagnostics.TraceEventType eventType, int id, object data) { }
         [System.Diagnostics.ConditionalAttribute("TRACE")]
@@ -305,6 +305,7 @@ namespace System.Diagnostics
         public void TraceInformation(string message) { }
         [System.Diagnostics.ConditionalAttribute("TRACE")]
         public void TraceInformation(string format, params object[] args) { }
+        [System.Diagnostics.ConditionalAttribute("TRACE")]
         public void TraceTransfer(int id, string message, System.Guid relatedActivityId) { }
     }
     [System.Diagnostics.SwitchLevelAttribute(typeof(System.Diagnostics.TraceLevel))]

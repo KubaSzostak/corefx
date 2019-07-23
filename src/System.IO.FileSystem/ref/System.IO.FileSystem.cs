@@ -59,8 +59,6 @@ namespace System.IO
     public sealed partial class DirectoryInfo : System.IO.FileSystemInfo
     {
         public DirectoryInfo(string path) { }
-        public override bool Exists { get { throw null; } }
-        public override string Name { get { throw null; } }
         public System.IO.DirectoryInfo Parent { get { throw null; } }
         public System.IO.DirectoryInfo Root { get { throw null; } }
         public void Create() { }
@@ -92,7 +90,6 @@ namespace System.IO
         public System.IO.FileSystemInfo[] GetFileSystemInfos(string searchPattern, System.IO.EnumerationOptions enumerationOptions) { throw null; }
         public System.IO.FileSystemInfo[] GetFileSystemInfos(string searchPattern, System.IO.SearchOption searchOption) { throw null; }
         public void MoveTo(string destDirName) { }
-        public override string ToString() { throw null; }
     }
     public partial class EnumerationOptions
     {
@@ -180,10 +177,8 @@ namespace System.IO
         public FileInfo(string fileName) { }
         public System.IO.DirectoryInfo Directory { get { throw null; } }
         public string DirectoryName { get { throw null; } }
-        public override bool Exists { get { throw null; } }
         public bool IsReadOnly { get { throw null; } set { } }
         public long Length { get { throw null; } }
-        public override string Name { get { throw null; } }
         public System.IO.StreamWriter AppendText() { throw null; }
         public System.IO.FileInfo CopyTo(string destFileName) { throw null; }
         public System.IO.FileInfo CopyTo(string destFileName, bool overwrite) { throw null; }
@@ -202,7 +197,6 @@ namespace System.IO
         public System.IO.FileStream OpenWrite() { throw null; }
         public System.IO.FileInfo Replace(string destinationFileName, string destinationBackupFileName) { throw null; }
         public System.IO.FileInfo Replace(string destinationFileName, string destinationBackupFileName, bool ignoreMetadataErrors) { throw null; }
-        public override string ToString() { throw null; }
     }
     public abstract partial class FileSystemInfo : System.MarshalByRefObject, System.Runtime.Serialization.ISerializable
     {
@@ -213,14 +207,14 @@ namespace System.IO
         public System.IO.FileAttributes Attributes { get { throw null; } set { } }
         public System.DateTime CreationTime { get { throw null; } set { } }
         public System.DateTime CreationTimeUtc { get { throw null; } set { } }
-        public abstract bool Exists { get; }
+        public virtual bool Exists { get { throw null; } }
         public string Extension { get { throw null; } }
         public virtual string FullName { get { throw null; } }
         public System.DateTime LastAccessTime { get { throw null; } set { } }
         public System.DateTime LastAccessTimeUtc { get { throw null; } set { } }
         public System.DateTime LastWriteTime { get { throw null; } set { } }
         public System.DateTime LastWriteTimeUtc { get { throw null; } set { } }
-        public abstract string Name { get; }
+        public virtual string Name { get { throw null; } }
         public abstract void Delete();
         public virtual void GetObjectData(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context) { }
         public void Refresh() { }
@@ -247,17 +241,19 @@ namespace System.IO.Enumeration
 {
     public ref partial struct FileSystemEntry
     {
+        private object _dummy;
+        private int _dummyPrimitive;
         public System.IO.FileAttributes Attributes { get { throw null; } }
         public System.DateTimeOffset CreationTimeUtc { get { throw null; } }
-        public System.ReadOnlySpan<char> Directory { get { throw null; } }
+        public readonly System.ReadOnlySpan<char> Directory { get { throw null; } }
         public System.ReadOnlySpan<char> FileName { get { throw null; } }
         public bool IsDirectory { get { throw null; } }
         public bool IsHidden { get { throw null; } }
         public System.DateTimeOffset LastAccessTimeUtc { get { throw null; } }
         public System.DateTimeOffset LastWriteTimeUtc { get { throw null; } }
         public long Length { get { throw null; } }
-        public System.ReadOnlySpan<char> OriginalRootDirectory { get { throw null; } }
-        public System.ReadOnlySpan<char> RootDirectory { get { throw null; } }
+        public readonly System.ReadOnlySpan<char> OriginalRootDirectory { get { throw null; } }
+        public readonly System.ReadOnlySpan<char> RootDirectory { get { throw null; } }
         public System.IO.FileSystemInfo ToFileSystemInfo() { throw null; }
         public string ToFullPath() { throw null; }
         public string ToSpecifiedFullPath() { throw null; }
@@ -280,6 +276,7 @@ namespace System.IO.Enumeration
         protected virtual bool ContinueOnError(int error) { throw null; }
         public void Dispose() { }
         protected virtual void Dispose(bool disposing) { }
+        ~FileSystemEnumerator() { }
         public bool MoveNext() { throw null; }
         protected virtual void OnDirectoryFinished(System.ReadOnlySpan<char> directory) { }
         public void Reset() { }

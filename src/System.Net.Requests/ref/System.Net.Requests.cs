@@ -114,6 +114,7 @@ namespace System.Net
     public sealed partial class FtpWebRequest : System.Net.WebRequest
     {
         internal FtpWebRequest() { }
+        public override System.Net.Cache.RequestCachePolicy CachePolicy { get { throw null; } set { } }
         public System.Security.Cryptography.X509Certificates.X509CertificateCollection ClientCertificates { get { throw null; } set { } }
         public override string ConnectionGroupName { get { throw null; } set { } }
         public override long ContentLength { get { throw null; } set { } }
@@ -148,7 +149,6 @@ namespace System.Net
         internal FtpWebResponse() { }
         public string BannerMessage { get { throw null; } }
         public override long ContentLength { get { throw null; } }
-        public override string ContentType { get { throw null; } }
         public string ExitMessage { get { throw null; } }
         public override System.Net.WebHeaderCollection Headers { get { throw null; } }
         public System.DateTime LastModified { get { throw null; } }
@@ -170,6 +170,7 @@ namespace System.Net
     public delegate void HttpContinueDelegate(int StatusCode, System.Net.WebHeaderCollection httpHeaders);
     public partial class HttpWebRequest : System.Net.WebRequest, System.Runtime.Serialization.ISerializable
     {
+        public HttpWebRequest() { }
         [System.ObsoleteAttribute("Serialization is obsoleted for this type.  https://go.microsoft.com/fwlink/?linkid=14202")]
         protected HttpWebRequest(System.Runtime.Serialization.SerializationInfo serializationInfo, System.Runtime.Serialization.StreamingContext streamingContext) { }
         public string Accept { get { throw null; } set { } }
@@ -231,14 +232,10 @@ namespace System.Net
         public override System.IO.Stream EndGetRequestStream(System.IAsyncResult asyncResult) { throw null; }
         public System.IO.Stream EndGetRequestStream(System.IAsyncResult asyncResult, out System.Net.TransportContext context) { throw null; }
         public override System.Net.WebResponse EndGetResponse(System.IAsyncResult asyncResult) { throw null; }
-#pragma warning disable 0809 // Obsolete member overrides non-obsolete member
-        [System.ObsoleteAttribute("Serialization is obsoleted for this type.  https://go.microsoft.com/fwlink/?linkid=14202")]
         protected override void GetObjectData(System.Runtime.Serialization.SerializationInfo serializationInfo, System.Runtime.Serialization.StreamingContext streamingContext) { }
-#pragma warning restore 0809
         public override System.IO.Stream GetRequestStream() { throw null; }
         public System.IO.Stream GetRequestStream(out System.Net.TransportContext context) { throw null; }
         public override System.Net.WebResponse GetResponse() { throw null; }
-        [System.ObsoleteAttribute("Serialization is obsoleted for this type.  https://go.microsoft.com/fwlink/?linkid=14202")]
         void System.Runtime.Serialization.ISerializable.GetObjectData(System.Runtime.Serialization.SerializationInfo serializationInfo, System.Runtime.Serialization.StreamingContext streamingContext) { }
     }
     public partial class HttpWebResponse : System.Net.WebResponse, System.Runtime.Serialization.ISerializable
@@ -263,13 +260,9 @@ namespace System.Net
         public override bool SupportsHeaders { get { throw null; } }
         public override void Close() { }
         protected override void Dispose(bool disposing) { }
-#pragma warning disable 0809 // Obsolete member overrides non-obsolete member
-        [System.ObsoleteAttribute("Serialization is obsoleted for this type.  https://go.microsoft.com/fwlink/?linkid=14202")]
         protected override void GetObjectData(System.Runtime.Serialization.SerializationInfo serializationInfo, System.Runtime.Serialization.StreamingContext streamingContext) { }
-#pragma warning restore 0809
         public string GetResponseHeader(string headerName) { throw null; }
         public override System.IO.Stream GetResponseStream() { throw null; }
-        [System.ObsoleteAttribute("Serialization is obsoleted for this type.  https://go.microsoft.com/fwlink/?linkid=14202")]
         void System.Runtime.Serialization.ISerializable.GetObjectData(System.Runtime.Serialization.SerializationInfo serializationInfo, System.Runtime.Serialization.StreamingContext streamingContext) { }
     }
     public partial interface IAuthenticationModule

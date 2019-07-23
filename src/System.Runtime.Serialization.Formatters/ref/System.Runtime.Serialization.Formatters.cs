@@ -128,6 +128,7 @@ namespace System.Runtime.Serialization
         public virtual void BindToName(System.Type serializedType, out string assemblyName, out string typeName) { throw null; }
         public abstract System.Type BindToType(string assemblyName, string typeName);
     }
+    public delegate void SerializationEventHandler(System.Runtime.Serialization.StreamingContext context);
     public sealed partial class SerializationObjectManager
     {
         public SerializationObjectManager(System.Runtime.Serialization.StreamingContext context) { }
@@ -142,6 +143,10 @@ namespace System.Runtime.Serialization
         public virtual System.Runtime.Serialization.ISurrogateSelector GetNextSelector() { throw null; }
         public virtual System.Runtime.Serialization.ISerializationSurrogate GetSurrogate(System.Type type, System.Runtime.Serialization.StreamingContext context, out System.Runtime.Serialization.ISurrogateSelector selector) { throw null; }
         public virtual void RemoveSurrogate(System.Type type, System.Runtime.Serialization.StreamingContext context) { }
+    }
+    public sealed partial class TypeLoadExceptionHolder
+    {
+        internal TypeLoadExceptionHolder() { }
     }
 }
 namespace System.Runtime.Serialization.Formatters

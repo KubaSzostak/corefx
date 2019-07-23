@@ -10,23 +10,23 @@ namespace System.Numerics.Tensors
     public static partial class ArrayTensorExtensions
     {
         public static System.Numerics.Tensors.CompressedSparseTensor<T> ToCompressedSparseTensor<T>(this System.Array array, bool reverseStride = false) { throw null; }
-        public static System.Numerics.Tensors.CompressedSparseTensor<T> ToCompressedSparseTensor<T>(this T[,,] array, bool reverseStride = false) { throw null; }
-        public static System.Numerics.Tensors.CompressedSparseTensor<T> ToCompressedSparseTensor<T>(this T[,] array, bool reverseStride = false) { throw null; }
+        public static System.Numerics.Tensors.CompressedSparseTensor<T> ToCompressedSparseTensor<T>(this T[] array, bool reverseStride = false) { throw null; }
+        public static System.Numerics.Tensors.CompressedSparseTensor<T> ToCompressedSparseTensor<T>(this T[] array, bool reverseStride = false) { throw null; }
         public static System.Numerics.Tensors.CompressedSparseTensor<T> ToCompressedSparseTensor<T>(this T[] array) { throw null; }
         public static System.Numerics.Tensors.SparseTensor<T> ToSparseTensor<T>(this System.Array array, bool reverseStride = false) { throw null; }
-        public static System.Numerics.Tensors.SparseTensor<T> ToSparseTensor<T>(this T[,,] array, bool reverseStride = false) { throw null; }
-        public static System.Numerics.Tensors.SparseTensor<T> ToSparseTensor<T>(this T[,] array, bool reverseStride = false) { throw null; }
+        public static System.Numerics.Tensors.SparseTensor<T> ToSparseTensor<T>(this T[] array, bool reverseStride = false) { throw null; }
+        public static System.Numerics.Tensors.SparseTensor<T> ToSparseTensor<T>(this T[] array, bool reverseStride = false) { throw null; }
         public static System.Numerics.Tensors.SparseTensor<T> ToSparseTensor<T>(this T[] array) { throw null; }
         public static System.Numerics.Tensors.DenseTensor<T> ToTensor<T>(this System.Array array, bool reverseStride = false) { throw null; }
-        public static System.Numerics.Tensors.DenseTensor<T> ToTensor<T>(this T[,,] array, bool reverseStride = false) { throw null; }
-        public static System.Numerics.Tensors.DenseTensor<T> ToTensor<T>(this T[,] array, bool reverseStride = false) { throw null; }
+        public static System.Numerics.Tensors.DenseTensor<T> ToTensor<T>(this T[] array, bool reverseStride = false) { throw null; }
+        public static System.Numerics.Tensors.DenseTensor<T> ToTensor<T>(this T[] array, bool reverseStride = false) { throw null; }
         public static System.Numerics.Tensors.DenseTensor<T> ToTensor<T>(this T[] array) { throw null; }
     }
     public partial class CompressedSparseTensor<T> : System.Numerics.Tensors.Tensor<T>
     {
-        public CompressedSparseTensor(System.Memory<T> values, System.Memory<int> compressedCounts, System.Memory<int> indices, int nonZeroCount, System.ReadOnlySpan<int> dimensions, bool reverseStride = false) : base (default(System.Array), default(bool)) { }
-        public CompressedSparseTensor(System.ReadOnlySpan<int> dimensions, bool reverseStride = false) : base (default(System.Array), default(bool)) { }
-        public CompressedSparseTensor(System.ReadOnlySpan<int> dimensions, int capacity, bool reverseStride = false) : base (default(System.Array), default(bool)) { }
+        public CompressedSparseTensor(System.Memory<T> values, System.Memory<int> compressedCounts, System.Memory<int> indices, int nonZeroCount, System.ReadOnlySpan<int> dimensions, bool reverseStride = false) : base (default(int)) { }
+        public CompressedSparseTensor(System.ReadOnlySpan<int> dimensions, bool reverseStride = false) : base (default(int)) { }
+        public CompressedSparseTensor(System.ReadOnlySpan<int> dimensions, int capacity, bool reverseStride = false) : base (default(int)) { }
         public int Capacity { get { throw null; } }
         public System.Memory<int> CompressedCounts { get { throw null; } }
         public System.Memory<int> Indices { get { throw null; } }
@@ -44,9 +44,9 @@ namespace System.Numerics.Tensors
     }
     public partial class DenseTensor<T> : System.Numerics.Tensors.Tensor<T>
     {
-        public DenseTensor(int length) : base (default(System.Array), default(bool)) { }
-        public DenseTensor(System.Memory<T> memory, System.ReadOnlySpan<int> dimensions, bool reverseStride = false) : base (default(System.Array), default(bool)) { }
-        public DenseTensor(System.ReadOnlySpan<int> dimensions, bool reverseStride = false) : base (default(System.Array), default(bool)) { }
+        public DenseTensor(int length) : base (default(int)) { }
+        public DenseTensor(System.Memory<T> memory, System.ReadOnlySpan<int> dimensions, bool reverseStride = false) : base (default(int)) { }
+        public DenseTensor(System.ReadOnlySpan<int> dimensions, bool reverseStride = false) : base (default(int)) { }
         public System.Memory<T> Buffer { get { throw null; } }
         public override System.Numerics.Tensors.Tensor<T> Clone() { throw null; }
         public override System.Numerics.Tensors.Tensor<TResult> CloneEmpty<TResult>(System.ReadOnlySpan<int> dimensions) { throw null; }
@@ -58,7 +58,7 @@ namespace System.Numerics.Tensors
     }
     public partial class SparseTensor<T> : System.Numerics.Tensors.Tensor<T>
     {
-        public SparseTensor(System.ReadOnlySpan<int> dimensions, bool reverseStride = false, int capacity = 0) : base (default(System.Array), default(bool)) { }
+        public SparseTensor(System.ReadOnlySpan<int> dimensions, bool reverseStride = false, int capacity = 0) : base (default(int)) { }
         public int NonZeroCount { get { throw null; } }
         public override System.Numerics.Tensors.Tensor<T> Clone() { throw null; }
         public override System.Numerics.Tensors.Tensor<TResult> CloneEmpty<TResult>(System.ReadOnlySpan<int> dimensions) { throw null; }
