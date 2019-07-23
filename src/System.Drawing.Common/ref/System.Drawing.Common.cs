@@ -208,7 +208,6 @@ namespace System.Drawing
         internal BufferedGraphics() { }
         public System.Drawing.Graphics Graphics { get { throw null; } }
         public void Dispose() { }
-        ~BufferedGraphics() { }
         public void Render() { }
         public void Render(System.Drawing.Graphics target) { }
         public void Render(System.IntPtr targetDC) { }
@@ -237,6 +236,15 @@ namespace System.Drawing
         public override int GetHashCode() { throw null; }
         public static bool operator ==(System.Drawing.CharacterRange cr1, System.Drawing.CharacterRange cr2) { throw null; }
         public static bool operator !=(System.Drawing.CharacterRange cr1, System.Drawing.CharacterRange cr2) { throw null; }
+    }
+    public static partial class ColorTranslator
+    {
+        public static System.Drawing.Color FromHtml(string htmlColor) { throw null; }
+        public static System.Drawing.Color FromOle(int oleColor) { throw null; }
+        public static System.Drawing.Color FromWin32(int win32Color) { throw null; }
+        public static string ToHtml(System.Drawing.Color c) { throw null; }
+        public static int ToOle(System.Drawing.Color c) { throw null; }
+        public static int ToWin32(System.Drawing.Color c) { throw null; }
     }
     public enum ContentAlignment
     {
@@ -270,9 +278,7 @@ namespace System.Drawing
         Whiteness = 16711778,
         CaptureBlt = 1073741824,
     }
-#if netcoreapp
     [System.ComponentModel.TypeConverterAttribute("System.Drawing.FontConverter, System.Windows.Extensions, Version=4.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51")]
-#endif
     public sealed partial class Font : System.MarshalByRefObject, System.ICloneable, System.IDisposable, System.Runtime.Serialization.ISerializable
     {
         public Font(System.Drawing.Font prototype, System.Drawing.FontStyle newStyle) { }
@@ -631,9 +637,7 @@ namespace System.Drawing
         Document = 5,
         Millimeter = 6,
     }
-#if netcoreapp
     [System.ComponentModel.TypeConverterAttribute("System.Drawing.IconConverter, System.Windows.Extensions, Version=4.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51")]
-#endif
     public sealed partial class Icon : System.MarshalByRefObject, System.ICloneable, System.IDisposable, System.Runtime.Serialization.ISerializable
     {
         public Icon(System.Drawing.Icon original, System.Drawing.Size size) { }
@@ -658,7 +662,7 @@ namespace System.Drawing
         ~Icon() { }
         public static System.Drawing.Icon FromHandle(System.IntPtr handle) { throw null; }
         public void Save(System.IO.Stream outputStream) { }
-        void System.Runtime.Serialization.ISerializable.GetObjectData(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context) { }
+        void System.Runtime.Serialization.ISerializable.GetObjectData(System.Runtime.Serialization.SerializationInfo si, System.Runtime.Serialization.StreamingContext context) { }
         public System.Drawing.Bitmap ToBitmap() { throw null; }
         public override string ToString() { throw null; }
     }
@@ -668,9 +672,7 @@ namespace System.Drawing
         void ReleaseHdc();
     }
     [System.ComponentModel.ImmutableObjectAttribute(true)]
-#if netcoreapp
     [System.ComponentModel.TypeConverterAttribute("System.Drawing.ImageConverter, System.Windows.Extensions, Version=4.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51")]
-#endif
     public abstract partial class Image : System.MarshalByRefObject, System.ICloneable, System.IDisposable, System.Runtime.Serialization.ISerializable
     {
         internal Image() { }
@@ -732,7 +734,7 @@ namespace System.Drawing
         public void SaveAdd(System.Drawing.Imaging.EncoderParameters encoderParams) { }
         public int SelectActiveFrame(System.Drawing.Imaging.FrameDimension dimension, int frameIndex) { throw null; }
         public void SetPropertyItem(System.Drawing.Imaging.PropertyItem propitem) { }
-        void System.Runtime.Serialization.ISerializable.GetObjectData(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context) { }
+        void System.Runtime.Serialization.ISerializable.GetObjectData(System.Runtime.Serialization.SerializationInfo si, System.Runtime.Serialization.StreamingContext context) { }
         public delegate bool GetThumbnailImageAbort();
     }
     public sealed partial class ImageAnimator
@@ -1117,6 +1119,42 @@ namespace System.Drawing
         public static System.Drawing.Brush WindowFrame { get { throw null; } }
         public static System.Drawing.Brush WindowText { get { throw null; } }
         public static System.Drawing.Brush FromSystemColor(System.Drawing.Color c) { throw null; }
+    }
+    public static partial class SystemColors
+    {
+        public static System.Drawing.Color ActiveBorder { get { throw null; } }
+        public static System.Drawing.Color ActiveCaption { get { throw null; } }
+        public static System.Drawing.Color ActiveCaptionText { get { throw null; } }
+        public static System.Drawing.Color AppWorkspace { get { throw null; } }
+        public static System.Drawing.Color ButtonFace { get { throw null; } }
+        public static System.Drawing.Color ButtonHighlight { get { throw null; } }
+        public static System.Drawing.Color ButtonShadow { get { throw null; } }
+        public static System.Drawing.Color Control { get { throw null; } }
+        public static System.Drawing.Color ControlDark { get { throw null; } }
+        public static System.Drawing.Color ControlDarkDark { get { throw null; } }
+        public static System.Drawing.Color ControlLight { get { throw null; } }
+        public static System.Drawing.Color ControlLightLight { get { throw null; } }
+        public static System.Drawing.Color ControlText { get { throw null; } }
+        public static System.Drawing.Color Desktop { get { throw null; } }
+        public static System.Drawing.Color GradientActiveCaption { get { throw null; } }
+        public static System.Drawing.Color GradientInactiveCaption { get { throw null; } }
+        public static System.Drawing.Color GrayText { get { throw null; } }
+        public static System.Drawing.Color Highlight { get { throw null; } }
+        public static System.Drawing.Color HighlightText { get { throw null; } }
+        public static System.Drawing.Color HotTrack { get { throw null; } }
+        public static System.Drawing.Color InactiveBorder { get { throw null; } }
+        public static System.Drawing.Color InactiveCaption { get { throw null; } }
+        public static System.Drawing.Color InactiveCaptionText { get { throw null; } }
+        public static System.Drawing.Color Info { get { throw null; } }
+        public static System.Drawing.Color InfoText { get { throw null; } }
+        public static System.Drawing.Color Menu { get { throw null; } }
+        public static System.Drawing.Color MenuBar { get { throw null; } }
+        public static System.Drawing.Color MenuHighlight { get { throw null; } }
+        public static System.Drawing.Color MenuText { get { throw null; } }
+        public static System.Drawing.Color ScrollBar { get { throw null; } }
+        public static System.Drawing.Color Window { get { throw null; } }
+        public static System.Drawing.Color WindowFrame { get { throw null; } }
+        public static System.Drawing.Color WindowText { get { throw null; } }
     }
     public static partial class SystemFonts
     {
@@ -2290,9 +2328,7 @@ namespace System.Drawing.Imaging
         ReadOnly = 65536,
         Caching = 131072,
     }
-#if netcoreapp
     [System.ComponentModel.TypeConverterAttribute("System.Drawing.ImageFormatConverter, System.Windows.Extensions, Version=4.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51")]
-#endif
     public sealed partial class ImageFormat
     {
         public ImageFormat(System.Guid guid) { }
@@ -2489,9 +2525,7 @@ namespace System.Drawing.Printing
         protected InvalidPrinterException(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context) { }
         public override void GetObjectData(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context) { }
     }
-#if netcoreapp
     [System.ComponentModel.TypeConverterAttribute("System.Drawing.Printing.MarginsConverter, System.Windows.Extensions, Version=4.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51")]
-#endif
     public partial class Margins : System.ICloneable
     {
         public Margins() { }

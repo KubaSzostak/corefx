@@ -85,4 +85,55 @@ namespace System.Runtime.Serialization
         public string MethodName { get { throw null; } }
         public System.Type Type { get { throw null; } }
     }
+    [System.AttributeUsageAttribute(System.AttributeTargets.Method, Inherited=false)]
+    public sealed partial class OnDeserializedAttribute : System.Attribute
+    {
+        public OnDeserializedAttribute() { }
+    }
+    [System.AttributeUsageAttribute(System.AttributeTargets.Method, Inherited=false)]
+    public sealed partial class OnDeserializingAttribute : System.Attribute
+    {
+        public OnDeserializingAttribute() { }
+    }
+    [System.AttributeUsageAttribute(System.AttributeTargets.Method, Inherited=false)]
+    public sealed partial class OnSerializedAttribute : System.Attribute
+    {
+        public OnSerializedAttribute() { }
+    }
+    [System.AttributeUsageAttribute(System.AttributeTargets.Method, Inherited=false)]
+    public sealed partial class OnSerializingAttribute : System.Attribute
+    {
+        public OnSerializingAttribute() { }
+    }
+    public partial class SerializationException : System.SystemException
+    {
+        public SerializationException() { }
+        protected SerializationException(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context) { }
+        public SerializationException(string? message) { }
+        public SerializationException(string? message, System.Exception? innerException) { }
+    }
+    public readonly partial struct StreamingContext
+    {
+        private readonly object? _dummy;
+        private readonly int _dummyPrimitive;
+        public StreamingContext(System.Runtime.Serialization.StreamingContextStates state) { throw null; }
+        public StreamingContext(System.Runtime.Serialization.StreamingContextStates state, object? additional) { throw null; }
+        public object? Context { get { throw null; } }
+        public System.Runtime.Serialization.StreamingContextStates State { get { throw null; } }
+        public override bool Equals(object? obj) { throw null; }
+        public override int GetHashCode() { throw null; }
+    }
+    [System.FlagsAttribute]
+    public enum StreamingContextStates
+    {
+        CrossProcess = 1,
+        CrossMachine = 2,
+        File = 4,
+        Persistence = 8,
+        Remoting = 16,
+        Other = 32,
+        Clone = 64,
+        CrossAppDomain = 128,
+        All = 255,
+    }
 }

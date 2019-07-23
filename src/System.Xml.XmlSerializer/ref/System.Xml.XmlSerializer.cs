@@ -10,11 +10,17 @@ namespace System.Xml.Serialization
     [System.FlagsAttribute]
     public enum CodeGenerationOptions
     {
+        [System.Xml.Serialization.XmlIgnoreAttribute]
         None = 0,
+        [System.Xml.Serialization.XmlEnumAttribute("properties")]
         GenerateProperties = 1,
+        [System.Xml.Serialization.XmlEnumAttribute("newAsync")]
         GenerateNewAsync = 2,
+        [System.Xml.Serialization.XmlEnumAttribute("oldAsync")]
         GenerateOldAsync = 4,
+        [System.Xml.Serialization.XmlEnumAttribute("order")]
         GenerateOrder = 8,
+        [System.Xml.Serialization.XmlEnumAttribute("enableDataBinding")]
         EnableDataBinding = 16,
     }
     public partial class CodeIdentifier
@@ -47,6 +53,12 @@ namespace System.Xml.Serialization
         public bool ShareTypes { get { throw null; } }
         public System.Xml.Serialization.CodeIdentifiers TypeIdentifiers { get { throw null; } }
         public System.Collections.Specialized.StringCollection Warnings { get { throw null; } }
+    }
+    public partial interface IXmlSerializable
+    {
+        System.Xml.Schema.XmlSchema GetSchema();
+        void ReadXml(System.Xml.XmlReader reader);
+        void WriteXml(System.Xml.XmlWriter writer);
     }
     public partial interface IXmlTextParser
     {
@@ -150,6 +162,21 @@ namespace System.Xml.Serialization
         public object UnreferencedObject { get { throw null; } }
     }
     public delegate void UnreferencedObjectEventHandler(object sender, System.Xml.Serialization.UnreferencedObjectEventArgs e);
+    [System.AttributeUsageAttribute(System.AttributeTargets.Field | System.AttributeTargets.Parameter | System.AttributeTargets.Property | System.AttributeTargets.ReturnValue, AllowMultiple=false)]
+    public partial class XmlAnyAttributeAttribute : System.Attribute
+    {
+        public XmlAnyAttributeAttribute() { }
+    }
+    [System.AttributeUsageAttribute(System.AttributeTargets.Field | System.AttributeTargets.Parameter | System.AttributeTargets.Property | System.AttributeTargets.ReturnValue, AllowMultiple=true)]
+    public partial class XmlAnyElementAttribute : System.Attribute
+    {
+        public XmlAnyElementAttribute() { }
+        public XmlAnyElementAttribute(string name) { }
+        public XmlAnyElementAttribute(string name, string ns) { }
+        public string Name { get { throw null; } set { } }
+        public string Namespace { get { throw null; } set { } }
+        public int Order { get { throw null; } set { } }
+    }
     public partial class XmlAnyElementAttributes : System.Collections.CollectionBase
     {
         public XmlAnyElementAttributes() { }
@@ -197,6 +224,19 @@ namespace System.Xml.Serialization
         public int IndexOf(System.Xml.Serialization.XmlArrayItemAttribute attribute) { throw null; }
         public void Insert(int index, System.Xml.Serialization.XmlArrayItemAttribute attribute) { }
         public void Remove(System.Xml.Serialization.XmlArrayItemAttribute attribute) { }
+    }
+    [System.AttributeUsageAttribute(System.AttributeTargets.Field | System.AttributeTargets.Parameter | System.AttributeTargets.Property | System.AttributeTargets.ReturnValue)]
+    public partial class XmlAttributeAttribute : System.Attribute
+    {
+        public XmlAttributeAttribute() { }
+        public XmlAttributeAttribute(string attributeName) { }
+        public XmlAttributeAttribute(string attributeName, System.Type type) { }
+        public XmlAttributeAttribute(System.Type type) { }
+        public string AttributeName { get { throw null; } set { } }
+        public string DataType { get { throw null; } set { } }
+        public System.Xml.Schema.XmlSchemaForm Form { get { throw null; } set { } }
+        public string Namespace { get { throw null; } set { } }
+        public System.Type Type { get { throw null; } set { } }
     }
     public partial class XmlAttributeEventArgs : System.EventArgs
     {
@@ -250,6 +290,21 @@ namespace System.Xml.Serialization
         public System.Xml.Serialization.XmlNodeEventHandler OnUnknownNode { get { throw null; } set { } }
         public System.Xml.Serialization.UnreferencedObjectEventHandler OnUnreferencedObject { get { throw null; } set { } }
     }
+    [System.AttributeUsageAttribute(System.AttributeTargets.Field | System.AttributeTargets.Parameter | System.AttributeTargets.Property | System.AttributeTargets.ReturnValue, AllowMultiple=true)]
+    public partial class XmlElementAttribute : System.Attribute
+    {
+        public XmlElementAttribute() { }
+        public XmlElementAttribute(string elementName) { }
+        public XmlElementAttribute(string elementName, System.Type type) { }
+        public XmlElementAttribute(System.Type type) { }
+        public string DataType { get { throw null; } set { } }
+        public string ElementName { get { throw null; } set { } }
+        public System.Xml.Schema.XmlSchemaForm Form { get { throw null; } set { } }
+        public bool IsNullable { get { throw null; } set { } }
+        public string Namespace { get { throw null; } set { } }
+        public int Order { get { throw null; } set { } }
+        public System.Type Type { get { throw null; } set { } }
+    }
     public partial class XmlElementAttributes : System.Collections.CollectionBase
     {
         public XmlElementAttributes() { }
@@ -271,6 +326,18 @@ namespace System.Xml.Serialization
         public object ObjectBeingDeserialized { get { throw null; } }
     }
     public delegate void XmlElementEventHandler(object sender, System.Xml.Serialization.XmlElementEventArgs e);
+    [System.AttributeUsageAttribute(System.AttributeTargets.Field)]
+    public partial class XmlEnumAttribute : System.Attribute
+    {
+        public XmlEnumAttribute() { }
+        public XmlEnumAttribute(string name) { }
+        public string Name { get { throw null; } set { } }
+    }
+    [System.AttributeUsageAttribute(System.AttributeTargets.Field | System.AttributeTargets.Parameter | System.AttributeTargets.Property | System.AttributeTargets.ReturnValue)]
+    public partial class XmlIgnoreAttribute : System.Attribute
+    {
+        public XmlIgnoreAttribute() { }
+    }
     [System.AttributeUsageAttribute(System.AttributeTargets.Class | System.AttributeTargets.Interface | System.AttributeTargets.Method | System.AttributeTargets.Struct, AllowMultiple=true)]
     public partial class XmlIncludeAttribute : System.Attribute
     {
@@ -313,6 +380,11 @@ namespace System.Xml.Serialization
         public string TypeName { get { throw null; } }
         public string TypeNamespace { get { throw null; } }
     }
+    [System.AttributeUsageAttribute(System.AttributeTargets.Field | System.AttributeTargets.Parameter | System.AttributeTargets.Property | System.AttributeTargets.ReturnValue, AllowMultiple=false)]
+    public partial class XmlNamespaceDeclarationsAttribute : System.Attribute
+    {
+        public XmlNamespaceDeclarationsAttribute() { }
+    }
     public partial class XmlNodeEventArgs : System.EventArgs
     {
         internal XmlNodeEventArgs() { }
@@ -353,6 +425,16 @@ namespace System.Xml.Serialization
         public System.Xml.Serialization.SoapAttributes SoapAttributes { get { throw null; } set { } }
         public System.Xml.Serialization.XmlAttributes XmlAttributes { get { throw null; } set { } }
     }
+    [System.AttributeUsageAttribute(System.AttributeTargets.Class | System.AttributeTargets.Enum | System.AttributeTargets.Interface | System.AttributeTargets.ReturnValue | System.AttributeTargets.Struct)]
+    public partial class XmlRootAttribute : System.Attribute
+    {
+        public XmlRootAttribute() { }
+        public XmlRootAttribute(string elementName) { }
+        public string DataType { get { throw null; } set { } }
+        public string ElementName { get { throw null; } set { } }
+        public bool IsNullable { get { throw null; } set { } }
+        public string Namespace { get { throw null; } set { } }
+    }
     public partial class XmlSchemaEnumerator : System.Collections.Generic.IEnumerator<System.Xml.Schema.XmlSchema>, System.Collections.IEnumerator, System.IDisposable
     {
         public XmlSchemaEnumerator(System.Xml.Serialization.XmlSchemas list) { }
@@ -387,6 +469,13 @@ namespace System.Xml.Serialization
         public System.Xml.Serialization.XmlTypeMapping ImportSchemaType(System.Xml.XmlQualifiedName typeName, System.Type baseType) { throw null; }
         public System.Xml.Serialization.XmlTypeMapping ImportSchemaType(System.Xml.XmlQualifiedName typeName, System.Type baseType, bool baseTypeCanBeIndirect) { throw null; }
         public System.Xml.Serialization.XmlTypeMapping ImportTypeMapping(System.Xml.XmlQualifiedName name) { throw null; }
+    }
+    [System.AttributeUsageAttribute(System.AttributeTargets.Class | System.AttributeTargets.Interface | System.AttributeTargets.Struct)]
+    public sealed partial class XmlSchemaProviderAttribute : System.Attribute
+    {
+        public XmlSchemaProviderAttribute(string methodName) { }
+        public bool IsAny { get { throw null; } set { } }
+        public string MethodName { get { throw null; } }
     }
     public partial class XmlSchemas : System.Collections.CollectionBase, System.Collections.Generic.IEnumerable<System.Xml.Schema.XmlSchema>, System.Collections.IEnumerable
     {
@@ -687,6 +776,15 @@ namespace System.Xml.Serialization
         public virtual bool CanSerialize(System.Type type) { throw null; }
         public virtual System.Xml.Serialization.XmlSerializer GetSerializer(System.Type type) { throw null; }
     }
+    public partial class XmlSerializerNamespaces
+    {
+        public XmlSerializerNamespaces() { }
+        public XmlSerializerNamespaces(System.Xml.Serialization.XmlSerializerNamespaces namespaces) { }
+        public XmlSerializerNamespaces(System.Xml.XmlQualifiedName[] namespaces) { }
+        public int Count { get { throw null; } }
+        public void Add(string prefix, string ns) { }
+        public System.Xml.XmlQualifiedName[] ToArray() { throw null; }
+    }
     [System.AttributeUsageAttribute(System.AttributeTargets.Assembly)]
     public sealed partial class XmlSerializerVersionAttribute : System.Attribute
     {
@@ -696,6 +794,14 @@ namespace System.Xml.Serialization
         public string ParentAssemblyId { get { throw null; } set { } }
         public System.Type Type { get { throw null; } set { } }
         public string Version { get { throw null; } set { } }
+    }
+    [System.AttributeUsageAttribute(System.AttributeTargets.Field | System.AttributeTargets.Parameter | System.AttributeTargets.Property | System.AttributeTargets.ReturnValue)]
+    public partial class XmlTextAttribute : System.Attribute
+    {
+        public XmlTextAttribute() { }
+        public XmlTextAttribute(System.Type type) { }
+        public string DataType { get { throw null; } set { } }
+        public System.Type Type { get { throw null; } set { } }
     }
     [System.AttributeUsageAttribute(System.AttributeTargets.Class | System.AttributeTargets.Enum | System.AttributeTargets.Interface | System.AttributeTargets.Struct)]
     public partial class XmlTypeAttribute : System.Attribute

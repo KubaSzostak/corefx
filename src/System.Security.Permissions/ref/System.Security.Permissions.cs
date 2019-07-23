@@ -41,21 +41,21 @@ namespace System.Data.Common
     public abstract partial class DBDataPermission : System.Security.CodeAccessPermission, System.Security.Permissions.IUnrestrictedPermission
     {
         protected DBDataPermission() { }
-        protected DBDataPermission(System.Data.Common.DBDataPermission permission) { }
-        protected DBDataPermission(System.Data.Common.DBDataPermissionAttribute permissionAttribute) { }
+        protected DBDataPermission(System.Data.Common.DBDataPermission dataPermission) { }
+        protected DBDataPermission(System.Data.Common.DBDataPermissionAttribute attribute) { }
         protected DBDataPermission(System.Security.Permissions.PermissionState state) { }
-        protected DBDataPermission(System.Security.Permissions.PermissionState state, bool allowBlankPassword) { }
+        protected DBDataPermission(System.Security.Permissions.PermissionState state, bool blankPassword) { }
         public bool AllowBlankPassword { get { throw null; } set { } }
         public virtual void Add(string connectionString, string restrictions, System.Data.KeyRestrictionBehavior behavior) { }
         protected void Clear() { }
         public override System.Security.IPermission Copy() { throw null; }
         protected virtual System.Data.Common.DBDataPermission CreateInstance() { throw null; }
-        public override void FromXml(System.Security.SecurityElement securityElement) { }
+        public override void FromXml(System.Security.SecurityElement elem) { }
         public override System.Security.IPermission Intersect(System.Security.IPermission target) { throw null; }
         public override bool IsSubsetOf(System.Security.IPermission target) { throw null; }
         public bool IsUnrestricted() { throw null; }
         public override System.Security.SecurityElement ToXml() { throw null; }
-        public override System.Security.IPermission Union(System.Security.IPermission target) { throw null; }
+        public override System.Security.IPermission Union(System.Security.IPermission other) { throw null; }
     }
     [System.AttributeUsageAttribute(System.AttributeTargets.Assembly | System.AttributeTargets.Class | System.AttributeTargets.Constructor | System.AttributeTargets.Method | System.AttributeTargets.Struct, AllowMultiple=true, Inherited=false)]
     public abstract partial class DBDataPermissionAttribute : System.Security.Permissions.CodeAccessSecurityAttribute
@@ -530,6 +530,7 @@ namespace System.Security
         public HostProtectionException(string message, System.Security.Permissions.HostProtectionResource protectedResources, System.Security.Permissions.HostProtectionResource demandedResources) { }
         public System.Security.Permissions.HostProtectionResource DemandedResources { get { throw null; } }
         public System.Security.Permissions.HostProtectionResource ProtectedResources { get { throw null; } }
+        public override void GetObjectData(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context) { }
         public override string ToString() { throw null; }
     }
     public partial class HostSecurityManager
@@ -562,12 +563,24 @@ namespace System.Security
     {
         System.Security.Policy.Evidence Evidence { get; }
     }
+    public partial interface IPermission : System.Security.ISecurityEncodable
+    {
+        System.Security.IPermission Copy();
+        void Demand();
+        System.Security.IPermission? Intersect(System.Security.IPermission? target);
+        bool IsSubsetOf(System.Security.IPermission? target);
+        System.Security.IPermission? Union(System.Security.IPermission? target);
+    }
+    public partial interface ISecurityEncodable
+    {
+        void FromXml(System.Security.SecurityElement e);
+        System.Security.SecurityElement? ToXml();
+    }
     public partial interface ISecurityPolicyEncodable
     {
         void FromXml(System.Security.SecurityElement e, System.Security.Policy.PolicyLevel level);
         System.Security.SecurityElement ToXml(System.Security.Policy.PolicyLevel level);
     }
-#if !netcoreapp && !uap
     public partial interface IStackWalk
     {
         void Assert();
@@ -575,7 +588,6 @@ namespace System.Security
         void Deny();
         void PermitOnly();
     }
-#endif
     public sealed partial class NamedPermissionSet : System.Security.PermissionSet
     {
         public NamedPermissionSet(System.Security.NamedPermissionSet permSet) : base (default(System.Security.Permissions.PermissionState)) { }
@@ -591,17 +603,16 @@ namespace System.Security
         public override int GetHashCode() { throw null; }
         public override System.Security.SecurityElement ToXml() { throw null; }
     }
-#if !netcoreapp && !uap
     public partial class PermissionSet : System.Collections.ICollection, System.Collections.IEnumerable, System.Runtime.Serialization.IDeserializationCallback, System.Security.ISecurityEncodable, System.Security.IStackWalk
     {
         public PermissionSet(System.Security.Permissions.PermissionState state) { }
-        public PermissionSet(System.Security.PermissionSet permSet) { }
+        public PermissionSet(System.Security.PermissionSet? permSet) { }
         public virtual int Count { get { throw null; } }
         public virtual bool IsReadOnly { get { throw null; } }
         public virtual bool IsSynchronized { get { throw null; } }
         public virtual object SyncRoot { get { throw null; } }
-        public System.Security.IPermission AddPermission(System.Security.IPermission perm) { throw null; }
-        protected virtual System.Security.IPermission AddPermissionImpl(System.Security.IPermission perm) { throw null; }
+        public System.Security.IPermission? AddPermission(System.Security.IPermission? perm) { throw null; }
+        protected virtual System.Security.IPermission? AddPermissionImpl(System.Security.IPermission? perm) { throw null; }
         public void Assert() { }
         public bool ContainsNonCodeAccessPermissions() { throw null; }
         [System.ObsoleteAttribute]
@@ -611,29 +622,28 @@ namespace System.Security
         public void Demand() { }
         [System.ObsoleteAttribute]
         public void Deny() { }
-        public override bool Equals(object o) { throw null; }
+        public override bool Equals(object? o) { throw null; }
         public virtual void FromXml(System.Security.SecurityElement et) { }
         public System.Collections.IEnumerator GetEnumerator() { throw null; }
         protected virtual System.Collections.IEnumerator GetEnumeratorImpl() { throw null; }
         public override int GetHashCode() { throw null; }
-        public System.Security.IPermission GetPermission(System.Type permClass) { throw null; }
-        protected virtual System.Security.IPermission GetPermissionImpl(System.Type permClass) { throw null; }
-        public System.Security.PermissionSet Intersect(System.Security.PermissionSet other) { throw null; }
+        public System.Security.IPermission? GetPermission(System.Type? permClass) { throw null; }
+        protected virtual System.Security.IPermission? GetPermissionImpl(System.Type? permClass) { throw null; }
+        public System.Security.PermissionSet? Intersect(System.Security.PermissionSet? other) { throw null; }
         public bool IsEmpty() { throw null; }
-        public bool IsSubsetOf(System.Security.PermissionSet target) { throw null; }
+        public bool IsSubsetOf(System.Security.PermissionSet? target) { throw null; }
         public bool IsUnrestricted() { throw null; }
         public void PermitOnly() { }
-        public System.Security.IPermission RemovePermission(System.Type permClass) { throw null; }
-        protected virtual System.Security.IPermission RemovePermissionImpl(System.Type permClass) { throw null; }
+        public System.Security.IPermission? RemovePermission(System.Type? permClass) { throw null; }
+        protected virtual System.Security.IPermission? RemovePermissionImpl(System.Type? permClass) { throw null; }
         public static void RevertAssert() { }
-        public System.Security.IPermission SetPermission(System.Security.IPermission perm) { throw null; }
-        protected virtual System.Security.IPermission SetPermissionImpl(System.Security.IPermission perm) { throw null; }
-        void System.Runtime.Serialization.IDeserializationCallback.OnDeserialization(object sender) { }
+        public System.Security.IPermission? SetPermission(System.Security.IPermission? perm) { throw null; }
+        protected virtual System.Security.IPermission? SetPermissionImpl(System.Security.IPermission? perm) { throw null; }
+        void System.Runtime.Serialization.IDeserializationCallback.OnDeserialization(object? sender) { }
         public override string ToString() { throw null; }
-        public virtual System.Security.SecurityElement ToXml() { throw null; }
-        public System.Security.PermissionSet Union(System.Security.PermissionSet other) { throw null; }
+        public virtual System.Security.SecurityElement? ToXml() { throw null; }
+        public System.Security.PermissionSet? Union(System.Security.PermissionSet? other) { throw null; }
     }
-#endif
     public enum PolicyLevelType
     {
         User = 0,
@@ -658,6 +668,29 @@ namespace System.Security
     {
         CurrentAppDomain = 0,
         CurrentAssembly = 1,
+    }
+    public sealed partial class SecurityElement
+    {
+        public SecurityElement(string tag) { }
+        public SecurityElement(string tag, string? text) { }
+        public System.Collections.Hashtable? Attributes { get { throw null; } set { } }
+        public System.Collections.ArrayList? Children { get { throw null; } set { } }
+        public string Tag { get { throw null; } set { } }
+        public string? Text { get { throw null; } set { } }
+        public void AddAttribute(string name, string value) { }
+        public void AddChild(System.Security.SecurityElement child) { }
+        public string? Attribute(string name) { throw null; }
+        public System.Security.SecurityElement Copy() { throw null; }
+        public bool Equal(System.Security.SecurityElement? other) { throw null; }
+        public static string? Escape(string? str) { throw null; }
+        public static System.Security.SecurityElement? FromString(string xml) { throw null; }
+        public static bool IsValidAttributeName(string? name) { throw null; }
+        public static bool IsValidAttributeValue(string? value) { throw null; }
+        public static bool IsValidTag(string? tag) { throw null; }
+        public static bool IsValidText(string? text) { throw null; }
+        public System.Security.SecurityElement? SearchForChildByTag(string tag) { throw null; }
+        public string? SearchForTextOfTag(string tag) { throw null; }
+        public override string ToString() { throw null; }
     }
     public static partial class SecurityManager
     {
@@ -717,6 +750,11 @@ namespace System.Security
 }
 namespace System.Security.Permissions
 {
+    [System.AttributeUsageAttribute(System.AttributeTargets.Assembly | System.AttributeTargets.Class | System.AttributeTargets.Constructor | System.AttributeTargets.Method | System.AttributeTargets.Struct, AllowMultiple=true, Inherited=false)]
+    public abstract partial class CodeAccessSecurityAttribute : System.Security.Permissions.SecurityAttribute
+    {
+        protected CodeAccessSecurityAttribute(System.Security.Permissions.SecurityAction action) : base (default(System.Security.Permissions.SecurityAction)) { }
+    }
     public sealed partial class DataProtectionPermission : System.Security.CodeAccessPermission, System.Security.Permissions.IUnrestrictedPermission
     {
         public DataProtectionPermission(System.Security.Permissions.DataProtectionPermissionFlags flag) { }
@@ -1101,13 +1139,11 @@ namespace System.Security.Permissions
         public override System.Security.IPermission CreatePermission() { throw null; }
         public System.Security.PermissionSet CreatePermissionSet() { throw null; }
     }
-#if !netcoreapp && !uap
     public enum PermissionState
     {
         None = 0,
         Unrestricted = 1,
     }
-#endif
     public sealed partial class PrincipalPermission : System.Security.IPermission, System.Security.ISecurityEncodable, System.Security.Permissions.IUnrestrictedPermission
     {
         public PrincipalPermission(System.Security.Permissions.PermissionState state) { }
@@ -1115,7 +1151,7 @@ namespace System.Security.Permissions
         public PrincipalPermission(string name, string role, bool isAuthenticated) { }
         public System.Security.IPermission Copy() { throw null; }
         public void Demand() { }
-        public override bool Equals(object o) { throw null; }
+        public override bool Equals(object obj) { throw null; }
         public void FromXml(System.Security.SecurityElement elem) { }
         public override int GetHashCode() { throw null; }
         public System.Security.IPermission Intersect(System.Security.IPermission target) { throw null; }
@@ -1174,10 +1210,10 @@ namespace System.Security.Permissions
         public ReflectionPermissionAttribute(System.Security.Permissions.SecurityAction action) : base (default(System.Security.Permissions.SecurityAction)) { }
         public System.Security.Permissions.ReflectionPermissionFlag Flags { get { throw null; } set { } }
         public bool MemberAccess { get { throw null; } set { } }
-        [System.ObsoleteAttribute]
+        [System.ObsoleteAttribute("This permission is no longer used by the CLR.")]
         public bool ReflectionEmit { get { throw null; } set { } }
         public bool RestrictedMemberAccess { get { throw null; } set { } }
-        [System.ObsoleteAttribute]
+        [System.ObsoleteAttribute("This API has been deprecated. https://go.microsoft.com/fwlink/?linkid=14202")]
         public bool TypeInformation { get { throw null; } set { } }
         public override System.Security.IPermission CreatePermission() { throw null; }
     }
@@ -1185,12 +1221,12 @@ namespace System.Security.Permissions
     public enum ReflectionPermissionFlag
     {
         NoFlags = 0,
-        [System.ObsoleteAttribute]
+        [System.ObsoleteAttribute("This API has been deprecated. https://go.microsoft.com/fwlink/?linkid=14202")]
         TypeInformation = 1,
         MemberAccess = 2,
-        [System.ObsoleteAttribute]
+        [System.ObsoleteAttribute("This permission is no longer used by the CLR.")]
         ReflectionEmit = 4,
-        [System.ObsoleteAttribute]
+        [System.ObsoleteAttribute("This permission has been deprecated. Use PermissionState.Unrestricted to get full access.")]
         AllFlags = 7,
         RestrictedMemberAccess = 8,
     }
@@ -1224,7 +1260,7 @@ namespace System.Security.Permissions
     public sealed partial class RegistryPermissionAttribute : System.Security.Permissions.CodeAccessSecurityAttribute
     {
         public RegistryPermissionAttribute(System.Security.Permissions.SecurityAction action) : base (default(System.Security.Permissions.SecurityAction)) { }
-        [System.ObsoleteAttribute]
+        [System.ObsoleteAttribute("Please use the ViewAndModify property instead.")]
         public string All { get { throw null; } set { } }
         public string ChangeAccessControl { get { throw null; } set { } }
         public string Create { get { throw null; } set { } }
@@ -1261,6 +1297,30 @@ namespace System.Security.Permissions
         public int PermissionAccess { get { throw null; } }
         public string[] PermissionAccessPath { get { throw null; } }
     }
+    public enum SecurityAction
+    {
+        Demand = 2,
+        Assert = 3,
+        [System.ObsoleteAttribute("Deny is obsolete and will be removed in a future release of the .NET Framework. See https://go.microsoft.com/fwlink/?LinkID=155570 for more information.")]
+        Deny = 4,
+        PermitOnly = 5,
+        LinkDemand = 6,
+        InheritanceDemand = 7,
+        [System.ObsoleteAttribute("Assembly level declarative security is obsolete and is no longer enforced by the CLR by default. See https://go.microsoft.com/fwlink/?LinkID=155570 for more information.")]
+        RequestMinimum = 8,
+        [System.ObsoleteAttribute("Assembly level declarative security is obsolete and is no longer enforced by the CLR by default. See https://go.microsoft.com/fwlink/?LinkID=155570 for more information.")]
+        RequestOptional = 9,
+        [System.ObsoleteAttribute("Assembly level declarative security is obsolete and is no longer enforced by the CLR by default. See https://go.microsoft.com/fwlink/?LinkID=155570 for more information.")]
+        RequestRefuse = 10,
+    }
+    [System.AttributeUsageAttribute(System.AttributeTargets.Assembly | System.AttributeTargets.Class | System.AttributeTargets.Constructor | System.AttributeTargets.Method | System.AttributeTargets.Struct, AllowMultiple=true, Inherited=false)]
+    public abstract partial class SecurityAttribute : System.Attribute
+    {
+        protected SecurityAttribute(System.Security.Permissions.SecurityAction action) { }
+        public System.Security.Permissions.SecurityAction Action { get { throw null; } set { } }
+        public bool Unrestricted { get { throw null; } set { } }
+        public abstract System.Security.IPermission? CreatePermission();
+    }
     public sealed partial class SecurityPermission : System.Security.CodeAccessPermission, System.Security.Permissions.IUnrestrictedPermission
     {
         public SecurityPermission(System.Security.Permissions.PermissionState state) { }
@@ -1273,6 +1333,47 @@ namespace System.Security.Permissions
         public bool IsUnrestricted() { throw null; }
         public override System.Security.SecurityElement ToXml() { throw null; }
         public override System.Security.IPermission Union(System.Security.IPermission target) { throw null; }
+    }
+    [System.AttributeUsageAttribute(System.AttributeTargets.Assembly | System.AttributeTargets.Class | System.AttributeTargets.Constructor | System.AttributeTargets.Method | System.AttributeTargets.Struct, AllowMultiple=true, Inherited=false)]
+    public sealed partial class SecurityPermissionAttribute : System.Security.Permissions.CodeAccessSecurityAttribute
+    {
+        public SecurityPermissionAttribute(System.Security.Permissions.SecurityAction action) : base (default(System.Security.Permissions.SecurityAction)) { }
+        public bool Assertion { get { throw null; } set { } }
+        public bool BindingRedirects { get { throw null; } set { } }
+        public bool ControlAppDomain { get { throw null; } set { } }
+        public bool ControlDomainPolicy { get { throw null; } set { } }
+        public bool ControlEvidence { get { throw null; } set { } }
+        public bool ControlPolicy { get { throw null; } set { } }
+        public bool ControlPrincipal { get { throw null; } set { } }
+        public bool ControlThread { get { throw null; } set { } }
+        public bool Execution { get { throw null; } set { } }
+        public System.Security.Permissions.SecurityPermissionFlag Flags { get { throw null; } set { } }
+        public bool Infrastructure { get { throw null; } set { } }
+        public bool RemotingConfiguration { get { throw null; } set { } }
+        public bool SerializationFormatter { get { throw null; } set { } }
+        public bool SkipVerification { get { throw null; } set { } }
+        public bool UnmanagedCode { get { throw null; } set { } }
+        public override System.Security.IPermission? CreatePermission() { throw null; }
+    }
+    [System.FlagsAttribute]
+    public enum SecurityPermissionFlag
+    {
+        NoFlags = 0,
+        Assertion = 1,
+        UnmanagedCode = 2,
+        SkipVerification = 4,
+        Execution = 8,
+        ControlThread = 16,
+        ControlEvidence = 32,
+        ControlPolicy = 64,
+        SerializationFormatter = 128,
+        ControlDomainPolicy = 256,
+        ControlPrincipal = 512,
+        ControlAppDomain = 1024,
+        RemotingConfiguration = 2048,
+        Infrastructure = 4096,
+        BindingRedirects = 8192,
+        AllFlags = 16383,
     }
     public sealed partial class SiteIdentityPermission : System.Security.CodeAccessPermission
     {
@@ -1622,29 +1723,29 @@ namespace System.Security.Policy
     public sealed partial class Evidence : System.Collections.ICollection, System.Collections.IEnumerable
     {
         public Evidence() { }
-        [System.ObsoleteAttribute]
+        [System.ObsoleteAttribute("This constructor is obsolete. Please use the constructor which takes arrays of EvidenceBase instead.")]
         public Evidence(object[] hostEvidence, object[] assemblyEvidence) { }
         public Evidence(System.Security.Policy.Evidence evidence) { }
         public Evidence(System.Security.Policy.EvidenceBase[] hostEvidence, System.Security.Policy.EvidenceBase[] assemblyEvidence) { }
-        [System.ObsoleteAttribute]
+        [System.ObsoleteAttribute("Evidence should not be treated as an ICollection. Please use GetHostEnumerator and GetAssemblyEnumerator to iterate over the evidence to collect a count.")]
         public int Count { get { throw null; } }
         public bool IsReadOnly { get { throw null; } }
         public bool IsSynchronized { get { throw null; } }
         public bool Locked { get { throw null; } set { } }
         public object SyncRoot { get { throw null; } }
-        [System.ObsoleteAttribute]
+        [System.ObsoleteAttribute("This method is obsolete. Please use AddAssemblyEvidence instead.")]
         public void AddAssembly(object id) { }
         public void AddAssemblyEvidence<T>(T evidence) where T : System.Security.Policy.EvidenceBase { }
-        [System.ObsoleteAttribute]
+        [System.ObsoleteAttribute("This method is obsolete. Please use AddHostEvidence instead.")]
         public void AddHost(object id) { }
         public void AddHostEvidence<T>(T evidence) where T : System.Security.Policy.EvidenceBase { }
         public void Clear() { }
         public System.Security.Policy.Evidence Clone() { throw null; }
-        [System.ObsoleteAttribute]
+        [System.ObsoleteAttribute("Evidence should not be treated as an ICollection. Please use the GetHostEnumerator and GetAssemblyEnumerator methods rather than using CopyTo.")]
         public void CopyTo(System.Array array, int index) { }
         public System.Collections.IEnumerator GetAssemblyEnumerator() { throw null; }
         public T GetAssemblyEvidence<T>() where T : System.Security.Policy.EvidenceBase { throw null; }
-        [System.ObsoleteAttribute]
+        [System.ObsoleteAttribute("GetEnumerator is obsolete. Please use GetAssemblyEnumerator and GetHostEnumerator instead.")]
         public System.Collections.IEnumerator GetEnumerator() { throw null; }
         public System.Collections.IEnumerator GetHostEnumerator() { throw null; }
         public T GetHostEvidence<T>() where T : System.Security.Policy.EvidenceBase { throw null; }
@@ -1781,16 +1882,16 @@ namespace System.Security.Policy
     public sealed partial class PolicyLevel
     {
         internal PolicyLevel() { }
-        [System.ObsoleteAttribute]
+        [System.ObsoleteAttribute("Because all GAC assemblies always get full trust, the full trust list is no longer meaningful. You should install any assemblies that are used in security policy in the GAC to ensure they are trusted.")]
         public System.Collections.IList FullTrustAssemblies { get { throw null; } }
         public string Label { get { throw null; } }
         public System.Collections.IList NamedPermissionSets { get { throw null; } }
         public System.Security.Policy.CodeGroup RootCodeGroup { get { throw null; } set { } }
         public string StoreLocation { get { throw null; } }
         public System.Security.PolicyLevelType Type { get { throw null; } }
-        [System.ObsoleteAttribute]
+        [System.ObsoleteAttribute("Because all GAC assemblies always get full trust, the full trust list is no longer meaningful. You should install any assemblies that are used in security policy in the GAC to ensure they are trusted.")]
         public void AddFullTrustAssembly(System.Security.Policy.StrongName sn) { }
-        [System.ObsoleteAttribute]
+        [System.ObsoleteAttribute("Because all GAC assemblies always get full trust, the full trust list is no longer meaningful. You should install any assemblies that are used in security policy in the GAC to ensure they are trusted.")]
         public void AddFullTrustAssembly(System.Security.Policy.StrongNameMembershipCondition snMC) { }
         public void AddNamedPermissionSet(System.Security.NamedPermissionSet permSet) { }
         public System.Security.NamedPermissionSet ChangeNamedPermissionSet(string name, System.Security.PermissionSet pSet) { throw null; }
@@ -1799,9 +1900,9 @@ namespace System.Security.Policy
         public void FromXml(System.Security.SecurityElement e) { }
         public System.Security.NamedPermissionSet GetNamedPermissionSet(string name) { throw null; }
         public void Recover() { }
-        [System.ObsoleteAttribute]
+        [System.ObsoleteAttribute("Because all GAC assemblies always get full trust, the full trust list is no longer meaningful. You should install any assemblies that are used in security policy in the GAC to ensure they are trusted.")]
         public void RemoveFullTrustAssembly(System.Security.Policy.StrongName sn) { }
-        [System.ObsoleteAttribute]
+        [System.ObsoleteAttribute("Because all GAC assemblies always get full trust, the full trust list is no longer meaningful. You should install any assemblies that are used in security policy in the GAC to ensure they are trusted.")]
         public void RemoveFullTrustAssembly(System.Security.Policy.StrongNameMembershipCondition snMC) { }
         public System.Security.NamedPermissionSet RemoveNamedPermissionSet(System.Security.NamedPermissionSet permSet) { throw null; }
         public System.Security.NamedPermissionSet RemoveNamedPermissionSet(string name) { throw null; }
@@ -1952,7 +2053,7 @@ namespace System.Security.Policy
         public string Url { get { throw null; } set { } }
         public bool Check(System.Security.Policy.Evidence evidence) { throw null; }
         public System.Security.Policy.IMembershipCondition Copy() { throw null; }
-        public override bool Equals(object o) { throw null; }
+        public override bool Equals(object obj) { throw null; }
         public void FromXml(System.Security.SecurityElement e) { }
         public void FromXml(System.Security.SecurityElement e, System.Security.Policy.PolicyLevel level) { }
         public override int GetHashCode() { throw null; }
@@ -2020,7 +2121,7 @@ namespace System.ServiceProcess
         public System.ServiceProcess.ServiceControllerPermissionAccess PermissionAccess { get { throw null; } }
         public string ServiceName { get { throw null; } }
     }
-    public sealed partial class ServiceControllerPermissionEntryCollection : System.Collections.CollectionBase
+    public partial class ServiceControllerPermissionEntryCollection : System.Collections.CollectionBase
     {
         internal ServiceControllerPermissionEntryCollection() { }
         public System.ServiceProcess.ServiceControllerPermissionEntry this[int index] { get { throw null; } set { } }
@@ -2091,4 +2192,23 @@ namespace System.Web
         Unrestricted = 600,
     }
 }
-
+namespace System.Xaml.Permissions
+{
+    public sealed partial class XamlLoadPermission : System.Security.CodeAccessPermission, System.Security.Permissions.IUnrestrictedPermission
+    {
+        public XamlLoadPermission(System.Collections.Generic.IEnumerable<System.Xaml.Permissions.XamlAccessLevel> allowedAccess) { }
+        public XamlLoadPermission(System.Security.Permissions.PermissionState state) { }
+        public XamlLoadPermission(System.Xaml.Permissions.XamlAccessLevel allowedAccess) { }
+        public System.Collections.Generic.IList<System.Xaml.Permissions.XamlAccessLevel> AllowedAccess { get { throw null; } }
+        public override System.Security.IPermission Copy() { throw null; }
+        public override bool Equals(object obj) { throw null; }
+        public override void FromXml(System.Security.SecurityElement elem) { }
+        public override int GetHashCode() { throw null; }
+        public bool Includes(System.Xaml.Permissions.XamlAccessLevel requestedAccess) { throw null; }
+        public override System.Security.IPermission Intersect(System.Security.IPermission target) { throw null; }
+        public override bool IsSubsetOf(System.Security.IPermission target) { throw null; }
+        public bool IsUnrestricted() { throw null; }
+        public override System.Security.SecurityElement ToXml() { throw null; }
+        public override System.Security.IPermission Union(System.Security.IPermission other) { throw null; }
+    }
+}

@@ -73,6 +73,13 @@ namespace System.Runtime.Serialization
     {
         System.Runtime.Serialization.ExtensionDataObject ExtensionData { get; set; }
     }
+    public partial class InvalidDataContractException : System.Exception
+    {
+        public InvalidDataContractException() { }
+        protected InvalidDataContractException(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context) { }
+        public InvalidDataContractException(string message) { }
+        public InvalidDataContractException(string message, System.Exception innerException) { }
+    }
     public abstract partial class XmlObjectSerializer
     {
         protected XmlObjectSerializer() { }
@@ -370,6 +377,7 @@ namespace System.Xml
     {
         protected XmlDictionaryWriter() { }
         public virtual bool CanCanonicalize { get { throw null; } }
+        public override void Close() { }
         public static System.Xml.XmlDictionaryWriter CreateBinaryWriter(System.IO.Stream stream) { throw null; }
         public static System.Xml.XmlDictionaryWriter CreateBinaryWriter(System.IO.Stream stream, System.Xml.IXmlDictionary dictionary) { throw null; }
         public static System.Xml.XmlDictionaryWriter CreateBinaryWriter(System.IO.Stream stream, System.Xml.IXmlDictionary dictionary, System.Xml.XmlBinaryWriterSession session) { throw null; }
@@ -380,6 +388,7 @@ namespace System.Xml
         public static System.Xml.XmlDictionaryWriter CreateTextWriter(System.IO.Stream stream) { throw null; }
         public static System.Xml.XmlDictionaryWriter CreateTextWriter(System.IO.Stream stream, System.Text.Encoding encoding) { throw null; }
         public static System.Xml.XmlDictionaryWriter CreateTextWriter(System.IO.Stream stream, System.Text.Encoding encoding, bool ownsStream) { throw null; }
+        protected override void Dispose(bool disposing) { }
         public virtual void EndCanonicalization() { }
         public virtual void StartCanonicalization(System.IO.Stream stream, bool includeComments, string[] inclusivePrefixes) { }
         public virtual void WriteArray(string prefix, string localName, string namespaceUri, bool[] array, int offset, int count) { }

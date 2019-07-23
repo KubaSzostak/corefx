@@ -5,6 +5,19 @@
 // Changes to this file must follow the http://aka.ms/api-review process.
 // ------------------------------------------------------------------------------
 
+namespace System
+{
+    public partial class Lazy<T, TMetadata> : System.Lazy<T>
+    {
+        public Lazy(System.Func<T> valueFactory, TMetadata metadata) { }
+        public Lazy(System.Func<T> valueFactory, TMetadata metadata, bool isThreadSafe) { }
+        public Lazy(System.Func<T> valueFactory, TMetadata metadata, System.Threading.LazyThreadSafetyMode mode) { }
+        public Lazy(TMetadata metadata) { }
+        public Lazy(TMetadata metadata, bool isThreadSafe) { }
+        public Lazy(TMetadata metadata, System.Threading.LazyThreadSafetyMode mode) { }
+        public TMetadata Metadata { get { throw null; } }
+    }
+}
 namespace System.ComponentModel.Composition
 {
     public static partial class AdaptationConstants
@@ -610,6 +623,7 @@ namespace System.ComponentModel.Composition.ReflectionModel
     public partial struct LazyMemberInfo
     {
         private object _dummy;
+        private int _dummyPrimitive;
         public LazyMemberInfo(System.Reflection.MemberInfo member) { throw null; }
         public LazyMemberInfo(System.Reflection.MemberTypes memberType, System.Func<System.Reflection.MemberInfo[]> accessorsCreator) { throw null; }
         public LazyMemberInfo(System.Reflection.MemberTypes memberType, params System.Reflection.MemberInfo[] accessors) { throw null; }

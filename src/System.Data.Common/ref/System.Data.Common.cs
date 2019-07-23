@@ -5,6 +5,33 @@
 // Changes to this file must follow the http://aka.ms/api-review process.
 // ------------------------------------------------------------------------------
 
+namespace System
+{
+    public sealed partial class DBNull : System.IConvertible, System.Runtime.Serialization.ISerializable
+    {
+        internal DBNull() { }
+        public static readonly System.DBNull Value;
+        public void GetObjectData(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context) { }
+        public System.TypeCode GetTypeCode() { throw null; }
+        bool System.IConvertible.ToBoolean(System.IFormatProvider provider) { throw null; }
+        byte System.IConvertible.ToByte(System.IFormatProvider provider) { throw null; }
+        char System.IConvertible.ToChar(System.IFormatProvider provider) { throw null; }
+        System.DateTime System.IConvertible.ToDateTime(System.IFormatProvider provider) { throw null; }
+        decimal System.IConvertible.ToDecimal(System.IFormatProvider provider) { throw null; }
+        double System.IConvertible.ToDouble(System.IFormatProvider provider) { throw null; }
+        short System.IConvertible.ToInt16(System.IFormatProvider provider) { throw null; }
+        int System.IConvertible.ToInt32(System.IFormatProvider provider) { throw null; }
+        long System.IConvertible.ToInt64(System.IFormatProvider provider) { throw null; }
+        sbyte System.IConvertible.ToSByte(System.IFormatProvider provider) { throw null; }
+        float System.IConvertible.ToSingle(System.IFormatProvider provider) { throw null; }
+        object System.IConvertible.ToType(System.Type type, System.IFormatProvider provider) { throw null; }
+        ushort System.IConvertible.ToUInt16(System.IFormatProvider provider) { throw null; }
+        uint System.IConvertible.ToUInt32(System.IFormatProvider provider) { throw null; }
+        ulong System.IConvertible.ToUInt64(System.IFormatProvider provider) { throw null; }
+        public override string ToString() { throw null; }
+        public string ToString(System.IFormatProvider? provider) { throw null; }
+    }
+}
 namespace System.Data
 {
     public enum AcceptRejectRule
@@ -93,7 +120,6 @@ namespace System.Data
     }
     [System.ComponentModel.DefaultPropertyAttribute("ColumnName")]
     [System.ComponentModel.DesignTimeVisibleAttribute(false)]
-    [System.ComponentModel.ToolboxItemAttribute(false)]
     public partial class DataColumn : System.ComponentModel.MarshalByValueComponent
     {
         public DataColumn() { }
@@ -595,7 +621,6 @@ namespace System.Data
     [System.ComponentModel.DefaultEventAttribute("RowChanging")]
     [System.ComponentModel.DefaultPropertyAttribute("TableName")]
     [System.ComponentModel.DesignTimeVisibleAttribute(false)]
-    [System.ComponentModel.ToolboxItemAttribute(false)]
     [System.Xml.Serialization.XmlSchemaProviderAttribute("GetDataTableSchema")]
     public partial class DataTable : System.ComponentModel.MarshalByValueComponent, System.ComponentModel.IListSource, System.ComponentModel.ISupportInitialize, System.ComponentModel.ISupportInitializeNotification, System.Runtime.Serialization.ISerializable, System.Xml.Serialization.IXmlSerializable
     {
@@ -3332,6 +3357,7 @@ namespace System.Data.SqlTypes
     public partial struct SqlString : System.Data.SqlTypes.INullable, System.IComparable, System.Xml.Serialization.IXmlSerializable
     {
         private object _dummy;
+        private int _dummyPrimitive;
         public static readonly int BinarySort;
         public static readonly int BinarySort2;
         public static readonly int IgnoreCase;

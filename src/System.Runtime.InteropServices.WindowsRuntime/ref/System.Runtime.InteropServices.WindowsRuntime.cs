@@ -13,10 +13,15 @@ namespace System.Runtime.InteropServices.WindowsRuntime
         public DefaultInterfaceAttribute(System.Type defaultInterface) { }
         public System.Type DefaultInterface { get { throw null; } }
     }
-    public partial struct EventRegistrationToken
+    public partial struct EventRegistrationToken : System.IEquatable<System.Runtime.InteropServices.WindowsRuntime.EventRegistrationToken>
     {
         private int _dummyPrimitive;
+        [System.CLSCompliantAttribute(false)]
+        public EventRegistrationToken(ulong value) { throw null; }
+        [System.CLSCompliantAttribute(false)]
+        public ulong Value { get { throw null; } }
         public override bool Equals(object? obj) { throw null; }
+        public bool Equals(System.Runtime.InteropServices.WindowsRuntime.EventRegistrationToken other) { throw null; }
         public override int GetHashCode() { throw null; }
         public static bool operator ==(System.Runtime.InteropServices.WindowsRuntime.EventRegistrationToken left, System.Runtime.InteropServices.WindowsRuntime.EventRegistrationToken right) { throw null; }
         public static bool operator !=(System.Runtime.InteropServices.WindowsRuntime.EventRegistrationToken left, System.Runtime.InteropServices.WindowsRuntime.EventRegistrationToken right) { throw null; }
@@ -28,6 +33,7 @@ namespace System.Runtime.InteropServices.WindowsRuntime
         public System.Runtime.InteropServices.WindowsRuntime.EventRegistrationToken AddEventHandler(T? handler) { throw null; }
         public static System.Runtime.InteropServices.WindowsRuntime.EventRegistrationTokenTable<T> GetOrCreateEventRegistrationTokenTable(ref System.Runtime.InteropServices.WindowsRuntime.EventRegistrationTokenTable<T>? refEventTable) { throw null; }
         public void RemoveEventHandler(System.Runtime.InteropServices.WindowsRuntime.EventRegistrationToken token) { }
+        public bool RemoveEventHandler(System.Runtime.InteropServices.WindowsRuntime.EventRegistrationToken token, [System.Diagnostics.CodeAnalysis.NotNullWhenAttribute(true)] out T? handler) { throw null; }
         public void RemoveEventHandler(T? handler) { }
     }
     public partial interface IActivationFactory
@@ -60,6 +66,7 @@ namespace System.Runtime.InteropServices.WindowsRuntime
         public static void AddEventHandler<T>(System.Func<T, System.Runtime.InteropServices.WindowsRuntime.EventRegistrationToken> addMethod, System.Action<System.Runtime.InteropServices.WindowsRuntime.EventRegistrationToken> removeMethod, T handler) { }
         public static void FreeHString(System.IntPtr ptr) { }
         public static System.Runtime.InteropServices.WindowsRuntime.IActivationFactory GetActivationFactory(System.Type type) { throw null; }
+        public static object GetUniqueObjectForIUnknownWithoutUnboxing(System.IntPtr unknown) { throw null; }
         public static string PtrToStringHString(System.IntPtr ptr) { throw null; }
         public static void RemoveAllEventHandlers(System.Action<System.Runtime.InteropServices.WindowsRuntime.EventRegistrationToken> removeMethod) { }
         public static void RemoveEventHandler<T>(System.Action<System.Runtime.InteropServices.WindowsRuntime.EventRegistrationToken> removeMethod, T handler) { }

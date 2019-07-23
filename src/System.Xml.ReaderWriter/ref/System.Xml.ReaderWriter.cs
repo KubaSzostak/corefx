@@ -30,7 +30,7 @@ namespace System.Xml
         Indented = 1,
     }
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Never)]
-    [System.ObsoleteAttribute("This API supports the .NET Framework infrastructure and is not intended to be used directly from your code.", true)]
+    [System.ObsoleteAttribute("This API supports the .NET Framework infrastructure and is not intended to be used directly from your code.", false)]
     public partial interface IApplicationResourceStreamResolver
     {
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Never)]
@@ -524,7 +524,6 @@ namespace System.Xml
         public abstract string Get(char[] array, int offset, int length);
         public abstract string Get(string array);
     }
-    [System.Diagnostics.DebuggerDisplayAttribute("{debuggerDisplayProxy}")]
     public abstract partial class XmlNode : System.Collections.IEnumerable, System.ICloneable, System.Xml.XPath.IXPathNavigable
     {
         internal XmlNode() { }
@@ -749,8 +748,6 @@ namespace System.Xml
         public override string ToString() { throw null; }
         public static string ToString(string name, string ns) { throw null; }
     }
-    [System.Diagnostics.DebuggerDisplayAttribute("{debuggerDisplayProxy}")]
-    [System.Diagnostics.DebuggerDisplayAttribute("{debuggerDisplayProxy}")]
     public abstract partial class XmlReader : System.IDisposable
     {
         protected XmlReader() { }
@@ -811,7 +808,6 @@ namespace System.Xml
         public abstract bool MoveToAttribute(string name);
         public abstract bool MoveToAttribute(string name, string ns);
         public virtual System.Xml.XmlNodeType MoveToContent() { throw null; }
-        [System.Diagnostics.DebuggerStepThroughAttribute]
         public virtual System.Threading.Tasks.Task<System.Xml.XmlNodeType> MoveToContentAsync() { throw null; }
         public abstract bool MoveToElement();
         public abstract bool MoveToFirstAttribute();
@@ -820,7 +816,6 @@ namespace System.Xml
         public virtual System.Threading.Tasks.Task<bool> ReadAsync() { throw null; }
         public abstract bool ReadAttributeValue();
         public virtual object ReadContentAs(System.Type returnType, System.Xml.IXmlNamespaceResolver namespaceResolver) { throw null; }
-        [System.Diagnostics.DebuggerStepThroughAttribute]
         public virtual System.Threading.Tasks.Task<object> ReadContentAsAsync(System.Type returnType, System.Xml.IXmlNamespaceResolver namespaceResolver) { throw null; }
         public virtual int ReadContentAsBase64(byte[] buffer, int index, int count) { throw null; }
         public virtual System.Threading.Tasks.Task<int> ReadContentAsBase64Async(byte[] buffer, int index, int count) { throw null; }
@@ -835,13 +830,11 @@ namespace System.Xml
         public virtual int ReadContentAsInt() { throw null; }
         public virtual long ReadContentAsLong() { throw null; }
         public virtual object ReadContentAsObject() { throw null; }
-        [System.Diagnostics.DebuggerStepThroughAttribute]
         public virtual System.Threading.Tasks.Task<object> ReadContentAsObjectAsync() { throw null; }
         public virtual string ReadContentAsString() { throw null; }
         public virtual System.Threading.Tasks.Task<string> ReadContentAsStringAsync() { throw null; }
         public virtual object ReadElementContentAs(System.Type returnType, System.Xml.IXmlNamespaceResolver namespaceResolver) { throw null; }
         public virtual object ReadElementContentAs(System.Type returnType, System.Xml.IXmlNamespaceResolver namespaceResolver, string localName, string namespaceURI) { throw null; }
-        [System.Diagnostics.DebuggerStepThroughAttribute]
         public virtual System.Threading.Tasks.Task<object> ReadElementContentAsAsync(System.Type returnType, System.Xml.IXmlNamespaceResolver namespaceResolver) { throw null; }
         public virtual int ReadElementContentAsBase64(byte[] buffer, int index, int count) { throw null; }
         public virtual System.Threading.Tasks.Task<int> ReadElementContentAsBase64Async(byte[] buffer, int index, int count) { throw null; }
@@ -863,11 +856,9 @@ namespace System.Xml
         public virtual long ReadElementContentAsLong(string localName, string namespaceURI) { throw null; }
         public virtual object ReadElementContentAsObject() { throw null; }
         public virtual object ReadElementContentAsObject(string localName, string namespaceURI) { throw null; }
-        [System.Diagnostics.DebuggerStepThroughAttribute]
         public virtual System.Threading.Tasks.Task<object> ReadElementContentAsObjectAsync() { throw null; }
         public virtual string ReadElementContentAsString() { throw null; }
         public virtual string ReadElementContentAsString(string localName, string namespaceURI) { throw null; }
-        [System.Diagnostics.DebuggerStepThroughAttribute]
         public virtual System.Threading.Tasks.Task<string> ReadElementContentAsStringAsync() { throw null; }
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Never)]
         public virtual string ReadElementString() { throw null; }
@@ -877,10 +868,8 @@ namespace System.Xml
         public virtual string ReadElementString(string localname, string ns) { throw null; }
         public virtual void ReadEndElement() { }
         public virtual string ReadInnerXml() { throw null; }
-        [System.Diagnostics.DebuggerStepThroughAttribute]
         public virtual System.Threading.Tasks.Task<string> ReadInnerXmlAsync() { throw null; }
         public virtual string ReadOuterXml() { throw null; }
-        [System.Diagnostics.DebuggerStepThroughAttribute]
         public virtual System.Threading.Tasks.Task<string> ReadOuterXmlAsync() { throw null; }
         public virtual void ReadStartElement() { }
         public virtual void ReadStartElement(string name) { }
@@ -1225,7 +1214,6 @@ namespace System.Xml
         public virtual System.Threading.Tasks.Task FlushAsync() { throw null; }
         public abstract string LookupPrefix(string ns);
         public virtual void WriteAttributes(System.Xml.XmlReader reader, bool defattr) { }
-        [System.Diagnostics.DebuggerStepThroughAttribute]
         public virtual System.Threading.Tasks.Task WriteAttributesAsync(System.Xml.XmlReader reader, bool defattr) { throw null; }
         public void WriteAttributeString(string localName, string value) { }
         public void WriteAttributeString(string localName, string ns, string value) { }
@@ -1248,7 +1236,6 @@ namespace System.Xml
         public void WriteElementString(string localName, string value) { }
         public void WriteElementString(string localName, string ns, string value) { }
         public void WriteElementString(string prefix, string localName, string ns, string value) { }
-        [System.Diagnostics.DebuggerStepThroughAttribute]
         public System.Threading.Tasks.Task WriteElementStringAsync(string prefix, string localName, string ns, string value) { throw null; }
         public abstract void WriteEndAttribute();
         protected internal virtual System.Threading.Tasks.Task WriteEndAttributeAsync() { throw null; }
@@ -1267,12 +1254,10 @@ namespace System.Xml
         public virtual void WriteNode(System.Xml.XmlReader reader, bool defattr) { }
         public virtual void WriteNode(System.Xml.XPath.XPathNavigator navigator, bool defattr) { }
         public virtual System.Threading.Tasks.Task WriteNodeAsync(System.Xml.XmlReader reader, bool defattr) { throw null; }
-        [System.Diagnostics.DebuggerStepThroughAttribute]
         public virtual System.Threading.Tasks.Task WriteNodeAsync(System.Xml.XPath.XPathNavigator navigator, bool defattr) { throw null; }
         public abstract void WriteProcessingInstruction(string name, string text);
         public virtual System.Threading.Tasks.Task WriteProcessingInstructionAsync(string name, string text) { throw null; }
         public virtual void WriteQualifiedName(string localName, string ns) { }
-        [System.Diagnostics.DebuggerStepThroughAttribute]
         public virtual System.Threading.Tasks.Task WriteQualifiedNameAsync(string localName, string ns) { throw null; }
         public abstract void WriteRaw(char[] buffer, int index, int count);
         public abstract void WriteRaw(string data);
@@ -2417,7 +2402,6 @@ namespace System.Xml.Serialization
 {
     public partial interface IXmlSerializable
     {
-        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Never)]
         System.Xml.Schema.XmlSchema GetSchema();
         void ReadXml(System.Xml.XmlReader reader);
         void WriteXml(System.Xml.XmlWriter writer);
@@ -2693,7 +2677,6 @@ namespace System.Xml.XPath
         public override object ValueAs(System.Type returnType, System.Xml.IXmlNamespaceResolver nsResolver) { throw null; }
         public virtual void WriteSubtree(System.Xml.XmlWriter writer) { }
     }
-    [System.Diagnostics.DebuggerDisplayAttribute("Position={CurrentPosition}, Current={debuggerDisplayProxy}")]
     public abstract partial class XPathNodeIterator : System.Collections.IEnumerable, System.ICloneable
     {
         protected XPathNodeIterator() { }

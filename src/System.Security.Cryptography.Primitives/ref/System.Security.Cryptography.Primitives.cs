@@ -46,6 +46,15 @@ namespace System.Security.Cryptography
         CFB = 4,
         CTS = 5,
     }
+    public partial class CryptographicException : System.SystemException
+    {
+        public CryptographicException() { }
+        public CryptographicException(int hr) { }
+        protected CryptographicException(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context) { }
+        public CryptographicException(string? message) { }
+        public CryptographicException(string? message, System.Exception? inner) { }
+        public CryptographicException(string format, string? insert) { }
+    }
     public static partial class CryptographicOperations
     {
         public static bool FixedTimeEquals(System.ReadOnlySpan<byte> left, System.ReadOnlySpan<byte> right) { throw null; }

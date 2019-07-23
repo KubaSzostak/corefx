@@ -689,6 +689,8 @@ namespace System
         public static void FailFast(string? message) { }
         [System.Diagnostics.CodeAnalysis.DoesNotReturnAttribute]
         public static void FailFast(string? message, System.Exception? exception) { }
+        [System.Diagnostics.CodeAnalysis.DoesNotReturnAttribute]
+        public static void FailFast(string? message, System.Exception? exception, string? errorMessage) { }
         public static string[] GetCommandLineArgs() { throw null; }
         public static string? GetEnvironmentVariable(string variable) { throw null; }
         public static string? GetEnvironmentVariable(string variable, System.EnvironmentVariableTarget target) { throw null; }
@@ -782,8 +784,8 @@ namespace System
     }
     public static partial class Math
     {
-        public const double E = 2.718281828459045;
-        public const double PI = 3.141592653589793;
+        public const double E = 2.7182818284590451;
+        public const double PI = 3.1415926535897931;
         public static decimal Abs(decimal value) { throw null; }
         public static double Abs(double value) { throw null; }
         public static short Abs(short value) { throw null; }
@@ -895,8 +897,8 @@ namespace System
     }
     public static partial class MathF
     {
-        public const float E = 2.7182817f;
-        public const float PI = 3.1415927f;
+        public const float E = 2.71828175f;
+        public const float PI = 3.14159274f;
         public static float Abs(float x) { throw null; }
         public static float Acos(float x) { throw null; }
         public static float Acosh(float x) { throw null; }
@@ -938,6 +940,14 @@ namespace System
         public static float Tan(float x) { throw null; }
         public static float Tanh(float x) { throw null; }
         public static float Truncate(float x) { throw null; }
+    }
+    public enum MidpointRounding
+    {
+        ToEven = 0,
+        AwayFromZero = 1,
+        ToZero = 2,
+        ToNegativeInfinity = 3,
+        ToPositiveInfinity = 4,
     }
     public sealed partial class OperatingSystem : System.ICloneable, System.Runtime.Serialization.ISerializable
     {
@@ -1003,16 +1013,14 @@ namespace System
         public abstract bool Equals(string? x, string? y);
         public static System.StringComparer FromComparison(System.StringComparison comparisonType) { throw null; }
         public int GetHashCode(object obj) { throw null; }
-#pragma warning disable CS8614 // Remove warning disable when nullable attributes are respected
         public abstract int GetHashCode(string obj);
-#pragma warning restore CS8614
     }
     public static partial class StringNormalizationExtensions
     {
-        public static bool IsNormalized(this string value) { throw null; }
-        public static bool IsNormalized(this string value, System.Text.NormalizationForm normalizationForm) { throw null; }
-        public static string Normalize(this string value) { throw null; }
-        public static string Normalize(this string value, System.Text.NormalizationForm normalizationForm) { throw null; }
+        public static bool IsNormalized(this string strInput) { throw null; }
+        public static bool IsNormalized(this string strInput, System.Text.NormalizationForm normalizationForm) { throw null; }
+        public static string Normalize(this string strInput) { throw null; }
+        public static string Normalize(this string strInput, System.Text.NormalizationForm normalizationForm) { throw null; }
     }
     public partial class UriBuilder
     {
@@ -1383,29 +1391,25 @@ namespace System.IO
         public virtual int Capacity { get { throw null; } set { } }
         public override long Length { get { throw null; } }
         public override long Position { get { throw null; } set { } }
-        public override System.IAsyncResult BeginRead(byte[] buffer, int offset, int count, System.AsyncCallback callback, object? state) { throw null; }
-        public override System.IAsyncResult BeginWrite(byte[] buffer, int offset, int count, System.AsyncCallback callback, object? state) { throw null; }
         public override void CopyTo(System.IO.Stream destination, int bufferSize) { }
         public override System.Threading.Tasks.Task CopyToAsync(System.IO.Stream destination, int bufferSize, System.Threading.CancellationToken cancellationToken) { throw null; }
         protected override void Dispose(bool disposing) { }
-        public override int EndRead(System.IAsyncResult asyncResult) { throw null; }
-        public override void EndWrite(System.IAsyncResult asyncResult) { }
         public override void Flush() { }
         public override System.Threading.Tasks.Task FlushAsync(System.Threading.CancellationToken cancellationToken) { throw null; }
         public virtual byte[] GetBuffer() { throw null; }
         public override int Read(byte[] buffer, int offset, int count) { throw null; }
-        public override int Read(System.Span<byte> destination) { throw null; }
+        public override int Read(System.Span<byte> buffer) { throw null; }
         public override System.Threading.Tasks.Task<int> ReadAsync(byte[] buffer, int offset, int count, System.Threading.CancellationToken cancellationToken) { throw null; }
-        public override System.Threading.Tasks.ValueTask<int> ReadAsync(System.Memory<byte> destination, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) { throw null; }
+        public override System.Threading.Tasks.ValueTask<int> ReadAsync(System.Memory<byte> buffer, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) { throw null; }
         public override int ReadByte() { throw null; }
         public override long Seek(long offset, System.IO.SeekOrigin loc) { throw null; }
         public override void SetLength(long value) { }
         public virtual byte[] ToArray() { throw null; }
         public virtual bool TryGetBuffer(out System.ArraySegment<byte> buffer) { throw null; }
         public override void Write(byte[] buffer, int offset, int count) { }
-        public override void Write(System.ReadOnlySpan<byte> source) { }
+        public override void Write(System.ReadOnlySpan<byte> buffer) { }
         public override System.Threading.Tasks.Task WriteAsync(byte[] buffer, int offset, int count, System.Threading.CancellationToken cancellationToken) { throw null; }
-        public override System.Threading.Tasks.ValueTask WriteAsync(System.ReadOnlyMemory<byte> source, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) { throw null; }
+        public override System.Threading.Tasks.ValueTask WriteAsync(System.ReadOnlyMemory<byte> buffer, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) { throw null; }
         public override void WriteByte(byte value) { }
         public virtual void WriteTo(System.IO.Stream stream) { }
     }
@@ -1531,7 +1535,7 @@ namespace System.IO
         public override System.Threading.Tasks.Task WriteAsync(char[] buffer, int index, int count) { throw null; }
         public override System.Threading.Tasks.Task WriteAsync(System.ReadOnlyMemory<char> buffer, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) { throw null; }
         public override System.Threading.Tasks.Task WriteAsync(string? value) { throw null; }
-        public override void WriteLine(System.ReadOnlySpan<char> buffer) { }
+        public override void WriteLine(System.ReadOnlySpan<char> value) { }
         public override void WriteLine(string? value) { }
         public override void WriteLine(string format, object? arg0) { }
         public override void WriteLine(string format, object? arg0, object? arg1) { }
@@ -1788,10 +1792,7 @@ namespace System.Runtime.Versioning
         Stable = 2,
         SideBySide = 4,
     }
-    public sealed partial class FrameworkName :
-#nullable disable
-        System.IEquatable<System.Runtime.Versioning.FrameworkName>
-#nullable restore
+    public sealed partial class FrameworkName : System.IEquatable<System.Runtime.Versioning.FrameworkName>
     {
         public FrameworkName(string frameworkName) { }
         public FrameworkName(string identifier, System.Version version) { }

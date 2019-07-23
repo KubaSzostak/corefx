@@ -496,6 +496,11 @@ namespace System.Collections.Generic
                 void System.Collections.IEnumerator.Reset() { }
             }
         }
+        public sealed partial class KeyValuePairComparer : System.Collections.Generic.Comparer<System.Collections.Generic.KeyValuePair<TKey, TValue>>
+        {
+            public KeyValuePairComparer(System.Collections.Generic.IComparer<TKey>? keyComparer) { }
+            public override int Compare(System.Collections.Generic.KeyValuePair<TKey, TValue> x, System.Collections.Generic.KeyValuePair<TKey, TValue> y) { throw null; }
+        }
         public sealed partial class ValueCollection : System.Collections.Generic.ICollection<TValue>, System.Collections.Generic.IEnumerable<TValue>, System.Collections.Generic.IReadOnlyCollection<TValue>, System.Collections.ICollection, System.Collections.IEnumerable
         {
             public ValueCollection(System.Collections.Generic.SortedDictionary<TKey, TValue> dictionary) { }
@@ -563,7 +568,7 @@ namespace System.Collections.Generic
         void System.Collections.Generic.ICollection<System.Collections.Generic.KeyValuePair<TKey, TValue>>.CopyTo(System.Collections.Generic.KeyValuePair<TKey, TValue>[] array, int arrayIndex) { }
         bool System.Collections.Generic.ICollection<System.Collections.Generic.KeyValuePair<TKey, TValue>>.Remove(System.Collections.Generic.KeyValuePair<TKey, TValue> keyValuePair) { throw null; }
         System.Collections.Generic.IEnumerator<System.Collections.Generic.KeyValuePair<TKey, TValue>> System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<TKey, TValue>>.GetEnumerator() { throw null; }
-        void System.Collections.ICollection.CopyTo(System.Array array, int arrayIndex) { }
+        void System.Collections.ICollection.CopyTo(System.Array array, int index) { }
         void System.Collections.IDictionary.Add(object key, object value) { }
         bool System.Collections.IDictionary.Contains(object key) { throw null; }
         System.Collections.IDictionaryEnumerator System.Collections.IDictionary.GetEnumerator() { throw null; }
@@ -571,6 +576,46 @@ namespace System.Collections.Generic
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() { throw null; }
         public void TrimExcess() { }
         public bool TryGetValue(TKey key, [System.Diagnostics.CodeAnalysis.MaybeNullWhenAttribute(false)] out TValue value) { throw null; }
+        public sealed partial class KeyList : System.Collections.Generic.ICollection<TKey>, System.Collections.Generic.IEnumerable<TKey>, System.Collections.Generic.IList<TKey>, System.Collections.ICollection, System.Collections.IEnumerable
+        {
+            internal KeyList() { }
+            public int Count { get { throw null; } }
+            public bool IsReadOnly { get { throw null; } }
+            public TKey this[int index] { get { throw null; } set { } }
+            bool System.Collections.ICollection.IsSynchronized { get { throw null; } }
+            object System.Collections.ICollection.SyncRoot { get { throw null; } }
+            public void Add(TKey key) { }
+            public void Clear() { }
+            public bool Contains(TKey key) { throw null; }
+            public void CopyTo(TKey[] array, int arrayIndex) { }
+            public System.Collections.Generic.IEnumerator<TKey> GetEnumerator() { throw null; }
+            public int IndexOf(TKey key) { throw null; }
+            public void Insert(int index, TKey value) { }
+            public bool Remove(TKey key) { throw null; }
+            public void RemoveAt(int index) { }
+            void System.Collections.ICollection.CopyTo(System.Array array, int arrayIndex) { }
+            System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() { throw null; }
+        }
+        public sealed partial class ValueList : System.Collections.Generic.ICollection<TValue>, System.Collections.Generic.IEnumerable<TValue>, System.Collections.Generic.IList<TValue>, System.Collections.ICollection, System.Collections.IEnumerable
+        {
+            internal ValueList() { }
+            public int Count { get { throw null; } }
+            public bool IsReadOnly { get { throw null; } }
+            public TValue this[int index] { get { throw null; } set { } }
+            bool System.Collections.ICollection.IsSynchronized { get { throw null; } }
+            object System.Collections.ICollection.SyncRoot { get { throw null; } }
+            public void Add(TValue key) { }
+            public void Clear() { }
+            public bool Contains(TValue value) { throw null; }
+            public void CopyTo(TValue[] array, int arrayIndex) { }
+            public System.Collections.Generic.IEnumerator<TValue> GetEnumerator() { throw null; }
+            public int IndexOf(TValue value) { throw null; }
+            public void Insert(int index, TValue value) { }
+            public bool Remove(TValue value) { throw null; }
+            public void RemoveAt(int index) { }
+            void System.Collections.ICollection.CopyTo(System.Array array, int index) { }
+            System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() { throw null; }
+        }
     }
     public partial class SortedSet<T> : System.Collections.Generic.ICollection<T>, System.Collections.Generic.IEnumerable<T>, System.Collections.Generic.IReadOnlyCollection<T>, System.Collections.Generic.ISet<T>, System.Collections.ICollection, System.Collections.IEnumerable, System.Runtime.Serialization.IDeserializationCallback, System.Runtime.Serialization.ISerializable
     {
@@ -666,5 +711,10 @@ namespace System.Collections.Generic
             public bool MoveNext() { throw null; }
             void System.Collections.IEnumerator.Reset() { }
         }
+    }
+    public sealed partial class TreeSet<T> : System.Collections.Generic.SortedSet<T>
+    {
+        public TreeSet() { }
+        public TreeSet(System.Collections.Generic.IComparer<T>? comparer) { }
     }
 }

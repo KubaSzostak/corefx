@@ -347,7 +347,6 @@ namespace System.DirectoryServices
         public System.DirectoryServices.DirectoryVirtualListViewContext DirectoryVirtualListViewContext { get { throw null; } set { } }
         [System.ComponentModel.DefaultValueAttribute(0)]
         public int Offset { get { throw null; } set { } }
-        [System.ComponentModel.DefaultValueAttribute("")]
         public string Target { get { throw null; } set { } }
         [System.ComponentModel.DefaultValueAttribute(0)]
         public int TargetPercentage { get { throw null; } set { } }

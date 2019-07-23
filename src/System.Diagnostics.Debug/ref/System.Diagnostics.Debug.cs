@@ -36,6 +36,7 @@ namespace System.Diagnostics
         public static void Print(string? message) { }
         [System.Diagnostics.ConditionalAttribute("DEBUG")]
         public static void Print(string format, params object?[] args) { }
+        public static System.Diagnostics.DebugProvider SetProvider(System.Diagnostics.DebugProvider provider) { throw null; }
         [System.Diagnostics.ConditionalAttribute("DEBUG")]
         public static void Unindent() { }
         [System.Diagnostics.ConditionalAttribute("DEBUG")]

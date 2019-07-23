@@ -12,7 +12,6 @@ namespace System.Resources
         void Close();
         new System.Collections.IDictionaryEnumerator GetEnumerator();
     }
-    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Never)]
     public partial class MissingManifestResourceException : System.SystemException
     {
         public MissingManifestResourceException() { }
@@ -30,7 +29,6 @@ namespace System.Resources
         public string? CultureName { get { throw null; } }
     }
     [System.AttributeUsageAttribute(System.AttributeTargets.Assembly, AllowMultiple=false)]
-    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Never)]
     public sealed partial class NeutralResourcesLanguageAttribute : System.Attribute
     {
         public NeutralResourcesLanguageAttribute(string cultureName) { }
@@ -38,9 +36,9 @@ namespace System.Resources
         public string CultureName { get { throw null; } }
         public System.Resources.UltimateResourceFallbackLocation Location { get { throw null; } }
     }
-    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Never)]
     public partial class ResourceManager
     {
+        protected string BaseNameField;
         public static readonly int HeaderVersionNumber;
         public static readonly int MagicNumber;
         protected System.Reflection.Assembly? MainAssembly;
@@ -78,6 +76,7 @@ namespace System.Resources
     }
     public partial class ResourceSet : System.Collections.IEnumerable, System.IDisposable
     {
+        protected System.Resources.IResourceReader Reader;
         protected ResourceSet() { }
         public ResourceSet(System.IO.Stream stream) { }
         public ResourceSet(System.Resources.IResourceReader reader) { }
@@ -96,7 +95,6 @@ namespace System.Resources
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() { throw null; }
     }
     [System.AttributeUsageAttribute(System.AttributeTargets.Assembly, AllowMultiple=false)]
-    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Never)]
     public sealed partial class SatelliteContractVersionAttribute : System.Attribute
     {
         public SatelliteContractVersionAttribute(string version) { }

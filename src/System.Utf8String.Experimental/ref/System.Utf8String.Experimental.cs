@@ -12,7 +12,7 @@ namespace System
         private readonly int _dummyPrimitive;
         public int CompareTo(System.Char8 other) { throw null; }
         public bool Equals(System.Char8 other) { throw null; }
-        public override bool Equals(object obj) { throw null; }
+        public override bool Equals(object? obj) { throw null; }
         public override int GetHashCode() { throw null; }
         public static bool operator ==(System.Char8 left, System.Char8 right) { throw null; }
         public static explicit operator System.Char8 (char value) { throw null; }
@@ -51,58 +51,59 @@ namespace System
     public static partial class Utf8Extensions
     {
         public static System.ReadOnlySpan<byte> AsBytes(this System.ReadOnlySpan<System.Char8> text) { throw null; }
-        public static System.ReadOnlySpan<byte> AsBytes(this System.Utf8String text) { throw null; }
-        public static System.ReadOnlySpan<byte> AsBytes(this System.Utf8String text, int start) { throw null; }
-        public static System.ReadOnlySpan<byte> AsBytes(this System.Utf8String text, int start, int length) { throw null; }
-        public static System.ReadOnlyMemory<System.Char8> AsMemory(this System.Utf8String text) { throw null; }
-        public static System.ReadOnlyMemory<System.Char8> AsMemory(this System.Utf8String text, System.Index startIndex) { throw null; }
-        public static System.ReadOnlyMemory<System.Char8> AsMemory(this System.Utf8String text, int start) { throw null; }
-        public static System.ReadOnlyMemory<System.Char8> AsMemory(this System.Utf8String text, int start, int length) { throw null; }
-        public static System.ReadOnlyMemory<System.Char8> AsMemory(this System.Utf8String text, System.Range range) { throw null; }
-        public static System.ReadOnlyMemory<byte> AsMemoryBytes(this System.Utf8String text) { throw null; }
-        public static System.ReadOnlyMemory<byte> AsMemoryBytes(this System.Utf8String text, System.Index startIndex) { throw null; }
-        public static System.ReadOnlyMemory<byte> AsMemoryBytes(this System.Utf8String text, int start) { throw null; }
-        public static System.ReadOnlyMemory<byte> AsMemoryBytes(this System.Utf8String text, int start, int length) { throw null; }
-        public static System.ReadOnlyMemory<byte> AsMemoryBytes(this System.Utf8String text, System.Range range) { throw null; }
-        public static System.ReadOnlySpan<System.Char8> AsSpan(this System.Utf8String text) { throw null; }
-        public static System.ReadOnlySpan<System.Char8> AsSpan(this System.Utf8String text, int start) { throw null; }
-        public static System.ReadOnlySpan<System.Char8> AsSpan(this System.Utf8String text, int start, int length) { throw null; }
+        public static System.ReadOnlySpan<byte> AsBytes(this System.Utf8String? text) { throw null; }
+        public static System.ReadOnlySpan<byte> AsBytes(this System.Utf8String? text, int start) { throw null; }
+        public static System.ReadOnlySpan<byte> AsBytes(this System.Utf8String? text, int start, int length) { throw null; }
+        public static System.ReadOnlyMemory<System.Char8> AsMemory(this System.Utf8String? text) { throw null; }
+        public static System.ReadOnlyMemory<System.Char8> AsMemory(this System.Utf8String? text, System.Index startIndex) { throw null; }
+        public static System.ReadOnlyMemory<System.Char8> AsMemory(this System.Utf8String? text, int start) { throw null; }
+        public static System.ReadOnlyMemory<System.Char8> AsMemory(this System.Utf8String? text, int start, int length) { throw null; }
+        public static System.ReadOnlyMemory<System.Char8> AsMemory(this System.Utf8String? text, System.Range range) { throw null; }
+        public static System.ReadOnlyMemory<byte> AsMemoryBytes(this System.Utf8String? text) { throw null; }
+        public static System.ReadOnlyMemory<byte> AsMemoryBytes(this System.Utf8String? text, System.Index startIndex) { throw null; }
+        public static System.ReadOnlyMemory<byte> AsMemoryBytes(this System.Utf8String? text, int start) { throw null; }
+        public static System.ReadOnlyMemory<byte> AsMemoryBytes(this System.Utf8String? text, int start, int length) { throw null; }
+        public static System.ReadOnlyMemory<byte> AsMemoryBytes(this System.Utf8String? text, System.Range range) { throw null; }
+        public static System.ReadOnlySpan<System.Char8> AsSpan(this System.Utf8String? text) { throw null; }
+        public static System.ReadOnlySpan<System.Char8> AsSpan(this System.Utf8String? text, int start) { throw null; }
+        public static System.ReadOnlySpan<System.Char8> AsSpan(this System.Utf8String? text, int start, int length) { throw null; }
     }
     public sealed partial class Utf8String : System.IEquatable<System.Utf8String>
     {
         public static readonly System.Utf8String Empty;
         [System.CLSCompliantAttribute(false)]
         public unsafe Utf8String(byte* value) { }
-        public Utf8String(byte[] value, int startIndex, int length) { }
+        public Utf8String(byte[]? value, int startIndex, int length) { }
         [System.CLSCompliantAttribute(false)]
         public unsafe Utf8String(char* value) { }
-        public Utf8String(char[] value, int startIndex, int length) { }
+        public Utf8String(char[]? value, int startIndex, int length) { }
         public Utf8String(System.ReadOnlySpan<byte> value) { }
         public Utf8String(System.ReadOnlySpan<char> value) { }
-        public Utf8String(string value) { }
+        public Utf8String(string? value) { }
         public System.Char8 this[int index] { get { throw null; } }
         public int Length { get { throw null; } }
         public bool Contains(char value) { throw null; }
         public bool Contains(System.Text.Rune value) { throw null; }
         public bool EndsWith(char value) { throw null; }
         public bool EndsWith(System.Text.Rune value) { throw null; }
-        public override bool Equals(object obj) { throw null; }
-        public bool Equals(System.Utf8String value) { throw null; }
-        public static bool Equals(System.Utf8String left, System.Utf8String right) { throw null; }
+        public override bool Equals(object? obj) { throw null; }
+        public bool Equals(System.Utf8String? value) { throw null; }
+        public static bool Equals(System.Utf8String? left, System.Utf8String? right) { throw null; }
         public override int GetHashCode() { throw null; }
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Never)]
         public ref readonly byte GetPinnableReference() { throw null; }
         public int IndexOf(char value) { throw null; }
         public int IndexOf(System.Text.Rune value) { throw null; }
-        public static bool IsNullOrEmpty(System.Utf8String value) { throw null; }
-        public static bool operator ==(System.Utf8String left, System.Utf8String right) { throw null; }
-        public static explicit operator System.ReadOnlySpan<byte> (System.Utf8String value) { throw null; }
-        public static implicit operator System.ReadOnlySpan<System.Char8> (System.Utf8String value) { throw null; }
-        public static bool operator !=(System.Utf8String left, System.Utf8String right) { throw null; }
+        public static bool IsNullOrEmpty([System.Diagnostics.CodeAnalysis.NotNullWhenAttribute(false)] System.Utf8String? value) { throw null; }
+        public static bool operator ==(System.Utf8String? left, System.Utf8String? right) { throw null; }
+        public static explicit operator System.ReadOnlySpan<byte> (System.Utf8String? value) { throw null; }
+        public static implicit operator System.ReadOnlySpan<System.Char8> (System.Utf8String? value) { throw null; }
+        public static bool operator !=(System.Utf8String? left, System.Utf8String? right) { throw null; }
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Never)]
         public System.Utf8String Slice(int startIndex, int length) { throw null; }
         public bool StartsWith(char value) { throw null; }
         public bool StartsWith(System.Text.Rune value) { throw null; }
+        public System.Utf8String Substring(System.Index startIndex) { throw null; }
         public System.Utf8String Substring(int startIndex) { throw null; }
         public System.Utf8String Substring(int startIndex, int length) { throw null; }
         public byte[] ToByteArray() { throw null; }

@@ -10,7 +10,6 @@ namespace Microsoft.Win32.SafeHandles
     public sealed partial class SafeProcessHandle : Microsoft.Win32.SafeHandles.SafeHandleZeroOrMinusOneIsInvalid
     {
         public SafeProcessHandle(System.IntPtr existingHandle, bool ownsHandle) : base (default(bool)) { }
-        public override bool IsInvalid { get { throw null; } }
         protected override bool ReleaseHandle() { throw null; }
     }
 }
@@ -28,11 +27,10 @@ namespace System.Diagnostics
         public MonitoringDescriptionAttribute(string description) { }
         public override string Description { get { throw null; } }
     }
-    public partial class Process : System.ComponentModel.Component
+    public partial class Process : System.ComponentModel.Component, System.IDisposable
     {
         public Process() { }
         public int BasePriority { get { throw null; } }
-        [System.ComponentModel.DefaultValueAttribute(false)]
         public bool EnableRaisingEvents { get { throw null; } set { } }
         public int ExitCode { get { throw null; } }
         public System.DateTime ExitTime { get { throw null; } }
@@ -166,7 +164,6 @@ namespace System.Diagnostics
         public string Arguments { get { throw null; } set { } }
         public bool CreateNoWindow { get { throw null; } set { } }
         public string Domain { get { throw null; } set { } }
-        [System.ComponentModel.DefaultValueAttribute(null)]
         public System.Collections.Generic.IDictionary<string, string> Environment { get { throw null; } }
         public System.Collections.Specialized.StringDictionary EnvironmentVariables { get { throw null; } }
         public bool ErrorDialog { get { throw null; } set { } }
@@ -184,10 +181,10 @@ namespace System.Diagnostics
         public System.Text.Encoding StandardOutputEncoding { get { throw null; } set { } }
         public string UserName { get { throw null; } set { } }
         public bool UseShellExecute { get { throw null; } set { } }
-        [System.ComponentModel.DefaultValueAttribute(null)]
+        [System.ComponentModel.DefaultValueAttribute("")]
         public string Verb { get { throw null; } set { } }
         public string[] Verbs { get { throw null; } }
-        [System.ComponentModel.DefaultValueAttribute(null)]
+        [System.ComponentModel.DefaultValueAttribute(System.Diagnostics.ProcessWindowStyle.Normal)]
         public System.Diagnostics.ProcessWindowStyle WindowStyle { get { throw null; } set { } }
         public string WorkingDirectory { get { throw null; } set { } }
     }

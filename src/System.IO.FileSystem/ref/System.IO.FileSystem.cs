@@ -5,6 +5,15 @@
 // Changes to this file must follow the http://aka.ms/api-review process.
 // ------------------------------------------------------------------------------
 
+namespace Microsoft.Win32.SafeHandles
+{
+    public sealed partial class SafeFileHandle : Microsoft.Win32.SafeHandles.SafeHandleZeroOrMinusOneIsInvalid
+    {
+        public SafeFileHandle(System.IntPtr preexistingHandle, bool ownsHandle) : base (default(bool)) { }
+        public override bool IsInvalid { get { throw null; } }
+        protected override bool ReleaseHandle() { throw null; }
+    }
+}
 namespace System.IO
 {
     public static partial class Directory
@@ -59,8 +68,6 @@ namespace System.IO
     public sealed partial class DirectoryInfo : System.IO.FileSystemInfo
     {
         public DirectoryInfo(string path) { }
-        public override bool Exists { get { throw null; } }
-        public override string Name { get { throw null; } }
         public System.IO.DirectoryInfo Parent { get { throw null; } }
         public System.IO.DirectoryInfo Root { get { throw null; } }
         public void Create() { }
@@ -92,7 +99,6 @@ namespace System.IO
         public System.IO.FileSystemInfo[] GetFileSystemInfos(string searchPattern, System.IO.EnumerationOptions enumerationOptions) { throw null; }
         public System.IO.FileSystemInfo[] GetFileSystemInfos(string searchPattern, System.IO.SearchOption searchOption) { throw null; }
         public void MoveTo(string destDirName) { }
-        public override string ToString() { throw null; }
     }
     public partial class EnumerationOptions
     {
@@ -180,10 +186,8 @@ namespace System.IO
         public FileInfo(string fileName) { }
         public System.IO.DirectoryInfo Directory { get { throw null; } }
         public string DirectoryName { get { throw null; } }
-        public override bool Exists { get { throw null; } }
         public bool IsReadOnly { get { throw null; } set { } }
         public long Length { get { throw null; } }
-        public override string Name { get { throw null; } }
         public System.IO.StreamWriter AppendText() { throw null; }
         public System.IO.FileInfo CopyTo(string destFileName) { throw null; }
         public System.IO.FileInfo CopyTo(string destFileName, bool overwrite) { throw null; }
@@ -202,7 +206,72 @@ namespace System.IO
         public System.IO.FileStream OpenWrite() { throw null; }
         public System.IO.FileInfo Replace(string destinationFileName, string destinationBackupFileName) { throw null; }
         public System.IO.FileInfo Replace(string destinationFileName, string destinationBackupFileName, bool ignoreMetadataErrors) { throw null; }
-        public override string ToString() { throw null; }
+    }
+    [System.FlagsAttribute]
+    public enum FileOptions
+    {
+        WriteThrough = -2147483648,
+        None = 0,
+        Encrypted = 16384,
+        DeleteOnClose = 67108864,
+        SequentialScan = 134217728,
+        RandomAccess = 268435456,
+        Asynchronous = 1073741824,
+    }
+    public partial class FileStream : System.IO.Stream
+    {
+        public FileStream(Microsoft.Win32.SafeHandles.SafeFileHandle handle, System.IO.FileAccess access) { }
+        public FileStream(Microsoft.Win32.SafeHandles.SafeFileHandle handle, System.IO.FileAccess access, int bufferSize) { }
+        public FileStream(Microsoft.Win32.SafeHandles.SafeFileHandle handle, System.IO.FileAccess access, int bufferSize, bool isAsync) { }
+        [System.ObsoleteAttribute("This constructor has been deprecated.  Please use new FileStream(SafeFileHandle handle, FileAccess access) instead.  https://go.microsoft.com/fwlink/?linkid=14202")]
+        public FileStream(System.IntPtr handle, System.IO.FileAccess access) { }
+        [System.ObsoleteAttribute("This constructor has been deprecated.  Please use new FileStream(SafeFileHandle handle, FileAccess access) instead, and optionally make a new SafeFileHandle with ownsHandle=false if needed.  https://go.microsoft.com/fwlink/?linkid=14202")]
+        public FileStream(System.IntPtr handle, System.IO.FileAccess access, bool ownsHandle) { }
+        [System.ObsoleteAttribute("This constructor has been deprecated.  Please use new FileStream(SafeFileHandle handle, FileAccess access, int bufferSize) instead, and optionally make a new SafeFileHandle with ownsHandle=false if needed.  https://go.microsoft.com/fwlink/?linkid=14202")]
+        public FileStream(System.IntPtr handle, System.IO.FileAccess access, bool ownsHandle, int bufferSize) { }
+        [System.ObsoleteAttribute("This constructor has been deprecated.  Please use new FileStream(SafeFileHandle handle, FileAccess access, int bufferSize, bool isAsync) instead, and optionally make a new SafeFileHandle with ownsHandle=false if needed.  https://go.microsoft.com/fwlink/?linkid=14202")]
+        public FileStream(System.IntPtr handle, System.IO.FileAccess access, bool ownsHandle, int bufferSize, bool isAsync) { }
+        public FileStream(string path, System.IO.FileMode mode) { }
+        public FileStream(string path, System.IO.FileMode mode, System.IO.FileAccess access) { }
+        public FileStream(string path, System.IO.FileMode mode, System.IO.FileAccess access, System.IO.FileShare share) { }
+        public FileStream(string path, System.IO.FileMode mode, System.IO.FileAccess access, System.IO.FileShare share, int bufferSize) { }
+        public FileStream(string path, System.IO.FileMode mode, System.IO.FileAccess access, System.IO.FileShare share, int bufferSize, bool useAsync) { }
+        public FileStream(string path, System.IO.FileMode mode, System.IO.FileAccess access, System.IO.FileShare share, int bufferSize, System.IO.FileOptions options) { }
+        public override bool CanRead { get { throw null; } }
+        public override bool CanSeek { get { throw null; } }
+        public override bool CanWrite { get { throw null; } }
+        [System.ObsoleteAttribute("This property has been deprecated.  Please use FileStream's SafeFileHandle property instead.  https://go.microsoft.com/fwlink/?linkid=14202")]
+        public virtual System.IntPtr Handle { get { throw null; } }
+        public virtual bool IsAsync { get { throw null; } }
+        public override long Length { get { throw null; } }
+        public virtual string Name { get { throw null; } }
+        public override long Position { get { throw null; } set { } }
+        public virtual Microsoft.Win32.SafeHandles.SafeFileHandle SafeFileHandle { get { throw null; } }
+        public override System.IAsyncResult BeginRead(byte[] array, int offset, int numBytes, System.AsyncCallback callback, object? state) { throw null; }
+        public override System.IAsyncResult BeginWrite(byte[] array, int offset, int numBytes, System.AsyncCallback callback, object? state) { throw null; }
+        public override System.Threading.Tasks.Task CopyToAsync(System.IO.Stream destination, int bufferSize, System.Threading.CancellationToken cancellationToken) { throw null; }
+        protected override void Dispose(bool disposing) { }
+        public override System.Threading.Tasks.ValueTask DisposeAsync() { throw null; }
+        public override int EndRead(System.IAsyncResult asyncResult) { throw null; }
+        public override void EndWrite(System.IAsyncResult asyncResult) { }
+        ~FileStream() { }
+        public override void Flush() { }
+        public virtual void Flush(bool flushToDisk) { }
+        public override System.Threading.Tasks.Task FlushAsync(System.Threading.CancellationToken cancellationToken) { throw null; }
+        public virtual void Lock(long position, long length) { }
+        public override int Read(byte[] array, int offset, int count) { throw null; }
+        public override int Read(System.Span<byte> buffer) { throw null; }
+        public override System.Threading.Tasks.Task<int> ReadAsync(byte[] buffer, int offset, int count, System.Threading.CancellationToken cancellationToken) { throw null; }
+        public override System.Threading.Tasks.ValueTask<int> ReadAsync(System.Memory<byte> buffer, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) { throw null; }
+        public override int ReadByte() { throw null; }
+        public override long Seek(long offset, System.IO.SeekOrigin origin) { throw null; }
+        public override void SetLength(long value) { }
+        public virtual void Unlock(long position, long length) { }
+        public override void Write(byte[] array, int offset, int count) { }
+        public override void Write(System.ReadOnlySpan<byte> buffer) { }
+        public override System.Threading.Tasks.Task WriteAsync(byte[] buffer, int offset, int count, System.Threading.CancellationToken cancellationToken) { throw null; }
+        public override System.Threading.Tasks.ValueTask WriteAsync(System.ReadOnlyMemory<byte> buffer, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) { throw null; }
+        public override void WriteByte(byte value) { }
     }
     public abstract partial class FileSystemInfo : System.MarshalByRefObject, System.Runtime.Serialization.ISerializable
     {
@@ -213,14 +282,14 @@ namespace System.IO
         public System.IO.FileAttributes Attributes { get { throw null; } set { } }
         public System.DateTime CreationTime { get { throw null; } set { } }
         public System.DateTime CreationTimeUtc { get { throw null; } set { } }
-        public abstract bool Exists { get; }
+        public virtual bool Exists { get { throw null; } }
         public string Extension { get { throw null; } }
         public virtual string FullName { get { throw null; } }
         public System.DateTime LastAccessTime { get { throw null; } set { } }
         public System.DateTime LastAccessTimeUtc { get { throw null; } set { } }
         public System.DateTime LastWriteTime { get { throw null; } set { } }
         public System.DateTime LastWriteTimeUtc { get { throw null; } set { } }
-        public abstract string Name { get; }
+        public virtual string Name { get { throw null; } }
         public abstract void Delete();
         public virtual void GetObjectData(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context) { }
         public void Refresh() { }
@@ -247,17 +316,19 @@ namespace System.IO.Enumeration
 {
     public ref partial struct FileSystemEntry
     {
+        private object _dummy;
+        private int _dummyPrimitive;
         public System.IO.FileAttributes Attributes { get { throw null; } }
         public System.DateTimeOffset CreationTimeUtc { get { throw null; } }
-        public System.ReadOnlySpan<char> Directory { get { throw null; } }
+        public readonly System.ReadOnlySpan<char> Directory { get { throw null; } }
         public System.ReadOnlySpan<char> FileName { get { throw null; } }
         public bool IsDirectory { get { throw null; } }
         public bool IsHidden { get { throw null; } }
         public System.DateTimeOffset LastAccessTimeUtc { get { throw null; } }
         public System.DateTimeOffset LastWriteTimeUtc { get { throw null; } }
         public long Length { get { throw null; } }
-        public System.ReadOnlySpan<char> OriginalRootDirectory { get { throw null; } }
-        public System.ReadOnlySpan<char> RootDirectory { get { throw null; } }
+        public readonly System.ReadOnlySpan<char> OriginalRootDirectory { get { throw null; } }
+        public readonly System.ReadOnlySpan<char> RootDirectory { get { throw null; } }
         public System.IO.FileSystemInfo ToFileSystemInfo() { throw null; }
         public string ToFullPath() { throw null; }
         public string ToSpecifiedFullPath() { throw null; }
@@ -280,6 +351,7 @@ namespace System.IO.Enumeration
         protected virtual bool ContinueOnError(int error) { throw null; }
         public void Dispose() { }
         protected virtual void Dispose(bool disposing) { }
+        ~FileSystemEnumerator() { }
         public bool MoveNext() { throw null; }
         protected virtual void OnDirectoryFinished(System.ReadOnlySpan<char> directory) { }
         public void Reset() { }

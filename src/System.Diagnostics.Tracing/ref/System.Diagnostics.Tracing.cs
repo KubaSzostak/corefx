@@ -7,6 +7,16 @@
 
 namespace System.Diagnostics.Tracing
 {
+    public abstract partial class DiagnosticCounter : System.IDisposable
+    {
+        internal DiagnosticCounter() { }
+        public string DisplayName { get { throw null; } set { } }
+        public string DisplayUnits { get { throw null; } set { } }
+        public System.Diagnostics.Tracing.EventSource EventSource { get { throw null; } }
+        public string Name { get { throw null; } }
+        public void AddMetadata(string key, string? value) { }
+        public void Dispose() { }
+    }
     [System.FlagsAttribute]
     public enum EventActivityOptions
     {
@@ -52,6 +62,14 @@ namespace System.Diagnostics.Tracing
         public System.Diagnostics.Tracing.EventCommand Command { get { throw null; } }
         public bool DisableEvent(int eventId) { throw null; }
         public bool EnableEvent(int eventId) { throw null; }
+    }
+    public partial class EventCounter : System.Diagnostics.Tracing.DiagnosticCounter
+    {
+        public EventCounter(string name, System.Diagnostics.Tracing.EventSource eventSource) { }
+        protected void Flush() { }
+        public override string ToString() { throw null; }
+        public void WriteMetric(double value) { }
+        public void WriteMetric(float value) { }
     }
     [System.AttributeUsageAttribute(System.AttributeTargets.Class | System.AttributeTargets.Struct, Inherited=false)]
     public partial class EventDataAttribute : System.Attribute
@@ -109,9 +127,9 @@ namespace System.Diagnostics.Tracing
         Informational = 4,
         Verbose = 5,
     }
-    public abstract partial class EventListener : System.IDisposable
+    public partial class EventListener : System.IDisposable
     {
-        protected EventListener() { }
+        public EventListener() { }
         public event System.EventHandler<System.Diagnostics.Tracing.EventSourceCreatedEventArgs>? EventSourceCreated { add { } remove { } }
         public event System.EventHandler<System.Diagnostics.Tracing.EventWrittenEventArgs>? EventWritten { add { } remove { } }
         public void DisableEvents(System.Diagnostics.Tracing.EventSource eventSource) { }
@@ -119,7 +137,7 @@ namespace System.Diagnostics.Tracing
         public void EnableEvents(System.Diagnostics.Tracing.EventSource eventSource, System.Diagnostics.Tracing.EventLevel level) { }
         public void EnableEvents(System.Diagnostics.Tracing.EventSource eventSource, System.Diagnostics.Tracing.EventLevel level, System.Diagnostics.Tracing.EventKeywords matchAnyKeyword) { }
         public void EnableEvents(System.Diagnostics.Tracing.EventSource eventSource, System.Diagnostics.Tracing.EventLevel level, System.Diagnostics.Tracing.EventKeywords matchAnyKeyword, System.Collections.Generic.IDictionary<string, string?>? arguments) { }
-        protected static int EventSourceIndex(System.Diagnostics.Tracing.EventSource eventSource) { throw null; }
+        public static int EventSourceIndex(System.Diagnostics.Tracing.EventSource eventSource) { throw null; }
         protected internal virtual void OnEventSourceCreated(System.Diagnostics.Tracing.EventSource eventSource) { }
         protected internal virtual void OnEventWritten(System.Diagnostics.Tracing.EventWrittenEventArgs eventData) { }
     }
@@ -207,7 +225,6 @@ namespace System.Diagnostics.Tracing
         public void Write<T>(string? eventName, ref System.Diagnostics.Tracing.EventSourceOptions options, ref System.Guid activityId, ref System.Guid relatedActivityId, ref T data) { }
         public void Write<T>(string? eventName, ref System.Diagnostics.Tracing.EventSourceOptions options, ref T data) { }
         public void Write<T>(string? eventName, T data) { }
-        [System.Runtime.InteropServices.StructLayoutAttribute(System.Runtime.InteropServices.LayoutKind.Sequential)]
         protected internal partial struct EventData
         {
             private int _dummyPrimitive;
@@ -235,7 +252,6 @@ namespace System.Diagnostics.Tracing
         public EventSourceException(string? message) { }
         public EventSourceException(string? message, System.Exception? innerException) { }
     }
-    [System.Runtime.InteropServices.StructLayoutAttribute(System.Runtime.InteropServices.LayoutKind.Sequential)]
     public partial struct EventSourceOptions
     {
         private int _dummyPrimitive;
@@ -283,9 +299,27 @@ namespace System.Diagnostics.Tracing
         public System.DateTime TimeStamp { get { throw null; } }
         public byte Version { get { throw null; } }
     }
+    public partial class IncrementingEventCounter : System.Diagnostics.Tracing.DiagnosticCounter
+    {
+        public IncrementingEventCounter(string name, System.Diagnostics.Tracing.EventSource eventSource) { }
+        public System.TimeSpan DisplayRateTimeScale { get { throw null; } set { } }
+        public void Increment(double increment = 1) { }
+        public override string ToString() { throw null; }
+    }
+    public partial class IncrementingPollingCounter : System.Diagnostics.Tracing.DiagnosticCounter
+    {
+        public IncrementingPollingCounter(string name, System.Diagnostics.Tracing.EventSource eventSource, System.Func<double> totalValueProvider) { }
+        public System.TimeSpan DisplayRateTimeScale { get { throw null; } set { } }
+        public override string ToString() { throw null; }
+    }
     [System.AttributeUsageAttribute(System.AttributeTargets.Method)]
     public sealed partial class NonEventAttribute : System.Attribute
     {
         public NonEventAttribute() { }
+    }
+    public partial class PollingCounter : System.Diagnostics.Tracing.DiagnosticCounter
+    {
+        public PollingCounter(string name, System.Diagnostics.Tracing.EventSource eventSource, System.Func<double> metricProvider) { }
+        public override string ToString() { throw null; }
     }
 }
