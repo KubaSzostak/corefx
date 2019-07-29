@@ -16,10 +16,8 @@ namespace System.Text.Json.Serialization.Tests
             string inputString = ">><++>>>\">>\\>>&>>>\u6f22\u5B57>>>"; // Non-ASCII text should remain unescaped. \u6f22 = 汉, \u5B57 = 字
 
             string actual = JsonSerializer.Serialize(inputString, new JsonSerializerOptions { Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping });
-            string expected = "\">><++>>>\\\">>\\\\>>&>>>\u6f22\u5B57>>>\"";
             Assert.Equal(JsonConvert.SerializeObject(inputString), actual);
-            Assert.Equal(expected, actual);
-            Assert.NotEqual(expected, JsonSerializer.Serialize(inputString));
+            Assert.Equal("\">><++>>>\\\">>\\\\>>&>>>\u6f22\u5B57>>>\"", actual);
         }
 
         [Fact]
