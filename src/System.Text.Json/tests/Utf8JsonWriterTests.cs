@@ -1494,7 +1494,7 @@ namespace System.Text.Json.Tests
                 sb.Append(Environment.NewLine);
             sb.Append("[]");
 
-            AssertContents(sb.ToString(), output);
+            JsonTestHelper.AssertContents(sb.ToString(), output);
         }
 
         [Theory]
@@ -1739,7 +1739,7 @@ namespace System.Text.Json.Tests
 
             jsonUtf8.Flush();
 
-            AssertContents(expectedStr, output);
+            JsonTestHelper.AssertContents(expectedStr, output);
         }
 
         [Theory]
@@ -1935,7 +1935,7 @@ namespace System.Text.Json.Tests
                 jsonUtf8.WriteEndObject();
                 jsonUtf8.Flush();
 
-                AssertContents(expectedStr, output);
+                JsonTestHelper.AssertContents(expectedStr, output);
             }
         }
 
@@ -2134,7 +2134,7 @@ namespace System.Text.Json.Tests
                 jsonUtf8.WriteEndObject();
                 jsonUtf8.Flush();
 
-                AssertContents(expectedStr, output);
+                JsonTestHelper.AssertContents(expectedStr, output);
             }
 
             // Verify that escaping does not change the input strings/spans.
@@ -2250,7 +2250,7 @@ namespace System.Text.Json.Tests
                 jsonUtf8.WriteEndObject();
                 jsonUtf8.Flush();
 
-                AssertContents(expectedStr, output);
+                JsonTestHelper.AssertContents(expectedStr, output);
             }
         }
 
@@ -2301,7 +2301,7 @@ namespace System.Text.Json.Tests
                 jsonUtf8.WriteEndObject();
                 jsonUtf8.Flush();
 
-                AssertContents(expectedStr, output);
+                JsonTestHelper.AssertContents(expectedStr, output);
             }
 
             // Verify that escaping does not change the input strings/spans.
@@ -2473,7 +2473,7 @@ namespace System.Text.Json.Tests
 
             jsonUtf8.Flush();
 
-            AssertContents("\"++++\"", output);
+            JsonTestHelper.AssertContents("\"++++\"", output);
         }
 
         [Fact]
@@ -2503,7 +2503,7 @@ namespace System.Text.Json.Tests
                 builder.Append("ZGRk");
             }
             builder.Append("ZGQ=\"");
-            AssertContents(builder.ToString(), output);
+            JsonTestHelper.AssertContents(builder.ToString(), output);
         }
 
         [Theory]
@@ -2603,7 +2603,7 @@ namespace System.Text.Json.Tests
                 jsonUtf8.WriteEndArray();
                 jsonUtf8.Flush();
 
-                AssertContents(expectedStr, output);
+                JsonTestHelper.AssertContents(expectedStr, output);
             }
         }
 
@@ -2675,7 +2675,7 @@ namespace System.Text.Json.Tests
             jsonUtf8.WriteCommentValue(invalidUtf8);
 
             string expectedStr = GetCommentExpectedString(prettyPrint: formatted);
-            AssertContents(expectedStr, output);
+            JsonTestHelper.AssertContents(expectedStr, output);
         }
 
         private static string GetCommentExpectedString(bool prettyPrint)
@@ -2746,7 +2746,7 @@ namespace System.Text.Json.Tests
                 jsonUtf8.WriteEndArray();
                 jsonUtf8.Flush();
 
-                AssertContents(expectedStr, output);
+                JsonTestHelper.AssertContents(expectedStr, output);
             }
         }
 
@@ -2909,7 +2909,7 @@ namespace System.Text.Json.Tests
                 jsonUtf8.WriteEndObject();
                 jsonUtf8.Flush();
 
-                AssertContents(expectedStr, output);
+                JsonTestHelper.AssertContents(expectedStr, output);
             }
         }
 
@@ -2976,7 +2976,7 @@ namespace System.Text.Json.Tests
                 jsonUtf8.WriteEndObject();
                 jsonUtf8.Flush();
 
-                AssertContents(expectedStr, output);
+                JsonTestHelper.AssertContents(expectedStr, output);
             }
         }
 
@@ -3039,7 +3039,7 @@ namespace System.Text.Json.Tests
                 jsonUtf8.WriteEndObject();
                 jsonUtf8.Flush();
 
-                AssertContents(expectedStr, output);
+                JsonTestHelper.AssertContents(expectedStr, output);
             }
         }
 
@@ -3093,7 +3093,7 @@ namespace System.Text.Json.Tests
                 jsonUtf8.WriteEndObject();
                 jsonUtf8.Flush();
 
-                AssertContents(expectedStr, output);
+                JsonTestHelper.AssertContents(expectedStr, output);
             }
         }
 
@@ -3292,7 +3292,7 @@ namespace System.Text.Json.Tests
             jsonUtf8.WriteEndObject();
             jsonUtf8.Flush();
 
-            AssertContents(GetCustomExpectedString(formatted), output);
+            JsonTestHelper.AssertContents(GetCustomExpectedString(formatted), output);
         }
 
         [Theory]
@@ -3315,7 +3315,7 @@ namespace System.Text.Json.Tests
             jsonUtf8.WriteEndArray();
             jsonUtf8.Flush();
 
-            AssertContents(expectedStr, output);
+            JsonTestHelper.AssertContents(expectedStr, output);
         }
 
         [Theory]
@@ -3335,7 +3335,7 @@ namespace System.Text.Json.Tests
                 jsonUtf8.WriteEndObject();
                 jsonUtf8.Flush();
 
-                AssertContents(expectedStr, output);
+                JsonTestHelper.AssertContents(expectedStr, output);
             }
 
             {
@@ -3350,7 +3350,7 @@ namespace System.Text.Json.Tests
                 jsonUtf8.WriteEndArray();
                 jsonUtf8.Flush();
 
-                AssertContents(expectedStr, output);
+                JsonTestHelper.AssertContents(expectedStr, output);
             }
         }
 
@@ -3389,7 +3389,7 @@ namespace System.Text.Json.Tests
                 jsonUtf8.WriteEndObject();
                 jsonUtf8.Flush();
 
-                AssertContents(expectedStr, output);
+                JsonTestHelper.AssertContents(expectedStr, output);
             }
         }
 
@@ -3439,7 +3439,7 @@ namespace System.Text.Json.Tests
                 jsonUtf8.WriteEndObject();
                 jsonUtf8.Flush();
 
-                AssertContents(expectedStr, output);
+                JsonTestHelper.AssertContents(expectedStr, output);
             }
         }
 
@@ -3478,7 +3478,7 @@ namespace System.Text.Json.Tests
                 jsonUtf8.WriteEndObject();
                 jsonUtf8.Flush();
 
-                AssertContents(expectedStr, output);
+                JsonTestHelper.AssertContents(expectedStr, output);
             }
         }
 
@@ -3528,7 +3528,7 @@ namespace System.Text.Json.Tests
                 jsonUtf8.WriteEndObject();
                 jsonUtf8.Flush();
 
-                AssertContents(expectedStr, output);
+                JsonTestHelper.AssertContents(expectedStr, output);
             }
         }
 
@@ -3567,7 +3567,7 @@ namespace System.Text.Json.Tests
                 jsonUtf8.WriteEndObject();
                 jsonUtf8.Flush();
 
-                AssertContents(expectedStr, output);
+                JsonTestHelper.AssertContents(expectedStr, output);
             }
         }
 
@@ -3636,7 +3636,7 @@ namespace System.Text.Json.Tests
                 jsonUtf8.WriteEndObject();
                 jsonUtf8.Flush();
 
-                AssertContents(expectedStr, output);
+                JsonTestHelper.AssertContents(expectedStr, output);
             }
         }
 
@@ -3696,7 +3696,7 @@ namespace System.Text.Json.Tests
                 jsonUtf8.WriteEndObject();
                 jsonUtf8.Flush();
 
-                AssertContents(expectedStr, output);
+                JsonTestHelper.AssertContents(expectedStr, output);
             }
         }
 
@@ -3758,7 +3758,7 @@ namespace System.Text.Json.Tests
                 jsonUtf8.WriteEndObject();
                 jsonUtf8.Flush();
 
-                AssertContents(expectedStr, output);
+                JsonTestHelper.AssertContents(expectedStr, output);
             }
         }
 
@@ -3985,7 +3985,7 @@ namespace System.Text.Json.Tests
                 jsonUtf8.Flush();
 
                 // TODO: The output doesn't match what JSON.NET does (different rounding/e-notation).
-                // AssertContents(expectedStr, output);
+                // JsonTestHelper.AssertContents(expectedStr, output);
             }
         }
 
@@ -4014,7 +4014,7 @@ namespace System.Text.Json.Tests
             jsonUtf8.Flush();
 
             string expectedStr = GetNumbersExpectedString(formatted, numberOfElements);
-            AssertContents(expectedStr, output);
+            JsonTestHelper.AssertContents(expectedStr, output);
         }
 
         [Theory]
@@ -4042,7 +4042,7 @@ namespace System.Text.Json.Tests
             jsonUtf8.Flush();
 
             string expectedStr = GetNumbersExpectedString(formatted, numberOfElements);
-            AssertContents(expectedStr, output);
+            JsonTestHelper.AssertContents(expectedStr, output);
         }
 
         [Theory]
@@ -4070,7 +4070,7 @@ namespace System.Text.Json.Tests
             jsonUtf8.Flush();
 
             string expectedStr = GetNumbersExpectedString(formatted, numberOfElements);
-            AssertContents(expectedStr, output);
+            JsonTestHelper.AssertContents(expectedStr, output);
         }
 
         [Theory]
@@ -4098,7 +4098,7 @@ namespace System.Text.Json.Tests
             jsonUtf8.Flush();
 
             string expectedStr = GetNumbersExpectedString(formatted, numberOfElements);
-            AssertContents(expectedStr, output);
+            JsonTestHelper.AssertContents(expectedStr, output);
         }
 
         [Theory]
@@ -4126,7 +4126,7 @@ namespace System.Text.Json.Tests
             jsonUtf8.Flush();
 
             string expectedStr = GetNumbersExpectedString(formatted, numberOfElements);
-            AssertContents(expectedStr, output);
+            JsonTestHelper.AssertContents(expectedStr, output);
         }
 
         [Theory]
@@ -4154,7 +4154,7 @@ namespace System.Text.Json.Tests
             jsonUtf8.Flush();
 
             string expectedStr = GetNumbersExpectedString(formatted, numberOfElements);
-            AssertContents(expectedStr, output);
+            JsonTestHelper.AssertContents(expectedStr, output);
         }
 
         [Theory]
@@ -4182,39 +4182,47 @@ namespace System.Text.Json.Tests
             jsonUtf8.Flush();
 
             string expectedStr = GetNumbersExpectedString(formatted, numberOfElements);
-            AssertContents(expectedStr, output);
+            JsonTestHelper.AssertContents(expectedStr, output);
         }
 
         [Theory]
-        [InlineData(true, true, "message")]
-        [InlineData(true, false, "message")]
-        [InlineData(false, true, "message")]
-        [InlineData(false, false, "message")]
-        [InlineData(true, true, "mess><age")]
-        [InlineData(true, false, "mess><age")]
-        [InlineData(false, true, "mess><age")]
-        [InlineData(false, false, "mess><age")]
-        [InlineData(true, true, ">><++>>>\">>\\>>&>>>\u6f22\u5B57>>>")] // \u6f22 = 汉, \u5B57 = 字
-        [InlineData(true, false, ">><++>>>\">>\\>>&>>>\u6f22\u5B57>>>")]
-        [InlineData(false, true, ">><++>>>\">>\\>>&>>>\u6f22\u5B57>>>")]
-        [InlineData(false, false, ">><++>>>\">>\\>>&>>>\u6f22\u5B57>>>")]
-        [InlineData(true, true, "mess\r\nage\u0008\u0001!")]
-        [InlineData(true, false, "mess\r\nage\u0008\u0001!")]
-        [InlineData(false, true, "mess\r\nage\u0008\u0001!")]
-        [InlineData(false, false, "mess\r\nage\u0008\u0001!")]
-        public void WriteStringsWithRelaxedEscaping(bool formatted, bool skipValidation, string keyString)
+        [InlineData(true, true, "message", true)]
+        [InlineData(true, false, "message", true)]
+        [InlineData(false, true, "message", true)]
+        [InlineData(false, false, "message", true)]
+        [InlineData(true, true, "mess><age", false)]
+        [InlineData(true, false, "mess><age", false)]
+        [InlineData(false, true, "mess><age", false)]
+        [InlineData(false, false, "mess><age", false)]
+        [InlineData(true, true, ">><++>>>\">>\\>>&>>>\u6f22\u5B57>>>", false)] // \u6f22 = 汉, \u5B57 = 字
+        [InlineData(true, false, ">><++>>>\">>\\>>&>>>\u6f22\u5B57>>>", false)]
+        [InlineData(false, true, ">><++>>>\">>\\>>&>>>\u6f22\u5B57>>>", false)]
+        [InlineData(false, false, ">><++>>>\">>\\>>&>>>\u6f22\u5B57>>>", false)]
+        [InlineData(true, true, "mess\r\nage\u0008\u0001!", true)]
+        [InlineData(true, false, "mess\r\nage\u0008\u0001!", true)]
+        [InlineData(false, true, "mess\r\nage\u0008\u0001!", true)]
+        [InlineData(false, false, "mess\r\nage\u0008\u0001!", true)]
+        public void WriteStringsWithRelaxedEscaping(bool formatted, bool skipValidation, string keyString, bool matchesRelaxedEscaping)
         {
             string expectedStr = GetExpectedString_RelaxedEscaping(prettyPrint: formatted, keyString);
 
             var options = new JsonWriterOptions { Indented = formatted, SkipValidation = skipValidation, Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
+            WriteStringHelper(options, keyString, expectedStr, shouldMatch: true);
 
+            // Default encoder
+            options = new JsonWriterOptions { Indented = formatted, SkipValidation = skipValidation };
+            WriteStringHelper(options, keyString, expectedStr, matchesRelaxedEscaping);
+        }
+
+        private static void WriteStringHelper(JsonWriterOptions options, string keyString, string expectedStr, bool shouldMatch)
+        {
             ReadOnlySpan<char> keyUtf16 = keyString.AsSpan();
             ReadOnlySpan<byte> keyUtf8 = Encoding.UTF8.GetBytes(keyString);
 
             for (int i = 0; i < 3; i++)
             {
                 var output = new ArrayBufferWriter<byte>(1024);
-                var jsonUtf8 = new Utf8JsonWriter(output, options);
+                using var jsonUtf8 = new Utf8JsonWriter(output, options);
 
                 jsonUtf8.WriteStartObject();
 
@@ -4241,7 +4249,14 @@ namespace System.Text.Json.Tests
                 jsonUtf8.WriteEndObject();
                 jsonUtf8.Flush();
 
-                AssertContents(expectedStr, output);
+                if (shouldMatch)
+                {
+                    JsonTestHelper.AssertContents(expectedStr, output);
+                }
+                else
+                {
+                    JsonTestHelper.AssertContentsNotEqual(expectedStr, output);
+                }
             }
         }
 
@@ -4308,7 +4323,7 @@ namespace System.Text.Json.Tests
                 jsonUtf8.WriteEndObject();
                 jsonUtf8.Flush();
 
-                AssertContents(expectedStr, output);
+                JsonTestHelper.AssertContents(expectedStr, output);
             }
         }
 
@@ -4377,7 +4392,7 @@ namespace System.Text.Json.Tests
                 jsonUtf8.WriteEndObject();
                 jsonUtf8.Flush();
 
-                AssertContents(expectedStr, output);
+                JsonTestHelper.AssertContents(expectedStr, output);
             }
         }
 
@@ -4446,7 +4461,7 @@ namespace System.Text.Json.Tests
                 jsonUtf8.WriteEndObject();
                 jsonUtf8.Flush();
 
-                AssertContents(expectedStr, output);
+                JsonTestHelper.AssertContents(expectedStr, output);
             }
         }
 
@@ -4532,7 +4547,7 @@ namespace System.Text.Json.Tests
             jsonUtf8.WriteStringValue(DateTime.ParseExact(testStr, "O", CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind));
             jsonUtf8.Flush();
 
-            AssertContents($"\"{expectedStr}\"", output);
+            JsonTestHelper.AssertContents($"\"{expectedStr}\"", output);
         }
 
         [Theory]
@@ -4545,7 +4560,7 @@ namespace System.Text.Json.Tests
             jsonUtf8.WriteStringValue(DateTimeOffset.ParseExact(testStr, "O", CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind));
             jsonUtf8.Flush();
 
-            AssertContents($"\"{expectedStr}\"", output);
+            JsonTestHelper.AssertContents($"\"{expectedStr}\"", output);
         }
 
         [Fact]
@@ -4606,7 +4621,7 @@ namespace System.Text.Json.Tests
             jsonUtf8.WriteStringValue(text);
             jsonUtf8.Flush();
 
-            AssertContents($"{expectedMessage}", output);
+            JsonTestHelper.AssertContents($"{expectedMessage}", output);
         }
 
         [Theory]
@@ -4633,7 +4648,7 @@ namespace System.Text.Json.Tests
                 jsonUtf8.WriteStringValue(text);
                 jsonUtf8.Flush();
 
-                AssertContents(expectedMessage, output);
+                JsonTestHelper.AssertContents(expectedMessage, output);
             }
             {
                 var message = new string('>', stringLength);
@@ -4652,7 +4667,7 @@ namespace System.Text.Json.Tests
                 jsonUtf8.WriteStringValue(text);
                 jsonUtf8.Flush();
 
-                AssertContents(expectedMessage, output);
+                JsonTestHelper.AssertContents(expectedMessage, output);
             }
         }
 
@@ -4680,7 +4695,7 @@ namespace System.Text.Json.Tests
                 jsonUtf8.WriteStartObject(text);
                 jsonUtf8.Flush();
 
-                AssertContents($"{{{expectedMessage}:{{", output);
+                JsonTestHelper.AssertContents($"{{{expectedMessage}:{{", output);
             }
 
             {
@@ -4690,7 +4705,7 @@ namespace System.Text.Json.Tests
                 jsonUtf8.WriteStartArray(text);
                 jsonUtf8.Flush();
 
-                AssertContents($"{{{expectedMessage}:[", output);
+                JsonTestHelper.AssertContents($"{{{expectedMessage}:[", output);
             }
         }
 
@@ -4718,7 +4733,7 @@ namespace System.Text.Json.Tests
                 jsonUtf8.WriteBoolean(text, true);
                 jsonUtf8.Flush();
 
-                AssertContents($"{{{expectedMessage}:true", output);
+                JsonTestHelper.AssertContents($"{{{expectedMessage}:true", output);
             }
 
             {
@@ -4728,7 +4743,7 @@ namespace System.Text.Json.Tests
                 jsonUtf8.WriteBoolean(text, false);
                 jsonUtf8.Flush();
 
-                AssertContents($"{{{expectedMessage}:false", output);
+                JsonTestHelper.AssertContents($"{{{expectedMessage}:false", output);
             }
 
             {
@@ -4738,7 +4753,7 @@ namespace System.Text.Json.Tests
                 jsonUtf8.WriteNull(text);
                 jsonUtf8.Flush();
 
-                AssertContents($"{{{expectedMessage}:null", output);
+                JsonTestHelper.AssertContents($"{{{expectedMessage}:null", output);
             }
         }
 
@@ -4767,7 +4782,7 @@ namespace System.Text.Json.Tests
                 jsonUtf8.WriteNumber(text, value);
                 jsonUtf8.Flush();
 
-                AssertContents($"{{{expectedMessage}:1", output);
+                JsonTestHelper.AssertContents($"{{{expectedMessage}:1", output);
             }
 
             {
@@ -4778,7 +4793,7 @@ namespace System.Text.Json.Tests
                 jsonUtf8.WriteNumber(text, value);
                 jsonUtf8.Flush();
 
-                AssertContents($"{{{expectedMessage}:1", output);
+                JsonTestHelper.AssertContents($"{{{expectedMessage}:1", output);
             }
 
             {
@@ -4789,7 +4804,7 @@ namespace System.Text.Json.Tests
                 jsonUtf8.WriteNumber(text, value);
                 jsonUtf8.Flush();
 
-                AssertContents($"{{{expectedMessage}:1", output);
+                JsonTestHelper.AssertContents($"{{{expectedMessage}:1", output);
             }
 
             {
@@ -4800,7 +4815,7 @@ namespace System.Text.Json.Tests
                 jsonUtf8.WriteNumber(text, value);
                 jsonUtf8.Flush();
 
-                AssertContents($"{{{expectedMessage}:1", output);
+                JsonTestHelper.AssertContents($"{{{expectedMessage}:1", output);
             }
 
             {
@@ -4811,7 +4826,7 @@ namespace System.Text.Json.Tests
                 jsonUtf8.WriteNumber(text, value);
                 jsonUtf8.Flush();
 
-                AssertContents($"{{{expectedMessage}:1", output);
+                JsonTestHelper.AssertContents($"{{{expectedMessage}:1", output);
             }
 
             {
@@ -4822,7 +4837,7 @@ namespace System.Text.Json.Tests
                 jsonUtf8.WriteNumber(text, value);
                 jsonUtf8.Flush();
 
-                AssertContents($"{{{expectedMessage}:1", output);
+                JsonTestHelper.AssertContents($"{{{expectedMessage}:1", output);
             }
 
             {
@@ -4833,7 +4848,7 @@ namespace System.Text.Json.Tests
                 jsonUtf8.WriteNumber(text, value);
                 jsonUtf8.Flush();
 
-                AssertContents($"{{{expectedMessage}:1", output);
+                JsonTestHelper.AssertContents($"{{{expectedMessage}:1", output);
             }
         }
 
@@ -4862,7 +4877,7 @@ namespace System.Text.Json.Tests
                 jsonUtf8.WriteString(text, value);
                 jsonUtf8.Flush();
 
-                AssertContents($"{{{expectedMessage}:\"{value.ToString("yyyy-MM-ddTHH:mm:ss")}\"", output);
+                JsonTestHelper.AssertContents($"{{{expectedMessage}:\"{value.ToString("yyyy-MM-ddTHH:mm:ss")}\"", output);
             }
 
             {
@@ -4873,7 +4888,7 @@ namespace System.Text.Json.Tests
                 jsonUtf8.WriteString(text, value);
                 jsonUtf8.Flush();
 
-                AssertContents($"{{{expectedMessage}:\"{value.ToString("yyyy-MM-ddTHH:mm:ssK")}\"", output);
+                JsonTestHelper.AssertContents($"{{{expectedMessage}:\"{value.ToString("yyyy-MM-ddTHH:mm:ssK")}\"", output);
             }
 
             {
@@ -4884,7 +4899,7 @@ namespace System.Text.Json.Tests
                 jsonUtf8.WriteString(text, value);
                 jsonUtf8.Flush();
 
-                AssertContents($"{{{expectedMessage}:\"{value.ToString()}\"", output);
+                JsonTestHelper.AssertContents($"{{{expectedMessage}:\"{value.ToString()}\"", output);
             }
         }
 
@@ -5225,7 +5240,7 @@ namespace System.Text.Json.Tests
                 writer.Flush();
             }
 
-            AssertContents("[/**//**/]", output);
+            JsonTestHelper.AssertContents("[/**//**/]", output);
         }
 
         [Fact]
@@ -5322,7 +5337,7 @@ namespace System.Text.Json.Tests
                 writer.Flush();
             }
 
-            AssertContents("{}", output);
+            JsonTestHelper.AssertContents("{}", output);
             output.Clear();
 
             using (var writer = new Utf8JsonWriter(output))
@@ -5338,7 +5353,7 @@ namespace System.Text.Json.Tests
                 writer.Flush();
             }
 
-            AssertContents($"{{\"\":{wireValue},\"\":{wireValue}}}", output);
+            JsonTestHelper.AssertContents($"{{\"\":{wireValue},\"\":{wireValue}}}", output);
         }
 
         private static void WriteNullPropertyName_NoValue(
@@ -5363,7 +5378,7 @@ namespace System.Text.Json.Tests
                 writer.Flush();
             }
 
-            AssertContents("{}", output);
+            JsonTestHelper.AssertContents("{}", output);
             output.Clear();
 
             using (var writer = new Utf8JsonWriter(output))
@@ -5381,7 +5396,7 @@ namespace System.Text.Json.Tests
                 writer.Flush();
             }
 
-            AssertContents($"{{\"\":{wireValue},\"\":{wireValue}}}", output);
+            JsonTestHelper.AssertContents($"{{\"\":{wireValue},\"\":{wireValue}}}", output);
         }
 
         private static void WriteNullValue_InObject(
@@ -5409,7 +5424,7 @@ namespace System.Text.Json.Tests
                 writer.Flush();
             }
 
-            AssertContents($"{{{nullValue},{wireValue},{wireValue}}}", output);
+            JsonTestHelper.AssertContents($"{{{nullValue},{wireValue},{wireValue}}}", output);
         }
 
         private static void WriteNullValue_InArray(
@@ -5437,7 +5452,7 @@ namespace System.Text.Json.Tests
                 writer.Flush();
             }
 
-            AssertContents($"[{nullValue},{wireValue},{wireValue}]", output);
+            JsonTestHelper.AssertContents($"[{nullValue},{wireValue},{wireValue}]", output);
         }
 
         private static string GetHelloWorldExpectedString(bool prettyPrint, string propertyName, string value)
@@ -5989,19 +6004,6 @@ namespace System.Text.Json.Tests
             json.Flush();
 
             return Encoding.UTF8.GetString(ms.ToArray());
-        }
-
-        private static void AssertContents(string expectedValue, ArrayBufferWriter<byte> buffer)
-        {
-            string value = Encoding.UTF8.GetString(
-                    buffer.WrittenSpan
-#if netfx
-                        .ToArray()
-#endif
-                    );
-
-            // Temporary hack until we can use the same escape algorithm on both sides and make sure we want uppercase hex.
-            Assert.Equal(expectedValue.NormalizeToJsonNetFormat(), value.NormalizeToJsonNetFormat());
         }
 
         public static IEnumerable<object[]> JsonEncodedTextStrings
