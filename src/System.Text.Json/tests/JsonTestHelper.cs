@@ -746,6 +746,7 @@ namespace System.Text.Json
         }
 
         public delegate void AssertThrowsActionUtf8JsonReader(Utf8JsonReader json);
+        public delegate void AssertThrowsActionUtf8JsonReaderByRef(ref Utf8JsonReader json);
 
         // Cannot use standard Assert.Throws() when testing Utf8JsonReader - ref structs and closures don't get along.
         public static void AssertThrows<E>(Utf8JsonReader json, AssertThrowsActionUtf8JsonReader action) where E : Exception
@@ -771,6 +772,34 @@ namespace System.Text.Json
             {
                 throw new ThrowsException(typeof(E), ex);
             }
+        }
+
+        // Cannot use standard Assert.Throws() when testing Utf8JsonReader - ref structs and closures don't get along.
+        public static E AssertThrowsByRef<E>(ref Utf8JsonReader json, AssertThrowsActionUtf8JsonReaderByRef action) where E : Exception
+        {
+            Exception ex;
+
+            try
+            {
+                action(ref json);
+                ex = null;
+            }
+            catch (Exception e)
+            {
+                ex = e;
+            }
+
+            if (ex == null)
+            {
+                throw new ThrowsException(typeof(E));
+            }
+
+            if (ex is E expectedException)
+            {
+                return expectedException;
+            }
+
+            throw new ThrowsException(typeof(E), ex);
         }
 
         public delegate void AssertThrowsActionUtf8JsonWriter(ref Utf8JsonWriter writer);

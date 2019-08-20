@@ -378,17 +378,10 @@ namespace System.Text.Json.Tests
                 Assert.True(jsonReader.Read());
             }
 
-            try
-            {
-                jsonReader.Read();
-                Assert.True(false, "Expected JsonException was not thrown for incomplete/invalid JSON payload reading.");
-            }
-            catch (JsonException ex)
-            {
-                Assert.Equal(0, ex.LineNumber);
-                Assert.Equal(expectedBytePositionInLine, ex.BytePositionInLine);
-                Assert.Equal(expectedConsumed, jsonReader.BytesConsumed);
-            }
+            JsonException ex = JsonTestHelper.AssertThrowsByRef<JsonException>(ref jsonReader, (ref Utf8JsonReader reader) => reader.Read());
+            Assert.Equal(0, ex.LineNumber);
+            Assert.Equal(expectedBytePositionInLine, ex.BytePositionInLine);
+            Assert.Equal(expectedConsumed, jsonReader.BytesConsumed);
         }
 
         [Fact]
