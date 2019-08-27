@@ -17,7 +17,7 @@ namespace System.Text.Json
         /// The Stream will be read to completion.
         /// </summary>
         /// <returns>A <typeparamref name="TValue"/> representation of the JSON value.</returns>
-        /// <param name="utf8Json">JSON data to parse.</param>
+        /// <param name="stream">JSON data to parse.</param>
         /// <param name="options">Options to control the behavior during reading.</param>
         /// <param name="cancellationToken">
         /// The <see cref="System.Threading.CancellationToken"/> which may be used to cancel the read operation.
@@ -28,14 +28,14 @@ namespace System.Text.Json
         /// or when there is remaining data in the Stream.
         /// </exception>
         public static ValueTask<TValue> DeserializeAsync<TValue>(
-            Stream utf8Json,
+            Stream stream,
             JsonSerializerOptions options = null,
             CancellationToken cancellationToken = default)
         {
-            if (utf8Json == null)
-                throw new ArgumentNullException(nameof(utf8Json));
+            if (stream == null)
+                throw new ArgumentNullException(nameof(stream));
 
-            return ReadAsync<TValue>(utf8Json, typeof(TValue), options, cancellationToken);
+            return ReadAsync<TValue>(stream, typeof(TValue), options, cancellationToken);
         }
 
         /// <summary>
@@ -43,14 +43,14 @@ namespace System.Text.Json
         /// The Stream will be read to completion.
         /// </summary>
         /// <returns>A <paramref name="returnType"/> representation of the JSON value.</returns>
-        /// <param name="utf8Json">JSON data to parse.</param>
+        /// <param name="stream">JSON data to parse.</param>
         /// <param name="returnType">The type of the object to convert to and return.</param>
         /// <param name="options">Options to control the behavior during reading.</param>
         /// <param name="cancellationToken">
         /// The <see cref="System.Threading.CancellationToken"/> which may be used to cancel the read operation.
         /// </param>
         /// <exception cref="System.ArgumentNullException">
-        /// Thrown if <paramref name="utf8Json"/> or <paramref name="returnType"/> is null.
+        /// Thrown if <paramref name="stream"/> or <paramref name="returnType"/> is null.
         /// </exception>
         /// <exception cref="JsonException">
         /// Thrown when the JSON is invalid,
@@ -58,22 +58,22 @@ namespace System.Text.Json
         /// or when there is remaining data in the Stream.
         /// </exception>
         public static ValueTask<object> DeserializeAsync(
-            Stream utf8Json,
+            Stream stream,
             Type returnType,
             JsonSerializerOptions options = null,
             CancellationToken cancellationToken = default)
         {
-            if (utf8Json == null)
-                throw new ArgumentNullException(nameof(utf8Json));
+            if (stream == null)
+                throw new ArgumentNullException(nameof(stream));
 
             if (returnType == null)
                 throw new ArgumentNullException(nameof(returnType));
 
-            return ReadAsync<object>(utf8Json, returnType, options, cancellationToken);
+            return ReadAsync<object>(stream, returnType, options, cancellationToken);
         }
 
         private static async ValueTask<TValue> ReadAsync<TValue>(
-            Stream utf8Json,
+            Stream stream,
             Type returnType,
             JsonSerializerOptions options = null,
             CancellationToken cancellationToken = default)
@@ -106,7 +106,7 @@ namespace System.Text.Json
                     bool isFinalBlock = false;
                     while (true)
                     {
-                        int bytesRead = await utf8Json.ReadAsync(
+                        int bytesRead = await stream.ReadAsync(
 #if BUILDING_INBOX_LIBRARY
                             buffer.AsMemory(bytesInBuffer),
 #else

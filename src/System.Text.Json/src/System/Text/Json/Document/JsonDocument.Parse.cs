@@ -99,25 +99,25 @@ namespace System.Text.Json
         ///   Parse a <see cref="Stream"/> as UTF-8-encoded data representing a single JSON value into a
         ///   JsonDocument.  The Stream will be read to completion.
         /// </summary>
-        /// <param name="utf8Json">JSON data to parse.</param>
+        /// <param name="stream">JSON data to parse.</param>
         /// <param name="options">Options to control the reader behavior during parsing.</param>
         /// <returns>
         ///   A JsonDocument representation of the JSON value.
         /// </returns>
         /// <exception cref="JsonException">
-        ///   <paramref name="utf8Json"/> does not represent a valid single JSON value.
+        ///   <paramref name="stream"/> does not represent a valid single JSON value.
         /// </exception>
         /// <exception cref="ArgumentException">
         ///   <paramref name="options"/> contains unsupported options.
         /// </exception>
-        public static JsonDocument Parse(Stream utf8Json, JsonDocumentOptions options = default)
+        public static JsonDocument Parse(Stream stream, JsonDocumentOptions options = default)
         {
-            if (utf8Json == null)
+            if (stream == null)
             {
-                throw new ArgumentNullException(nameof(utf8Json));
+                throw new ArgumentNullException(nameof(stream));
             }
 
-            ArraySegment<byte> drained = ReadToEnd(utf8Json);
+            ArraySegment<byte> drained = ReadToEnd(stream);
 
             try
             {
@@ -136,37 +136,37 @@ namespace System.Text.Json
         ///   Parse a <see cref="Stream"/> as UTF-8-encoded data representing a single JSON value into a
         ///   JsonDocument.  The Stream will be read to completion.
         /// </summary>
-        /// <param name="utf8Json">JSON data to parse.</param>
+        /// <param name="stream">JSON data to parse.</param>
         /// <param name="options">Options to control the reader behavior during parsing.</param>
         /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
         /// <returns>
         ///   A Task to produce a JsonDocument representation of the JSON value.
         /// </returns>
         /// <exception cref="JsonException">
-        ///   <paramref name="utf8Json"/> does not represent a valid single JSON value.
+        ///   <paramref name="stream"/> does not represent a valid single JSON value.
         /// </exception>
         /// <exception cref="ArgumentException">
         ///   <paramref name="options"/> contains unsupported options.
         /// </exception>
         public static Task<JsonDocument> ParseAsync(
-            Stream utf8Json,
+            Stream stream,
             JsonDocumentOptions options = default,
             CancellationToken cancellationToken = default)
         {
-            if (utf8Json == null)
+            if (stream == null)
             {
-                throw new ArgumentNullException(nameof(utf8Json));
+                throw new ArgumentNullException(nameof(stream));
             }
 
-            return ParseAsyncCore(utf8Json, options, cancellationToken);
+            return ParseAsyncCore(stream, options, cancellationToken);
         }
 
         private static async Task<JsonDocument> ParseAsyncCore(
-            Stream utf8Json,
+            Stream stream,
             JsonDocumentOptions options = default,
             CancellationToken cancellationToken = default)
         {
-            ArraySegment<byte> drained = await ReadToEndAsync(utf8Json, cancellationToken).ConfigureAwait(false);
+            ArraySegment<byte> drained = await ReadToEndAsync(stream, cancellationToken).ConfigureAwait(false);
 
             try
             {

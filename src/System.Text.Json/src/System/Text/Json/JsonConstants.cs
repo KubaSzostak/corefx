@@ -34,6 +34,8 @@ namespace System.Text.Json
         public const byte StartingByteOfNonStandardSeparator = 0xE2;
 
         public static ReadOnlySpan<byte> Utf8Bom => new byte[] { 0xEF, 0xBB, 0xBF };
+        public static ReadOnlySpan<byte> Utf16LEBom => new byte[] { 0xFF, 0xFE };
+        public static ReadOnlySpan<byte> Utf16BEBom => new byte[] { 0xFE, 0xFF };
         public static ReadOnlySpan<byte> TrueValue => new byte[] { (byte)'t', (byte)'r', (byte)'u', (byte)'e' };
         public static ReadOnlySpan<byte> FalseValue => new byte[] { (byte)'f', (byte)'a', (byte)'l', (byte)'s', (byte)'e' };
         public static ReadOnlySpan<byte> NullValue => new byte[] { (byte)'n', (byte)'u', (byte)'l', (byte)'l' };
