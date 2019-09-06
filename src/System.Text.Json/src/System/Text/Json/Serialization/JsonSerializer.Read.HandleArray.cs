@@ -38,7 +38,7 @@ namespace System.Text.Json
             Type arrayType = jsonPropertyInfo.RuntimePropertyType;
             if (!typeof(IEnumerable).IsAssignableFrom(arrayType))
             {
-                ThrowHelper.ThrowJsonException_DeserializeUnableToConvertValue(arrayType, reader, state.JsonPath);
+                ThrowHelper.ThrowJsonException_DeserializeUnableToConvertValue(arrayType, reader, ref state);
             }
 
             Debug.Assert(state.Current.IsProcessingEnumerableOrDictionary);
@@ -49,7 +49,7 @@ namespace System.Text.Json
                 Type elementType = jsonPropertyInfo.ElementClassInfo.Type;
 
                 state.Push();
-                state.Current.Initialize(elementType, options);
+                state.Current = new ReadStackFrame(elementType, options);
             }
 
             state.Current.CollectionPropertyInitialized = true;
@@ -162,7 +162,7 @@ namespace System.Text.Json
                 {
                     if (!(state.Current.ReturnValue is IList list))
                     {
-                        ThrowHelper.ThrowJsonException_DeserializeUnableToConvertValue(value.GetType(), reader, state.JsonPath);
+                        ThrowHelper.ThrowJsonException_DeserializeUnableToConvertValue(value.GetType(), reader, ref state);
                         return;
                     }
                     list.Add(value);

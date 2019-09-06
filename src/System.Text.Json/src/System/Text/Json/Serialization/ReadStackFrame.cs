@@ -20,9 +20,6 @@ namespace System.Text.Json
         // Support Dictionary keys.
         public string KeyName;
 
-        // Support JSON Path on exceptions.
-        public byte[] JsonPropertyName;
-
         // Current property values.
         public JsonPropertyInfo JsonPropertyInfo;
 
@@ -50,11 +47,15 @@ namespace System.Text.Json
         public bool IsIDictionaryConstructible => JsonClassInfo.ClassType == ClassType.IDictionaryConstructible;
         public bool IsDictionary => JsonClassInfo.ClassType == ClassType.Dictionary;
 
-        public bool IsDictionaryProperty => JsonPropertyInfo != null &&
+        public bool IsDictionaryProperty =>
+            JsonPropertyInfo != null &&
             !JsonPropertyInfo.IsPropertyPolicy &&
             JsonPropertyInfo.ClassType == ClassType.Dictionary;
-        public bool IsIDictionaryConstructibleProperty => JsonPropertyInfo != null &&
-            !JsonPropertyInfo.IsPropertyPolicy && (JsonPropertyInfo.ClassType == ClassType.IDictionaryConstructible);
+
+        public bool IsIDictionaryConstructibleProperty =>
+            JsonPropertyInfo != null &&
+            !JsonPropertyInfo.IsPropertyPolicy &&
+            JsonPropertyInfo.ClassType == ClassType.IDictionaryConstructible;
 
         public bool IsEnumerable => JsonClassInfo.ClassType == ClassType.Enumerable;
 
@@ -68,8 +69,8 @@ namespace System.Text.Json
         public bool IsProcessingIDictionaryConstructible => IsIDictionaryConstructible || IsIDictionaryConstructibleProperty;
         public bool IsProcessingEnumerable => IsEnumerable || IsEnumerableProperty;
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         // Determine whether a StartObject or StartArray token should be treated as a value.
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool IsProcessingValue()
         {
             if (SkipProperty)
@@ -95,19 +96,33 @@ namespace System.Text.Json
             return classType == ClassType.Value || classType == ClassType.Unknown;
         }
 
-        public void Initialize(Type type, JsonSerializerOptions options)
+        public ReadStackFrame(Type type, JsonSerializerOptions options)
         {
             JsonClassInfo = options.GetOrAddClass(type);
+
+            ReturnValue = default;
+            JsonClassInfo = default;
+            KeyName = default;
+            JsonPropertyInfo = default;
+            TempEnumerableValues = default;
+            CollectionPropertyInitialized = default;
+            TempDictionaryValues = default;
+            PropertyIndex = default;
+            PropertyRefCache = default;
+            Drain = default;
+
             InitializeJsonPropertyInfo();
         }
 
         public void InitializeJsonPropertyInfo()
         {
-            if (JsonClassInfo.ClassType == ClassType.Value ||
-                JsonClassInfo.ClassType == ClassType.Enumerable ||
-                JsonClassInfo.ClassType == ClassType.Dictionary ||
-                JsonClassInfo.ClassType == ClassType.IDictionaryConstructible)
+            if (JsonClassInfo.ClassType > ClassType.Object)
             {
+                Debug.Assert(JsonClassInfo.ClassType == ClassType.Value ||
+                    JsonClassInfo.ClassType == ClassType.Enumerable ||
+                    JsonClassInfo.ClassType == ClassType.Dictionary ||
+                    JsonClassInfo.ClassType == ClassType.IDictionaryConstructible);
+
                 JsonPropertyInfo = JsonClassInfo.PolicyProperty;
             }
         }
@@ -118,11 +133,6 @@ namespace System.Text.Json
             JsonClassInfo = null;
             PropertyRefCache = null;
             ReturnValue = null;
-            EndObject();
-        }
-
-        public void EndObject()
-        {
             PropertyIndex = 0;
             EndProperty();
         }
@@ -133,7 +143,6 @@ namespace System.Text.Json
             JsonPropertyInfo = null;
             TempEnumerableValues = null;
             TempDictionaryValues = null;
-            JsonPropertyName = null;
             KeyName = null;
         }
 
@@ -187,13 +196,13 @@ namespace System.Text.Json
                 }
                 else
                 {
-                    ThrowHelper.ThrowJsonException_DeserializeUnableToConvertValue(jsonPropertyInfo.DeclaredPropertyType, reader, state.JsonPath);
+                    ThrowHelper.ThrowJsonException_DeserializeUnableToConvertValue(jsonPropertyInfo.DeclaredPropertyType, reader, ref state);
                     return null;
                 }
             }
             else
             {
-                ThrowHelper.ThrowJsonException_DeserializeUnableToConvertValue(propertyType, reader, state.JsonPath);
+                ThrowHelper.ThrowJsonException_DeserializeUnableToConvertValue(propertyType, reader, ref state);
                 return null;
             }
         }

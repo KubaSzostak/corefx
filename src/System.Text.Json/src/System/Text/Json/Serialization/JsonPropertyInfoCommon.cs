@@ -317,27 +317,11 @@ namespace System.Text.Json
             return collection;
         }
 
-        private IEnumerable<TRuntimeProperty> CreateGenericTRuntimePropertyIEnumerable(IList sourceList)
-        {
-            foreach (object item in sourceList)
-            {
-                yield return (TRuntimeProperty)item;
-            }
-        }
-
         private IEnumerable<TDeclaredProperty> CreateGenericTDeclaredPropertyIEnumerable(IList sourceList)
         {
             foreach (object item in sourceList)
             {
                 yield return (TDeclaredProperty)item;
-            }
-        }
-
-        private IEnumerable<KeyValuePair<string, TRuntimeProperty>> CreateGenericIEnumerableFromDictionary(IDictionary sourceDictionary)
-        {
-            foreach (DictionaryEntry item in sourceDictionary)
-            {
-                yield return new KeyValuePair<string, TRuntimeProperty>((string)item.Key, (TRuntimeProperty)item.Value);
             }
         }
     }

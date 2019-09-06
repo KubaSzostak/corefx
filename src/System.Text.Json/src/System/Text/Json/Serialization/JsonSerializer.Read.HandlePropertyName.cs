@@ -20,22 +20,18 @@ namespace System.Text.Json
                 return;
             }
 
-            Debug.Assert(state.Current.ReturnValue != default || state.Current.TempDictionaryValues != default);
-            Debug.Assert(state.Current.JsonClassInfo != default);
+            Debug.Assert(state.Current.ReturnValue != null || state.Current.TempDictionaryValues != null);
+            Debug.Assert(state.Current.JsonClassInfo != null);
 
-            if ((state.Current.IsProcessingDictionary || state.Current.IsProcessingIDictionaryConstructible) &&
+            if ((state.Current.JsonClassInfo.ClassType >= ClassType.Dictionary ||
+                (state.Current.JsonPropertyInfo != null && !state.Current.JsonPropertyInfo.IsPropertyPolicy && state.Current.JsonPropertyInfo.ClassType >= ClassType.Dictionary)) &&
                 state.Current.JsonClassInfo.DataExtensionProperty != state.Current.JsonPropertyInfo)
             {
-                if (state.Current.IsDictionary || state.Current.IsIDictionaryConstructible)
+                if (state.Current.JsonClassInfo.ClassType >= ClassType.Dictionary)
                 {
+                    Debug.Assert(state.Current.IsDictionary || state.Current.IsIDictionaryConstructible);
                     state.Current.JsonPropertyInfo = state.Current.JsonClassInfo.PolicyProperty;
                 }
-
-                Debug.Assert(
-                    state.Current.IsDictionary ||
-                    (state.Current.IsDictionaryProperty && state.Current.JsonPropertyInfo != null) ||
-                    state.Current.IsIDictionaryConstructible ||
-                    (state.Current.IsIDictionaryConstructibleProperty && state.Current.JsonPropertyInfo != null));
 
                 state.Current.KeyName = reader.GetString();
             }
@@ -51,7 +47,7 @@ namespace System.Text.Json
                     propertyName = GetUnescapedString(propertyName, idx);
                 }
 
-                JsonPropertyInfo jsonPropertyInfo = state.Current.JsonClassInfo.GetProperty(propertyName, ref state.Current);
+                (JsonPropertyInfo jsonPropertyInfo, string stringPropertyName) = state.Current.JsonClassInfo.GetProperty(propertyName, ref state.Current);
                 if (jsonPropertyInfo == null)
                 {
                     JsonPropertyInfo dataExtProperty = state.Current.JsonClassInfo.DataExtensionProperty;
@@ -62,8 +58,7 @@ namespace System.Text.Json
                     else
                     {
                         state.Current.JsonPropertyInfo = dataExtProperty;
-                        state.Current.JsonPropertyName = propertyName.ToArray();
-                        state.Current.KeyName = JsonHelpers.Utf8GetString(propertyName);
+                        state.Current.KeyName = stringPropertyName;
                         state.Current.CollectionPropertyInitialized = true;
 
                         CreateDataExtensionProperty(dataExtProperty, ref state);
@@ -72,29 +67,8 @@ namespace System.Text.Json
                 else
                 {
                     // Support JsonException.Path.
-                    Debug.Assert(
-                        jsonPropertyInfo.JsonPropertyName == null ||
-                        options.PropertyNameCaseInsensitive ||
-                        propertyName.SequenceEqual(jsonPropertyInfo.JsonPropertyName));
-
+                    Debug.Assert(options.PropertyNameCaseInsensitive);
                     state.Current.JsonPropertyInfo = jsonPropertyInfo;
-
-                    if (jsonPropertyInfo.JsonPropertyName == null)
-                    {
-                        byte[] propertyNameArray = propertyName.ToArray();
-                        if (options.PropertyNameCaseInsensitive)
-                        {
-                            // Each payload can have a different name here; remember the value on the temporary stack.
-                            state.Current.JsonPropertyName = propertyNameArray;
-                        }
-                        else
-                        {
-                            // Prevent future allocs by caching globally on the JsonPropertyInfo which is specific to a Type+PropertyName
-                            // so it will match the incoming payload except when case insensitivity is enabled (which is handled above).
-                            state.Current.JsonPropertyInfo.JsonPropertyName = propertyNameArray;
-                        }
-                    }
-
                     state.Current.PropertyIndex++;
                 }
             }

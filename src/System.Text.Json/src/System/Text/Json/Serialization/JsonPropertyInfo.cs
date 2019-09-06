@@ -311,9 +311,6 @@ namespace System.Text.Json
 
         public bool IsPropertyPolicy { get; protected set; }
 
-        // The name from a Json value. This is cached for performance on first deserialize.
-        public byte[] JsonPropertyName { get; set; }
-
         // The name of the property with any casing policy or the name specified from JsonPropertyNameAttribute.
         public byte[] Name { get; private set; }
         public string NameAsString { get; private set; }
@@ -407,13 +404,9 @@ namespace System.Text.Json
             switch (tokenType)
             {
                 case JsonTokenType.StartArray:
-                    if (reader.TokenType != JsonTokenType.EndArray)
+                    if (reader.TokenType != JsonTokenType.EndArray || depth != reader.CurrentDepth)
                     {
-                        ThrowHelper.ThrowJsonException_SerializationConverterRead(reader, state.JsonPath, ConverterBase.ToString());
-                    }
-                    else if (depth != reader.CurrentDepth)
-                    {
-                        ThrowHelper.ThrowJsonException_SerializationConverterRead(reader, state.JsonPath, ConverterBase.ToString());
+                        goto Error;
                     }
 
                     // Should not be possible to have not read anything.
@@ -421,13 +414,9 @@ namespace System.Text.Json
                     break;
 
                 case JsonTokenType.StartObject:
-                    if (reader.TokenType != JsonTokenType.EndObject)
+                    if (reader.TokenType != JsonTokenType.EndObject || depth != reader.CurrentDepth)
                     {
-                        ThrowHelper.ThrowJsonException_SerializationConverterRead(reader, state.JsonPath, ConverterBase.ToString());
-                    }
-                    else if (depth != reader.CurrentDepth)
-                    {
-                        ThrowHelper.ThrowJsonException_SerializationConverterRead(reader, state.JsonPath, ConverterBase.ToString());
+                        goto Error;
                     }
 
                     // Should not be possible to have not read anything.
@@ -438,7 +427,7 @@ namespace System.Text.Json
                     // Reading a single property value.
                     if (reader.BytesConsumed != bytesConsumed)
                     {
-                        ThrowHelper.ThrowJsonException_SerializationConverterRead(reader, state.JsonPath, ConverterBase.ToString());
+                        goto Error;
                     }
 
                     // Should not be possible to change token type.
@@ -446,6 +435,11 @@ namespace System.Text.Json
 
                     break;
             }
+
+            return;
+
+            Error:
+            ThrowHelper.ThrowJsonException_SerializationConverterRead(reader, ref state, ConverterBase);
         }
 
         public void Write(ref WriteStack state, Utf8JsonWriter writer)

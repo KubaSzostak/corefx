@@ -14,6 +14,116 @@ namespace System.Text.Json
     /// </summary>
     public static partial class JsonSerializer
     {
+        private static void ReadCoreSync(
+            JsonSerializerOptions options,
+            ref Utf8JsonReader reader,
+            ref ReadStack readStack)
+        {
+            Debug.Assert(!readStack.ReadAhead);
+            Debug.Assert(reader.IsFinalBlock);
+
+            try
+            {
+                while (reader.Read())
+                {
+                    JsonTokenType tokenType = reader.TokenType;
+
+                    // Since reader.Read() returned true, tokenType cannot be None
+                    // Since the JsonSerializer doesn't support JsonCommentHandling.Allow, tokenType cannot be Comment
+                    Debug.Assert(tokenType != JsonTokenType.None && tokenType != JsonTokenType.Comment);
+
+                    if (JsonHelpers.IsInRangeInclusive(tokenType, JsonTokenType.String, JsonTokenType.False))
+                    {
+                        Debug.Assert(tokenType == JsonTokenType.String || tokenType == JsonTokenType.Number || tokenType == JsonTokenType.True || tokenType == JsonTokenType.False);
+
+                        HandleValue(tokenType, options, ref reader, ref readStack);
+                    }
+                    else if (tokenType == JsonTokenType.PropertyName)
+                    {
+                        HandlePropertyName(options, ref reader, ref readStack);
+                    }
+                    else if (tokenType == JsonTokenType.StartObject)
+                    {
+                        if (readStack.Current.SkipProperty)
+                        {
+                            readStack.Push();
+                            readStack.Current.Drain = true;
+                        }
+                        else if (readStack.Current.IsProcessingValue())
+                        {
+                            HandleValue(tokenType, options, ref reader, ref readStack);
+                        }
+                        else if (readStack.Current.IsProcessingDictionary || readStack.Current.IsProcessingIDictionaryConstructible)
+                        {
+                            HandleStartDictionary(options, ref reader, ref readStack);
+                        }
+                        else
+                        {
+                            HandleStartObject(options, ref readStack);
+                        }
+                    }
+                    else if (tokenType == JsonTokenType.EndObject)
+                    {
+                        if (readStack.Current.Drain)
+                        {
+                            readStack.Pop();
+
+                            // Clear the current property in case it is a dictionary, since dictionaries must have EndProperty() called when completed.
+                            // A non-dictionary property can also have EndProperty() called when completed, although it is redundant.
+                            readStack.Current.EndProperty();
+                        }
+                        else if (readStack.Current.IsProcessingDictionary || readStack.Current.IsProcessingIDictionaryConstructible)
+                        {
+                            HandleEndDictionary(options, ref reader, ref readStack);
+                        }
+                        else
+                        {
+                            HandleEndObject(ref reader, ref readStack);
+                        }
+                    }
+                    else if (tokenType == JsonTokenType.StartArray)
+                    {
+                        if (!readStack.Current.IsProcessingValue())
+                        {
+                            HandleStartArray(options, ref reader, ref readStack);
+                        }
+                        else
+                        {
+                            HandleValue(tokenType, options, ref reader, ref readStack);
+                        }
+                    }
+                    else if (tokenType == JsonTokenType.EndArray)
+                    {
+                        HandleEndArray(options, ref reader, ref readStack);
+                    }
+                    else
+                    {
+                        // All other token types are already covered
+                        Debug.Assert(tokenType == JsonTokenType.Null);
+                        HandleNull(ref reader, ref readStack);
+                    }
+                }
+            }
+            catch (JsonReaderException ex)
+            {
+                // Re-throw with Path information.
+                ThrowHelper.ReThrowWithPath(readStack, ex);
+            }
+            catch (FormatException ex) when (ex.Source == ThrowHelper.ExceptionSourceValueToRethrowAsJsonException)
+            {
+                ThrowHelper.ReThrowWithPath(readStack, reader, ex);
+            }
+            catch (InvalidOperationException ex) when (ex.Source == ThrowHelper.ExceptionSourceValueToRethrowAsJsonException)
+            {
+                ThrowHelper.ReThrowWithPath(readStack, reader, ex);
+            }
+            catch (JsonException ex)
+            {
+                ThrowHelper.AddExceptionInformation(readStack, reader, ex);
+                throw;
+            }
+        }
+
         private static void ReadCore(
             JsonSerializerOptions options,
             ref Utf8JsonReader reader,
@@ -42,6 +152,10 @@ namespace System.Text.Json
                     }
 
                     JsonTokenType tokenType = reader.TokenType;
+
+                    // Since reader.Read() returned true, tokenType cannot be None
+                    // Since the JsonSerializer doesn't support JsonCommentHandling.Allow, tokenType cannot be Comment
+                    Debug.Assert(tokenType != JsonTokenType.None && tokenType != JsonTokenType.Comment);
 
                     if (JsonHelpers.IsInRangeInclusive(tokenType, JsonTokenType.String, JsonTokenType.False))
                     {
@@ -112,8 +226,10 @@ namespace System.Text.Json
                     {
                         HandleEndArray(options, ref reader, ref readStack);
                     }
-                    else if (tokenType == JsonTokenType.Null)
+                    else
                     {
+                        // All other token types are already covered
+                        Debug.Assert(tokenType == JsonTokenType.Null);
                         HandleNull(ref reader, ref readStack);
                     }
                 }
@@ -138,7 +254,6 @@ namespace System.Text.Json
             }
 
             readStack.BytesConsumed += reader.BytesConsumed;
-            return;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

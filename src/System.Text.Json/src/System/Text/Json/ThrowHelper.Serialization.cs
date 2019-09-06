@@ -34,9 +34,9 @@ namespace System.Text.Json
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        public static void ThrowJsonException_DeserializeUnableToConvertValue(Type propertyType, in Utf8JsonReader reader, string path, Exception innerException = null)
+        public static void ThrowJsonException_DeserializeUnableToConvertValue(Type propertyType, in Utf8JsonReader reader, ref ReadStack stack, Exception innerException = null)
         {
-            ThrowJsonException(SR.Format(SR.DeserializeUnableToConvertValue, propertyType), in reader, path, innerException);
+            ThrowJsonException(SR.Format(SR.DeserializeUnableToConvertValue, propertyType), in reader, stack.GetJsonPath(), innerException);
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
@@ -55,9 +55,9 @@ namespace System.Text.Json
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        public static void ThrowJsonException_SerializationConverterRead(in Utf8JsonReader reader, string path, string converter)
+        public static void ThrowJsonException_SerializationConverterRead(in Utf8JsonReader reader, ref ReadStack state, JsonConverter ConverterBase)
         {
-            ThrowJsonException(SR.Format(SR.SerializationConverterRead, converter), reader, path);
+            ThrowJsonException(SR.Format(SR.SerializationConverterRead, ConverterBase.ToString()), reader, state.GetJsonPath());
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
@@ -153,7 +153,7 @@ namespace System.Text.Json
         {
             Debug.Assert(ex.Path == null);
 
-            string path = readStack.JsonPath;
+            string path = readStack.GetJsonPath();
             string message = ex.Message;
 
             // Insert the "Path" portion before "LineNumber" and "BytePositionInLine".
@@ -186,7 +186,7 @@ namespace System.Text.Json
             long bytePositionInLine = reader.CurrentState._bytePositionInLine;
             ex.BytePositionInLine = bytePositionInLine;
 
-            string path = readStack.JsonPath;
+            string path = readStack.GetJsonPath();
             ex.Path = path;
 
             // If the message is empty, use a default message with Path, LineNumber and BytePositionInLine.

@@ -64,7 +64,7 @@ namespace System.Text.Json.Serialization.Converters
             string delegateKey = DefaultImmutableEnumerableConverter.GetDelegateKey(immutableCollectionType, elementType, out _, out _);
 
             JsonPropertyInfo propertyInfo = options.GetJsonPropertyInfoFromClassInfo(elementType, options);
-            return propertyInfo.CreateImmutableDictionaryInstance(immutableCollectionType, delegateKey, sourceDictionary, state.JsonPath, options);
+            return propertyInfo.CreateImmutableDictionaryInstance(immutableCollectionType, delegateKey, sourceDictionary, state.GetJsonPath(), options);
         }
     }
 }

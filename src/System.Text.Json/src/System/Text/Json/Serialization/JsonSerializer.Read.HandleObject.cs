@@ -18,14 +18,14 @@ namespace System.Text.Json
                 // A nested object within an enumerable.
                 Type objType = state.Current.GetElementType();
                 state.Push();
-                state.Current.Initialize(objType, options);
+                state.Current = new ReadStackFrame(objType, options);
             }
             else if (state.Current.JsonPropertyInfo != null)
             {
                 // Nested object.
                 Type objType = state.Current.JsonPropertyInfo.RuntimePropertyType;
                 state.Push();
-                state.Current.Initialize(objType, options);
+                state.Current = new ReadStackFrame(objType, options);
             }
 
             JsonClassInfo classInfo = state.Current.JsonClassInfo;

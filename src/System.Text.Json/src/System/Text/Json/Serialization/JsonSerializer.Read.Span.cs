@@ -52,15 +52,17 @@ namespace System.Text.Json
                 options = JsonSerializerOptions.s_defaultOptions;
             }
 
-            var readerState = new JsonReaderState(options.GetReaderOptions());
-            var reader = new Utf8JsonReader(utf8Json, isFinalBlock: true, readerState);
-            object result = ReadCore(returnType, options, ref reader);
+            var reader = new Utf8JsonReader(utf8Json, options.GetReaderOptions());
+            var state = new ReadStack(returnType, options);
+
+            ReadCoreSync(options, ref reader, ref state);
 
             if (reader.BytesConsumed != utf8Json.Length)
             {
                 ThrowHelper.ThrowJsonException_DeserializeDataRemaining(utf8Json.Length, utf8Json.Length - reader.BytesConsumed);
             }
 
+            object result = state.Current.ReturnValue;
             return result;
         }
     }

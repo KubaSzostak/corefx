@@ -11,20 +11,37 @@ namespace System.Text.Json
     [DebuggerDisplay("Current: ClassType.{Current.JsonClassInfo.ClassType}, {Current.JsonClassInfo.Type.Name}")]
     internal struct ReadStack
     {
-        internal static readonly char[] SpecialCharacters = { '.', ' ', '\'', '/', '"', '[', ']', '(', ')', '\t', '\n', '\r', '\f', '\b', '\\', '\u0085', '\u2028', '\u2029' };
+        internal static readonly char[] s_specialCharacters = { '.', ' ', '\'', '/', '"', '[', ']', '(', ')', '\t', '\n', '\r', '\f', '\b', '\\', '\u0085', '\u2028', '\u2029' };
 
         // A field is used instead of a property to avoid value semantics.
         public ReadStackFrame Current;
 
-        private List<ReadStackFrame> _previous;
+        /// <summary>
+        /// Bytes consumed in the current loop
+        /// </summary>
+        public long BytesConsumed;
+
+        /// <summary>
+        /// Flag to let us know that we need to read ahead in the inner read loop.
+        /// </summary>
+        public bool ReadAhead;
+
+        private readonly List<ReadStackFrame> _previous;
         public int _index;
+
+        public ReadStack(Type returnType, JsonSerializerOptions options)
+        {
+            _previous = new List<ReadStackFrame>();
+            _index = 0;
+            Current = new ReadStackFrame(returnType, options);
+            BytesConsumed = 0;
+            ReadAhead = false;
+        }
 
         public void Push()
         {
-            if (_previous == null)
-            {
-                _previous = new List<ReadStackFrame>();
-            }
+            Debug.Assert(_previous != null);
+            Debug.Assert(_index <= _previous.Count);
 
             if (_index == _previous.Count)
             {
@@ -33,8 +50,6 @@ namespace System.Text.Json
             }
             else
             {
-                Debug.Assert(_index < _previous.Count);
-
                 // Use a previously allocated slot.
                 _previous[_index] = Current;
             }
@@ -45,6 +60,7 @@ namespace System.Text.Json
 
         public void Pop()
         {
+            Debug.Assert(_previous != null);
             Debug.Assert(_index > 0);
             Current = _previous[--_index];
         }
@@ -54,26 +70,24 @@ namespace System.Text.Json
         // Return a JSONPath using simple dot-notation when possible. When special characters are present, bracket-notation is used:
         // $.x.y[0].z
         // $['PropertyName.With.Special.Chars']
-        public string JsonPath
+        public string GetJsonPath()
         {
-            get
+            var sb = new StringBuilder("$");
+
+            for (int i = 0; i < _index; i++)
             {
-                StringBuilder sb = new StringBuilder("$");
-
-                for (int i = 0; i < _index; i++)
-                {
-                    AppendStackFrame(sb, _previous[i]);
-                }
-
-                AppendStackFrame(sb, Current);
-                return sb.ToString();
+                ReadStackFrame previousFrame = _previous[i];
+                AppendStackFrame(sb, ref previousFrame);
             }
+
+            AppendStackFrame(sb, ref Current);
+            return sb.ToString();
         }
 
-        private void AppendStackFrame(StringBuilder sb, in ReadStackFrame frame)
+        private void AppendStackFrame(StringBuilder sb, ref ReadStackFrame frame)
         {
             // Append the property name.
-            string propertyName = GetPropertyName(frame);
+            string propertyName = GetPropertyName(ref frame);
             AppendPropertyName(sb, propertyName);
 
             if (frame.JsonClassInfo != null)
@@ -106,7 +120,7 @@ namespace System.Text.Json
         {
             if (propertyName != null)
             {
-                if (propertyName.IndexOfAny(SpecialCharacters) != -1)
+                if (propertyName.IndexOfAny(s_specialCharacters) != -1)
                 {
                     sb.Append(@"['");
                     sb.Append(propertyName);
@@ -120,37 +134,9 @@ namespace System.Text.Json
             }
         }
 
-        private string GetPropertyName(in ReadStackFrame frame)
+        private string GetPropertyName(ref ReadStackFrame frame)
         {
-            // Attempt to get the JSON property name from the frame.
-            byte[] utf8PropertyName = frame.JsonPropertyName;
-            if (utf8PropertyName == null)
-            {
-                // Attempt to get the JSON property name from the JsonPropertyInfo.
-                utf8PropertyName = frame.JsonPropertyInfo?.JsonPropertyName;
-            }
-
-            string propertyName;
-            if (utf8PropertyName != null)
-            {
-                propertyName = JsonHelpers.Utf8GetString(utf8PropertyName);
-            }
-            else
-            {
-                propertyName = null;
-            }
-
-            return propertyName;
+            return frame.KeyName;
         }
-
-        /// <summary>
-        /// Bytes consumed in the current loop
-        /// </summary>
-        public long BytesConsumed;
-
-        /// <summary>
-        /// Internal flag to let us know that we need to read ahead in the inner read loop.
-        /// </summary>
-        internal bool ReadAhead;
     }
 }

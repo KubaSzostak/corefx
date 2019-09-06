@@ -257,9 +257,10 @@ namespace System.Text.Json
             return property;
         }
 
-        public JsonPropertyInfo GetProperty(ReadOnlySpan<byte> propertyName, ref ReadStackFrame frame)
+        public (JsonPropertyInfo, string) GetProperty(ReadOnlySpan<byte> propertyName, ref ReadStackFrame frame)
         {
             JsonPropertyInfo info = null;
+            string stringPropertyName = null;
 
             // Keep a local copy of the cache in case it changes by another thread.
             PropertyRef[] localPropertyRefsSorted = _propertyRefsSorted;
@@ -282,7 +283,7 @@ namespace System.Text.Json
                     {
                         if (TryIsPropertyRefEqual(localPropertyRefsSorted[iForward], propertyName, key, ref info))
                         {
-                            return info;
+                            return (info, stringPropertyName);
                         }
                         ++iForward;
                     }
@@ -291,7 +292,7 @@ namespace System.Text.Json
                     {
                         if (TryIsPropertyRefEqual(localPropertyRefsSorted[iBackward], propertyName, key, ref info))
                         {
-                            return info;
+                            return (info, stringPropertyName);
                         }
                         --iBackward;
                     }
@@ -299,27 +300,25 @@ namespace System.Text.Json
             }
 
             // No cached item was found. Try the main list which has all of the properties.
-
-            string stringPropertyName = JsonHelpers.Utf8GetString(propertyName);
+            stringPropertyName = JsonHelpers.Utf8GetString(propertyName);
             if (PropertyCache.TryGetValue(stringPropertyName, out info))
             {
                 // Check if we should add this to the cache.
                 // Only cache up to a threshold length and then just use the dictionary when an item is not found in the cache.
-                int count;
+                int count = 0;
                 if (localPropertyRefsSorted != null)
                 {
                     count = localPropertyRefsSorted.Length;
-                }
-                else
-                {
-                    count = 0;
                 }
 
                 // Do a quick check for the stable (after warm-up) case.
                 if (count < PropertyNameCountCacheThreshold)
                 {
-                    // Do a slower check for the warm-up case.
-                    if (frame.PropertyRefCache != null)
+                    if (frame.PropertyRefCache == null)
+                    {
+                        frame.PropertyRefCache = new List<PropertyRef>();
+                    }
+                    else
                     {
                         count += frame.PropertyRefCache.Count;
                     }
@@ -327,11 +326,6 @@ namespace System.Text.Json
                     // Check again to append the cache up to the threshold.
                     if (count < PropertyNameCountCacheThreshold)
                     {
-                        if (frame.PropertyRefCache == null)
-                        {
-                            frame.PropertyRefCache = new List<PropertyRef>();
-                        }
-
                         ulong key = info.PropertyNameKey;
                         PropertyRef propertyRef = new PropertyRef(key, info);
                         frame.PropertyRefCache.Add(propertyRef);
@@ -339,7 +333,7 @@ namespace System.Text.Json
                 }
             }
 
-            return info;
+            return (info, stringPropertyName);
         }
 
         private Dictionary<string, JsonPropertyInfo> CreatePropertyCache(int capacity)
