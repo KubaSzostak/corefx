@@ -83,7 +83,8 @@ namespace System.Text.Json
                 options = JsonSerializerOptions.s_defaultOptions;
             }
 
-            var readStack = new ReadStack(returnType, options);
+            ReadStack readStack = default;
+            readStack.Current.Initialize(returnType, options);
 
             var readerState = new JsonReaderState(options.GetReaderOptions());
 

@@ -53,7 +53,8 @@ namespace System.Text.Json
             }
 
             var reader = new Utf8JsonReader(utf8Json, options.GetReaderOptions());
-            var state = new ReadStack(returnType, options);
+            ReadStack state = default;
+            state.Current.Initialize(returnType, options);
 
             ReadCoreSync(options, ref reader, ref state);
 

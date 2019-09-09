@@ -49,7 +49,7 @@ namespace System.Text.Json
                 Type elementType = jsonPropertyInfo.ElementClassInfo.Type;
 
                 state.Push();
-                state.Current = new ReadStackFrame(elementType, options);
+                state.Current.Initialize(elementType, options);
             }
 
             state.Current.CollectionPropertyInitialized = true;

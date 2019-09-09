@@ -26,21 +26,16 @@ namespace System.Text.Json
         /// </summary>
         public bool ReadAhead;
 
-        private readonly List<ReadStackFrame> _previous;
+        private List<ReadStackFrame> _previous;
         public int _index;
-
-        public ReadStack(Type returnType, JsonSerializerOptions options)
-        {
-            _previous = new List<ReadStackFrame>();
-            _index = 0;
-            Current = new ReadStackFrame(returnType, options);
-            BytesConsumed = 0;
-            ReadAhead = false;
-        }
 
         public void Push()
         {
-            Debug.Assert(_previous != null);
+            if (_previous == null)
+            {
+                _previous = new List<ReadStackFrame>();
+            }
+
             Debug.Assert(_index <= _previous.Count);
 
             if (_index == _previous.Count)
@@ -60,7 +55,6 @@ namespace System.Text.Json
 
         public void Pop()
         {
-            Debug.Assert(_previous != null);
             Debug.Assert(_index > 0);
             Current = _previous[--_index];
         }

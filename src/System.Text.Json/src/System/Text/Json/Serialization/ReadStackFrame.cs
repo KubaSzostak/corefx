@@ -96,20 +96,9 @@ namespace System.Text.Json
             return classType == ClassType.Value || classType == ClassType.Unknown;
         }
 
-        public ReadStackFrame(Type type, JsonSerializerOptions options)
+        public void Initialize(Type type, JsonSerializerOptions options)
         {
             JsonClassInfo = options.GetOrAddClass(type);
-
-            ReturnValue = default;
-            JsonClassInfo = default;
-            KeyName = default;
-            JsonPropertyInfo = default;
-            TempEnumerableValues = default;
-            CollectionPropertyInitialized = default;
-            TempDictionaryValues = default;
-            PropertyIndex = default;
-            PropertyRefCache = default;
-            Drain = default;
 
             InitializeJsonPropertyInfo();
         }
