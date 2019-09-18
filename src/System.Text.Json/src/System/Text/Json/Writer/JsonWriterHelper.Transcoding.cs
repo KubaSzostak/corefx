@@ -6,11 +6,27 @@ using System.Buffers;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Text.Unicode;
 
 namespace System.Text.Json
 {
     internal static partial class JsonWriterHelper
     {
+        public static OperationStatus ToUtf8(ReadOnlySpan<char> utf16Source, Span<byte> utf8Destination, out int charsRead, out int bytesWritten)
+        {
+#if BUILDING_INBOX_LIBRARY
+            OperationStatus status = Utf8.FromUtf16(utf16Source, utf8Destination, out charsRead, out bytesWritten, replaceInvalidSequences: false, isFinalBlock: true);
+            return status;
+#else
+            Debug.Assert(utf16Source.Length <= int.MaxValue / 2);
+            OperationStatus status = ToUtf8(MemoryMarshal.AsBytes(utf16Source), utf8Destination, out int bytesConsumed, out bytesWritten);
+            Debug.Assert(bytesConsumed % 2 == 0);
+            charsRead = bytesConsumed / 2;
+            return status;
+#endif
+        }
+
+#if !BUILDING_INBOX_LIBRARY
         // TODO: Replace this with publicly shipping implementation: https://github.com/dotnet/corefx/issues/34094
         /// <summary>
         /// Converts a span containing a sequence of UTF-16 bytes into UTF-8 bytes.
@@ -26,7 +42,7 @@ namespace System.Text.Json
         /// <param name="bytesConsumed">On exit, contains the number of bytes that were consumed from the <paramref name="utf16Source"/>.</param>
         /// <param name="bytesWritten">On exit, contains the number of bytes written to <paramref name="utf8Destination"/></param>
         /// <returns>A <see cref="OperationStatus"/> value representing the state of the conversion.</returns>
-        public static unsafe OperationStatus ToUtf8(ReadOnlySpan<byte> utf16Source, Span<byte> utf8Destination, out int bytesConsumed, out int bytesWritten)
+        private static unsafe OperationStatus ToUtf8(ReadOnlySpan<byte> utf16Source, Span<byte> utf8Destination, out int bytesConsumed, out int bytesWritten)
         {
             //
             //
@@ -330,5 +346,7 @@ namespace System.Text.Json
         {
             return (int)(a - b);
         }
+#endif
+
     }
 }

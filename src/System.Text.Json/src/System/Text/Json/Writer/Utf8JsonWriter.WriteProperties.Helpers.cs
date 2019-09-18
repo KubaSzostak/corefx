@@ -206,10 +206,9 @@ namespace System.Text.Json
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void TranscodeAndWrite(ReadOnlySpan<char> escapedPropertyName, Span<byte> output)
         {
-            ReadOnlySpan<byte> byteSpan = MemoryMarshal.AsBytes(escapedPropertyName);
-            OperationStatus status = JsonWriterHelper.ToUtf8(byteSpan, output.Slice(BytesPending), out int consumed, out int written);
+            OperationStatus status = JsonWriterHelper.ToUtf8(escapedPropertyName, output.Slice(BytesPending), out int consumed, out int written);
             Debug.Assert(status == OperationStatus.Done);
-            Debug.Assert(consumed == byteSpan.Length);
+            Debug.Assert(consumed == escapedPropertyName.Length);
             BytesPending += written;
         }
     }
