@@ -302,8 +302,7 @@ namespace System.Text.Json
                 stackalloc byte[JsonConstants.StackallocThreshold] :
                 (otherUtf8TextArray = ArrayPool<byte>.Shared.Rent(length));
 
-            ReadOnlySpan<byte> utf16Text = MemoryMarshal.AsBytes(otherText);
-            OperationStatus status = JsonWriterHelper.ToUtf8(utf16Text, otherUtf8Text, out int consumed, out int written);
+            OperationStatus status = JsonWriterHelper.ToUtf8(otherText, otherUtf8Text, out int consumed, out int written);
             Debug.Assert(status != OperationStatus.DestinationTooSmall);
             bool result;
             if (status > OperationStatus.DestinationTooSmall)   // Equivalent to: (status == NeedMoreData || status == InvalidData)
@@ -313,7 +312,7 @@ namespace System.Text.Json
             else
             {
                 Debug.Assert(status == OperationStatus.Done);
-                Debug.Assert(consumed == utf16Text.Length);
+                Debug.Assert(consumed == otherText.Length);
 
                 result = TextEquals(index, otherUtf8Text.Slice(0, written), isPropertyName);
             }
