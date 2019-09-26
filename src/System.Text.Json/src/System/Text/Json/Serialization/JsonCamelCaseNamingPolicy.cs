@@ -59,7 +59,7 @@ namespace System.Text.Json
 
             chars[0] = char.ToLowerInvariant(chars[0]);
 
-            if (chars.Length > 1)
+            if ((uint)chars.Length > 1)
             {
                 if (!char.IsUpper(chars[1]))
                 {
@@ -73,26 +73,26 @@ namespace System.Text.Json
 
             Debug.Assert(chars.Length > 1 && char.IsUpper(chars[1]));
 
-            int lastCharIndex = chars.Length - 1;
-            for (int i = 1; i < lastCharIndex; i++)
+            for (int i = 1; i < chars.Length - 1; i++)
             {
                 char nextChar = chars[i + 1];
+                char currentChar = chars[i];
+
                 // Stop when next char is already lowercase.
                 if (!char.IsUpper(nextChar))
                 {
                     // If the next char is a space, lowercase current char before exiting.
                     if (nextChar == ' ')
                     {
-                        chars[i] = char.ToLowerInvariant(chars[i]);
+                        chars[i] = char.ToLowerInvariant(currentChar);
                     }
 
                     goto Done;
                 }
 
-                chars[i] = char.ToLowerInvariant(chars[i]);
+                chars[i] = char.ToLowerInvariant(currentChar);
             }
-
-            chars[lastCharIndex] = char.ToLowerInvariant(chars[lastCharIndex]);
+            chars[chars.Length - 1] = char.ToLowerInvariant(chars[chars.Length - 1]);
 
         Done:
             return new string(chars);
