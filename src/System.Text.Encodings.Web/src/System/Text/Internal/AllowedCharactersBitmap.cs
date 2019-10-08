@@ -76,7 +76,7 @@ namespace System.Text.Internal
             int codePoint = character;
             int index = codePoint >> 5;
             int offset = codePoint & 0x1F;
-            return ((_allowedCharacters[index] >> offset) & 0x1U) != 0;
+            return (_allowedCharacters[index] & (1u << offset)) != 0;
         }
 
         // Determines whether the given character can be returned unencoded.

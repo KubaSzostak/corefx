@@ -3,6 +3,7 @@
 // See the LICENSE file in the project root for more information.
 
 using System.Buffers;
+using System.Buffers.Text;
 using System.Diagnostics;
 
 namespace System.Text.Json
@@ -49,6 +50,17 @@ namespace System.Text.Json
         /// </remarks>
         public void WriteStringValue(string value)
         {
+            //if (string.IsNullOrEmpty(value))
+            //{
+            //    if (value == null)
+            //    {
+            //        WriteNullValue();
+            //    }
+            //    else
+            //    {
+            //        WriteEmptyStringValue();
+            //    }
+            //}
             if (value == null)
             {
                 WriteNullValue();
@@ -57,6 +69,82 @@ namespace System.Text.Json
             {
                 WriteStringValue(value.AsSpan());
             }
+        }
+
+        private void WriteEmptyStringValue()
+        {
+            WriteEmptyStringByOptions();
+
+            SetFlagToAddListSeparatorBeforeNextItem();
+            _tokenType = JsonTokenType.String;
+        }
+
+        private void WriteEmptyStringByOptions()
+        {
+            ValidateWritingValue();
+            if (_options.Indented)
+            {
+                WriteEmptyStringIndented();
+            }
+            else
+            {
+                WriteEmptyStringMinimized();
+            }
+        }
+
+        private void WriteEmptyStringMinimized()
+        {
+            // 2 quotes, and optionally, 1 list separator => 2 + 1
+            int maxRequired = 3;
+
+            if (_memory.Length - BytesPending < maxRequired)
+            {
+                Grow(maxRequired);
+            }
+
+            Span<byte> output = _memory.Span;
+
+            if (_currentDepth < 0)
+            {
+                output[BytesPending++] = JsonConstants.ListSeparator;
+            }
+            output[BytesPending++] = JsonConstants.Quote;
+            output[BytesPending++] = JsonConstants.Quote;
+        }
+
+        private void WriteEmptyStringIndented()
+        {
+            int indent = Indentation;
+            Debug.Assert(indent <= 2 * JsonConstants.MaxWriterDepth);
+
+            // 2 quotes => indent + 2
+            // Optionally, 1 list separator, and 1-2 bytes for new line
+            int maxRequired = indent + 3 + s_newLineLength;
+
+            if (_memory.Length - BytesPending < maxRequired)
+            {
+                Grow(maxRequired);
+            }
+
+            Span<byte> output = _memory.Span;
+
+            if (_currentDepth < 0)
+            {
+                output[BytesPending++] = JsonConstants.ListSeparator;
+            }
+
+            if (_tokenType != JsonTokenType.PropertyName)
+            {
+                if (_tokenType != JsonTokenType.None)
+                {
+                    WriteNewLine(output);
+                }
+                JsonWriterHelper.WriteIndentation(output.Slice(BytesPending), indent);
+                BytesPending += indent;
+            }
+
+            output[BytesPending++] = JsonConstants.Quote;
+            output[BytesPending++] = JsonConstants.Quote;
         }
 
         /// <summary>
@@ -219,26 +307,10 @@ namespace System.Text.Json
         {
             JsonWriterHelper.ValidateValue(utf8Value);
 
-            WriteStringEscape(utf8Value);
+            WriteStringByOptions(utf8Value);
 
             SetFlagToAddListSeparatorBeforeNextItem();
             _tokenType = JsonTokenType.String;
-        }
-
-        private void WriteStringEscape(ReadOnlySpan<byte> utf8Value)
-        {
-            int valueIdx = JsonWriterHelper.NeedsEscaping(utf8Value, _options.Encoder);
-
-            Debug.Assert(valueIdx >= -1 && valueIdx < utf8Value.Length);
-
-            if (valueIdx != -1)
-            {
-                WriteStringEscapeValue(utf8Value, valueIdx);
-            }
-            else
-            {
-                WriteStringByOptions(utf8Value);
-            }
         }
 
         private void WriteStringByOptions(ReadOnlySpan<byte> utf8Value)
@@ -255,11 +327,11 @@ namespace System.Text.Json
         }
 
         // TODO: https://github.com/dotnet/corefx/issues/36958
-        private void WriteStringMinimized(ReadOnlySpan<byte> escapedValue)
+        private void WriteStringMinimized(ReadOnlySpan<byte> utf8Value)
         {
-            Debug.Assert(escapedValue.Length < int.MaxValue - 3);
+            Debug.Assert(utf8Value.Length < int.MaxValue - 3);
 
-            int minRequired = escapedValue.Length + 2; // 2 quotes
+            int minRequired = (utf8Value.Length * JsonConstants.MaxExpansionFactorWhileEscaping) + 2; // 2 quotes
             int maxRequired = minRequired + 1; // Optionally, 1 list separator
 
             if (_memory.Length - BytesPending < maxRequired)
@@ -275,21 +347,101 @@ namespace System.Text.Json
             }
             output[BytesPending++] = JsonConstants.Quote;
 
-            escapedValue.CopyTo(output.Slice(BytesPending));
-            BytesPending += escapedValue.Length;
+            int bytesWritten = EscapeAndCopy(utf8Value, output.Slice(BytesPending));
+            BytesPending += bytesWritten;
 
             output[BytesPending++] = JsonConstants.Quote;
         }
 
+        private int EscapeAndCopy(ReadOnlySpan<byte> utf8Value, Span<byte> destination)
+        {
+            if (_options.Encoder != null)
+            {
+                // go to slow path
+            }
+
+            int written = 0;
+            int bytesConsumed;
+            while (utf8Value.Length > 0)
+            {
+                int valueIdx = JsonWriterHelper.NeedsEscaping(utf8Value, _options.Encoder);
+                Debug.Assert(valueIdx >= -1 && valueIdx < utf8Value.Length);
+                if (valueIdx != -1)
+                {
+                    utf8Value.Slice(0, valueIdx).CopyTo(destination.Slice(written));
+                    written += valueIdx;
+                    byte val = utf8Value[valueIdx];
+                    if (val > 0x7F)
+                    {
+                        // go to slow path
+                    }
+                    EscapeNextByte(val, destination, ref written);
+                    bytesConsumed = valueIdx + 1;
+                }
+                else
+                {
+                    utf8Value.CopyTo(destination.Slice(written));
+                    written += utf8Value.Length;
+                    bytesConsumed = utf8Value.Length;
+                }
+                utf8Value = utf8Value.Slice(bytesConsumed);
+            }
+            return written;
+        }
+
+        private static void EscapeNextByte(byte value, Span<byte> destination, ref int written)
+        {
+            destination[written++] = (byte)'\\';
+            switch (value)
+            {
+                case JsonConstants.Quote:
+                    // Optimize for the common quote case.
+                    destination[written++] = (byte)'u';
+                    destination[written++] = (byte)'0';
+                    destination[written++] = (byte)'0';
+                    destination[written++] = (byte)'2';
+                    destination[written++] = (byte)'2';
+                    break;
+                case JsonConstants.LineFeed:
+                    destination[written++] = (byte)'n';
+                    break;
+                case JsonConstants.CarriageReturn:
+                    destination[written++] = (byte)'r';
+                    break;
+                case JsonConstants.Tab:
+                    destination[written++] = (byte)'t';
+                    break;
+                case JsonConstants.BackSlash:
+                    destination[written++] = (byte)'\\';
+                    break;
+                case JsonConstants.BackSpace:
+                    destination[written++] = (byte)'b';
+                    break;
+                case JsonConstants.FormFeed:
+                    destination[written++] = (byte)'f';
+                    break;
+                default:
+                    destination[written++] = (byte)'u';
+
+                    bool result = Utf8Formatter.TryFormat(value, destination.Slice(written), out int bytesWritten, format: s_hexStandardFormat);
+                    Debug.Assert(result);
+                    Debug.Assert(bytesWritten == 4);
+                    written += bytesWritten;
+                    break;
+            }
+        }
+
+        private static readonly StandardFormat s_hexStandardFormat = new StandardFormat('X', 4);
+
         // TODO: https://github.com/dotnet/corefx/issues/36958
-        private void WriteStringIndented(ReadOnlySpan<byte> escapedValue)
+        private void WriteStringIndented(ReadOnlySpan<byte> utf8Value)
         {
             int indent = Indentation;
             Debug.Assert(indent <= 2 * JsonConstants.MaxWriterDepth);
 
-            Debug.Assert(escapedValue.Length < int.MaxValue - indent - 3 - s_newLineLength);
+            Debug.Assert(utf8Value.Length < int.MaxValue - indent - 3 - s_newLineLength);
 
-            int minRequired = indent + escapedValue.Length + 2; // 2 quotes
+            int minRequired = indent + utf8Value.Length + 2; // 2 quotes
             int maxRequired = minRequired + 1 + s_newLineLength; // Optionally, 1 list separator and 1-2 bytes for new line
 
             if (_memory.Length - BytesPending < maxRequired)
@@ -316,8 +468,8 @@ namespace System.Text.Json
 
             output[BytesPending++] = JsonConstants.Quote;
 
-            escapedValue.CopyTo(output.Slice(BytesPending));
-            BytesPending += escapedValue.Length;
+            utf8Value.CopyTo(output.Slice(BytesPending));
+            BytesPending += utf8Value.Length;
 
             output[BytesPending++] = JsonConstants.Quote;
         }

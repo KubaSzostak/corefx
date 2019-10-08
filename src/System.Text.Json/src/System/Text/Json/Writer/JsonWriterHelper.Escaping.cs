@@ -5,8 +5,11 @@
 using System.Buffers;
 using System.Buffers.Text;
 using System.Diagnostics;
+using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Runtime.Intrinsics;
+using System.Runtime.Intrinsics.X86;
 using System.Text.Encodings.Web;
 
 namespace System.Text.Json
@@ -14,6 +17,60 @@ namespace System.Text.Json
     // TODO: Replace the escaping logic with publicly shipping APIs from https://github.com/dotnet/corefx/issues/33509
     internal static partial class JsonWriterHelper
     {
+        public static int NeedsEscaping_New(ReadOnlySpan<byte> value)
+        {
+            int idx = 0;
+
+            while (value.Length - 16 >= idx)
+            {
+                Vector128<sbyte> sourceValue = MemoryMarshal.Read<Vector128<sbyte>>(value.Slice(idx));
+
+                Vector128<sbyte> mask = Sse2.CompareLessThan(sourceValue, Mask0x20); // Control characters, and anything above 0x7E since sbyte.MaxValue is 0x7E
+
+                mask = Sse2.Or(mask, Sse2.CompareEqual(sourceValue, Mask0x22)); // Quotation Mark "
+                mask = Sse2.Or(mask, Sse2.CompareEqual(sourceValue, Mask0x26)); // Ampersand &
+                mask = Sse2.Or(mask, Sse2.CompareEqual(sourceValue, Mask0x27)); // Apostrophe '
+                mask = Sse2.Or(mask, Sse2.CompareEqual(sourceValue, Mask0x2B)); // Plus sign +
+                mask = Sse2.Or(mask, Sse2.CompareEqual(sourceValue, Mask0x3C)); // Less Than Sign <
+                mask = Sse2.Or(mask, Sse2.CompareEqual(sourceValue, Mask0x3E)); // Greater Than Sign >
+                mask = Sse2.Or(mask, Sse2.CompareEqual(sourceValue, Mask0x5C)); // Reverse Solidus \
+                mask = Sse2.Or(mask, Sse2.CompareEqual(sourceValue, Mask0x60)); // Grave Access `
+
+                int index = Sse2.MoveMask(mask);
+                // TrailingZeroCount is relatively expensive, avoid it if possible.
+                if (index != 0)
+                {
+                    idx += BitOperations.TrailingZeroCount(index | 0xFFFF0000);
+                    goto Return;
+                }
+                idx += 16;
+            }
+
+            for (; idx < value.Length; idx++)
+            {
+                if (NeedsEscaping(value[idx]))
+                {
+                    goto Return;
+                }
+            }
+
+            idx = -1; // all characters allowed
+
+        Return:
+            return idx;
+        }
+
+        private static readonly Vector128<sbyte> Mask0x20 = Vector128.Create((sbyte)0x20);
+
+        private static readonly Vector128<sbyte> Mask0x22 = Vector128.Create((sbyte)0x22);
+        private static readonly Vector128<sbyte> Mask0x26 = Vector128.Create((sbyte)0x26);
+        private static readonly Vector128<sbyte> Mask0x27 = Vector128.Create((sbyte)0x27);
+        private static readonly Vector128<sbyte> Mask0x2B = Vector128.Create((sbyte)0x2B);
+        private static readonly Vector128<sbyte> Mask0x3C = Vector128.Create((sbyte)0x3C);
+        private static readonly Vector128<sbyte> Mask0x3E = Vector128.Create((sbyte)0x3E);
+        private static readonly Vector128<sbyte> Mask0x5C = Vector128.Create((sbyte)0x5C);
+        private static readonly Vector128<sbyte> Mask0x60 = Vector128.Create((sbyte)0x60);
+
         // Only allow ASCII characters between ' ' (0x20) and '~' (0x7E), inclusively,
         // but exclude characters that need to be escaped as hex: '"', '\'', '&', '+', '<', '>', '`'
         // and exclude characters that need to be escaped by adding a backslash: '\n', '\r', '\t', '\\', '\b', '\f'
