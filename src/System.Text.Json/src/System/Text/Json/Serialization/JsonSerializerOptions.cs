@@ -42,6 +42,7 @@ namespace System.Text.Json
         public JsonSerializerOptions()
         {
             Converters = new ConverterList(this);
+            Encoder = JavaScriptEncoder.Default;
         }
 
         /// <summary>
@@ -107,7 +108,7 @@ namespace System.Text.Json
             {
                 VerifyMutable();
 
-                _encoder = value;
+                _encoder = value ?? JavaScriptEncoder.Default;
             }
         }
 

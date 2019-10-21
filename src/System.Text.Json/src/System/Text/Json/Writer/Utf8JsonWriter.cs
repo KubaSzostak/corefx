@@ -6,6 +6,7 @@ using System.Buffers;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.CompilerServices;
+using System.Text.Encodings.Web;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -118,6 +119,10 @@ namespace System.Text.Json
             _tokenType = default;
             _currentDepth = default;
             _options = options;
+            if (_options.Encoder == null)
+            {
+                _options.Encoder = JavaScriptEncoder.Default;
+            }
 
             // Only allocate if the user writes a JSON payload beyond the depth that the _allocationFreeContainer can handle.
             // This way we avoid allocations in the common, default cases, and allocate lazily.
@@ -153,6 +158,10 @@ namespace System.Text.Json
             _tokenType = default;
             _currentDepth = default;
             _options = options;
+            if (_options.Encoder == null)
+            {
+                _options.Encoder = JavaScriptEncoder.Default;
+            }
 
             // Only allocate if the user writes a JSON payload beyond the depth that the _allocationFreeContainer can handle.
             // This way we avoid allocations in the common, default cases, and allocate lazily.
