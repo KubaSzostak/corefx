@@ -4,6 +4,7 @@
 
 using System;
 using System.Buffers;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -14,6 +15,176 @@ namespace System.Text.Encodings.Web.Tests
 {
     public partial class JavaScriptStringEncoderTests
     {
+        [Fact]
+        public void TextEncoderEncode_String()
+        {
+            JavaScriptEncoder encoder = JavaScriptEncoder.Create(UnicodeRanges.All);
+            Assert.Equal(string.Empty, encoder.Encode(string.Empty));
+
+            var stream = new MemoryStream();
+            TextWriter output = new StreamWriter(stream);
+
+            TextEncoder invalidEncoder = new InvalidTextEncoder();
+            string str = new string('a', 500);
+            Assert.Throws<ArgumentException>(() => invalidEncoder.Encode(str));
+            Assert.Throws<ArgumentException>(() => invalidEncoder.Encode(output, str, 0, 1));
+            Assert.Throws<ArgumentException>(() => invalidEncoder.Encode(output, str, 0, 10));
+
+            Assert.Throws<ArgumentOutOfRangeException>(() => invalidEncoder.Encode(output, str, -1, 10));
+            Assert.Throws<ArgumentOutOfRangeException>(() => invalidEncoder.Encode(output, str, 501, 10));
+            Assert.Throws<ArgumentOutOfRangeException>(() => invalidEncoder.Encode(output, str, 100, 500));
+            Assert.Throws<ArgumentOutOfRangeException>(() => invalidEncoder.Encode(output, str, 10, -1));
+
+            str = new string('a', 5_000);
+            Assert.Throws<ArgumentException>(() => invalidEncoder.Encode(str));
+            Assert.Throws<ArgumentException>(() => invalidEncoder.Encode(output, str, 0, 1));
+            Assert.Throws<ArgumentException>(() => invalidEncoder.Encode(output, str, 0, 10));
+        }
+
+        [Fact]
+        public void TextEncoderEncode_TextWriter_Null()
+        {
+            JavaScriptEncoder encoder = JavaScriptEncoder.Create(UnicodeRanges.All);
+
+            var stream = new MemoryStream();
+            TextWriter output = new StreamWriter(stream);
+
+            Assert.Throws<ArgumentNullException>(() => encoder.Encode(null, string.Empty, 0, 0));
+            Assert.Throws<ArgumentNullException>(() => encoder.Encode(output, (string)null, 0, 0));
+            Assert.Throws<ArgumentNullException>(() => encoder.Encode(null, Array.Empty<char>(), 0, 0));
+            Assert.Throws<ArgumentNullException>(() => encoder.Encode(output, (char[])null, 0, 0));
+
+            Assert.Throws<ArgumentNullException>(() => encoder.Encode(output, Array.Empty<char>(), 0, 0));
+
+            encoder.Encode(output, string.Empty, 0, 0);
+            output.Flush();
+            Assert.Equal(string.Empty, Encoding.UTF8.GetString(stream.ToArray()));
+        }
+
+        [Fact]
+        public void TextEncoderEncode_TextWriter_NoEncoding()
+        {
+            JavaScriptEncoder encoder = JavaScriptEncoder.Create(UnicodeRanges.All);
+            string str = "abcdefg";
+
+            {
+                var stream = new MemoryStream();
+                TextWriter output = new StreamWriter(stream);
+
+                encoder.Encode(output, str, 0, str.Length);
+                output.Flush();
+                Assert.Equal(str, Encoding.UTF8.GetString(stream.ToArray()));
+            }
+
+            {
+                var stream = new MemoryStream();
+                TextWriter output = new StreamWriter(stream);
+
+                encoder.Encode(output, str.ToCharArray(), 0, str.Length);
+                output.Flush();
+                Assert.Equal(str, Encoding.UTF8.GetString(stream.ToArray()));
+            }
+
+            {
+                var stream = new MemoryStream();
+                TextWriter output = new StreamWriter(stream);
+
+                encoder.Encode(output, str, 1, 3);
+                output.Flush();
+                Assert.Equal(str.Substring(1, 3), Encoding.UTF8.GetString(stream.ToArray()));
+            }
+
+            {
+                var stream = new MemoryStream();
+                TextWriter output = new StreamWriter(stream);
+
+                encoder.Encode(output, str.ToCharArray(), 1, 3);
+                output.Flush();
+                Assert.Equal(str.Substring(1, 3), Encoding.UTF8.GetString(stream.ToArray()));
+            }
+        }
+
+        //[Fact]
+        internal void TextEncoderEncode_ReadOnlySpan()
+        {
+            JavaScriptEncoder encoder = JavaScriptEncoder.Create(UnicodeRanges.All);
+            string source = "abcdefg\\hijklmnop";
+
+            var destination = new char[source.Length - 5];
+            Assert.Equal(OperationStatus.DestinationTooSmall, encoder.Encode(source.AsSpan(), destination, out int charsConsumed, out int charsWritten));
+        }
+
+        internal class InvalidTextEncoder : TextEncoder
+        {
+            public override int MaxOutputCharactersPerInputCharacter => 1;
+
+            public override unsafe int FindFirstCharacterToEncode(char* text, int textLength)
+            {
+                return 0;
+            }
+
+            public override unsafe bool TryEncodeUnicodeScalar(int unicodeScalar, char* buffer, int bufferLength, out int numberOfCharactersWritten)
+            {
+                numberOfCharactersWritten = 0;
+                return false;
+            }
+
+            public override bool WillEncode(int unicodeScalar)
+            {
+                return true;
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(JavaScriptEncoders))]
+        public unsafe void TryEncodeSurrogates_DifferentOutputBufferLength(JavaScriptEncoder encoder)
+        {
+            for (int unicodeScalar = 0x10000; unicodeScalar <= 0x11000; unicodeScalar++)
+            {
+                TryEncodeUnicodeScalarHelper(encoder, unicodeScalar);
+            }
+
+            for (int unicodeScalar = 0x100000; unicodeScalar <= 0x10FFFF; unicodeScalar++)
+            {
+                TryEncodeUnicodeScalarHelper(encoder, unicodeScalar);
+            }
+        }
+
+        private static unsafe void TryEncodeUnicodeScalarHelper(JavaScriptEncoder encoder, int unicodeScalar)
+        {
+            for (int i = 1; i < 12; i++)
+            {
+                var output = new char[i];
+                fixed (char* buffer = output)
+                {
+                    Assert.False(encoder.TryEncodeUnicodeScalar(unicodeScalar, buffer, output.Length, out int numberOfCharactersWritten));
+                    Assert.Equal(0, numberOfCharactersWritten);
+                }
+            }
+            {
+                var output = new char[12];
+                fixed (char* buffer = output)
+                {
+                    Assert.True(encoder.TryEncodeUnicodeScalar(unicodeScalar, buffer, output.Length, out int numberOfCharactersWritten));
+                    Assert.Equal(12, numberOfCharactersWritten);
+                }
+            }
+        }
+
+        public static IEnumerable<object[]> JavaScriptEncoders
+        {
+            get
+            {
+                return new List<object[]>
+                {
+                    new object[] { JavaScriptEncoder.Default },
+                    new object[] { JavaScriptEncoder.Create(UnicodeRanges.BasicLatin) },
+                    new object[] { JavaScriptEncoder.Create(UnicodeRanges.All) },
+                    new object[] { JavaScriptEncoder.UnsafeRelaxedJsonEscaping },
+                };
+            }
+        }
+
         [Fact]
         public void TestSurrogate()
         {

@@ -118,6 +118,6 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="TextEncoderDoesNotImplementMaxOutputCharsPerInputChar" xml:space="preserve">
-    <value>TextEncoder does not implement MaxOutputCharsPerInputChar correctly.</value>
+    <value>TextEncoder does not implement the 'MaxOutputCharactersPerInputCharacter' property correctly.</value>
   </data>
 </root>

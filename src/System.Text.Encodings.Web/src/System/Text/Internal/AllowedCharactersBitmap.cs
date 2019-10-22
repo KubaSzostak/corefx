@@ -21,10 +21,7 @@ namespace System.Text.Internal
 
         private AllowedCharactersBitmap(uint[] allowedCharacters)
         {
-            if (allowedCharacters == null)
-            {
-                throw new ArgumentNullException(nameof(allowedCharacters));
-            }
+            Debug.Assert(allowedCharacters != null);
             _allowedCharacters = allowedCharacters;
         }
 
