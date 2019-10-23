@@ -99,6 +99,24 @@ namespace System.Text.Json
         public long TokenStartIndex { get; private set; }
 
         /// <summary>
+        /// The number of lines read so far within the JSON payload (starting at 0).
+        /// </summary>
+        /// <remarks>
+        /// This returns the current line number of the reader on which the last processed JSON token ends, not where it started.
+        /// See also <see cref="TokenStartIndex"/>.
+        /// </remarks>
+        public long LineNumber => _lineNumber;
+
+        /// <summary>
+        /// The number of bytes read so far within the current line of the JSON payload (starting at 0).
+        /// </summary>
+        /// <remarks>
+        /// This returns the current position of the reader which is at the end of the last processed JSON token, not where it started.
+        /// See also <see cref="TokenStartIndex"/>.
+        /// </remarks>
+        public long BytePositionInLine => _bytePositionInLine;
+
+        /// <summary>
         /// Tracks the recursive depth of the nested objects / arrays within the JSON text
         /// processed so far. This provides the depth of the current token.
         /// </summary>
