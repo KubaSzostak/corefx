@@ -73,14 +73,16 @@ namespace System.Text.Internal
         // Determines whether the given character can be returned unencoded.
         public bool IsCharacterAllowed(char character)
         {
-            return IsUnicodeScalarAllowed(character);
+            int codePoint = character;
+            int index = codePoint >> 5;
+            int offset = codePoint & 0x1F;
+            return (_allowedCharacters[index] & (0x1U << offset)) != 0;
         }
 
         // Determines whether the given character can be returned unencoded.
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool IsUnicodeScalarAllowed(int unicodeScalar)
         {
-            Debug.Assert(unicodeScalar < 0x10000);
             int index = unicodeScalar >> 5;
             int offset = unicodeScalar & 0x1F;
             return (_allowedCharacters[index] & (0x1U << offset)) != 0;

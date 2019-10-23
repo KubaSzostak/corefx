@@ -906,6 +906,7 @@ namespace System.Text.Encodings.Web
                     _asciiEscape[value] = encoding;
                 }
             }
+
             return encoding;
         }
 
