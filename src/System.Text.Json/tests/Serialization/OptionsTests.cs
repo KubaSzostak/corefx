@@ -53,7 +53,7 @@ namespace System.Text.Json.Serialization.Tests
             Assert.False(options.AllowTrailingCommas);
             Assert.Equal(16 * 1024, options.DefaultBufferSize);
             Assert.Null(options.DictionaryKeyPolicy);
-            Assert.Null(options.Encoder);
+            Assert.Equal(JavaScriptEncoder.Default, options.Encoder);
             Assert.False(options.IgnoreNullValues);
             Assert.Equal(0, options.MaxDepth);
             Assert.False(options.PropertyNameCaseInsensitive);
@@ -321,6 +321,40 @@ namespace System.Text.Json.Serialization.Tests
 
             obj = JsonSerializer.Deserialize<TestClassForEncoding>(json);
             Assert.Equal(obj.MyString, message);
+        }
+
+        [Fact]
+        public static void NullEncoderIsSameAsDefault()
+        {
+            var defaultOptions = new JsonSerializerOptions();
+
+            var nullOptions = new JsonSerializerOptions
+            {
+                Encoder = null
+            };
+
+            var optionsWithDefaultEncoder = new JsonSerializerOptions
+            {
+                Encoder = JavaScriptEncoder.Default
+            };
+
+            var optionsWithCustomEncoder = new JsonSerializerOptions
+            {
+                Encoder = JavaScriptEncoder.Create(UnicodeRanges.BasicLatin)
+            };
+
+            Assert.Equal(JavaScriptEncoder.Default, defaultOptions.Encoder);
+            Assert.Equal(defaultOptions.Encoder, nullOptions.Encoder);
+            Assert.Equal(defaultOptions.Encoder, optionsWithDefaultEncoder.Encoder);
+
+            string input = "abcdefg<>+&`\\ABC'123\"! $";
+            string expected = "\"abcdefg\\u003C\\u003E\\u002B\\u0026\\u0060\\\\ABC\\u0027123\\u0022! $\"";
+
+            Assert.Equal(expected, JsonSerializer.Serialize(input));
+            Assert.Equal(expected, JsonSerializer.Serialize(input, defaultOptions));
+            Assert.Equal(expected, JsonSerializer.Serialize(input, nullOptions));
+            Assert.Equal(expected, JsonSerializer.Serialize(input, optionsWithDefaultEncoder));
+            Assert.Equal(expected, JsonSerializer.Serialize(input, optionsWithCustomEncoder));
         }
 
         [Fact]

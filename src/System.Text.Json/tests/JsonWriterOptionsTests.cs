@@ -2,6 +2,9 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using System.Collections.Generic;
+using System.Text.Encodings.Web;
+using System.Text.Unicode;
 using Xunit;
 
 namespace System.Text.Json.Tests
@@ -19,6 +22,7 @@ namespace System.Text.Json.Tests
                 SkipValidation = false
             };
             Assert.Equal(expectedOption, options);
+            Assert.Equal(JavaScriptEncoder.Default, options.Encoder);
         }
 
         [Fact]
@@ -32,6 +36,7 @@ namespace System.Text.Json.Tests
                 SkipValidation = false
             };
             Assert.Equal(expectedOption, options);
+            Assert.Equal(JavaScriptEncoder.Default, options.Encoder);
         }
 
         [Theory]
@@ -51,6 +56,40 @@ namespace System.Text.Json.Tests
                 SkipValidation = skipValidation
             };
             Assert.Equal(expectedOption, options);
+            Assert.Equal(JavaScriptEncoder.Default, options.Encoder);
+        }
+
+        [Theory]
+        [MemberData(nameof(JavaScriptEncoders))]
+        public static void JsonWriterOptionsCustomEncoder(JavaScriptEncoder encoder)
+        {
+            var options = new JsonWriterOptions
+            {
+                Encoder = encoder
+            };
+
+            var expectedOption = new JsonWriterOptions
+            {
+                Indented = false,
+                SkipValidation = false,
+                Encoder = encoder ?? JavaScriptEncoder.Default,
+            };
+            Assert.Equal(expectedOption, options);
+        }
+
+        public static IEnumerable<object[]> JavaScriptEncoders
+        {
+            get
+            {
+                return new List<object[]>
+                {
+                    new object[] { null },
+                    new object[] { JavaScriptEncoder.Default },
+                    new object[] { JavaScriptEncoder.Create(UnicodeRanges.BasicLatin) },
+                    new object[] { JavaScriptEncoder.Create(UnicodeRanges.All) },
+                    new object[] { JavaScriptEncoder.UnsafeRelaxedJsonEscaping },
+                };
+            }
         }
     }
 }

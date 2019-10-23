@@ -66,6 +66,11 @@ namespace System.Text.Json
                 return new JsonEncodedText(Array.Empty<byte>());
             }
 
+            if (encoder == null)
+            {
+                encoder = JavaScriptEncoder.Default;
+            }
+
             return TranscodeAndEncode(value, encoder);
         }
 
@@ -105,6 +110,11 @@ namespace System.Text.Json
             if (utf8Value.Length == 0)
             {
                 return new JsonEncodedText(Array.Empty<byte>());
+            }
+
+            if (encoder == null)
+            {
+                encoder = JavaScriptEncoder.Default;
             }
 
             JsonWriterHelper.ValidateValue(utf8Value);

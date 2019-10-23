@@ -40,6 +40,7 @@ namespace System.Text.Json
         public JsonSerializerOptions()
         {
             Converters = new ConverterList(this);
+            Encoder = JavaScriptEncoder.Default;
         }
 
         /// <summary>
@@ -99,13 +100,14 @@ namespace System.Text.Json
         {
             get
             {
+                Debug.Assert(_encoder != null);
                 return _encoder;
             }
             set
             {
                 VerifyMutable();
 
-                _encoder = value;
+                _encoder = value ?? JavaScriptEncoder.Default;
             }
         }
 
@@ -339,6 +341,8 @@ namespace System.Text.Json
 
         internal JsonWriterOptions GetWriterOptions()
         {
+            Debug.Assert(Encoder != null);
+
             return new JsonWriterOptions
             {
                 Encoder = Encoder,

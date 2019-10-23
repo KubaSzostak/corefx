@@ -15,11 +15,22 @@ namespace System.Text.Json
     public struct JsonWriterOptions
     {
         private int _optionsMask;
+        private JavaScriptEncoder _encoder;
 
         /// <summary>
         /// The encoder to use when escaping strings, or <see langword="null" /> to use the default encoder.
         /// </summary>
-        public JavaScriptEncoder Encoder { get; set; }
+        public JavaScriptEncoder Encoder
+        {
+            get
+            {
+                return _encoder ?? JavaScriptEncoder.Default;
+            }
+            set
+            {
+                _encoder = value ?? JavaScriptEncoder.Default;
+            }
+        }
 
         /// <summary>
         /// Defines whether the <see cref="Utf8JsonWriter"/> should pretty print the JSON which includes:
