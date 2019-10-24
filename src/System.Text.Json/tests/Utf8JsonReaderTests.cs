@@ -13,6 +13,75 @@ namespace System.Text.Json.Tests
     public static partial class Utf8JsonReaderTests
     {
         [Fact]
+        public static void LineNumberAndPositionSemantics()
+        {
+            string str = "{  \"foo\"\r\n:  \"bar\"  }";
+            Utf8JsonReader reader = new Utf8JsonReader(Encoding.UTF8.GetBytes(str));
+
+            //Generally speaking, white space after a token is not eagerly consumed (only what's before)
+            reader.Read(); // Read the start object token
+            Assert.Equal(0, reader.LineNumber);
+            Assert.Equal(1, reader.BytePositionInLine);
+
+            // However, an exception is whitespace between property names and the colon that separates name/value is consumed
+            reader.Read(); // Read the property name (cursor is now at the end of the colon, not at the end of the property name)
+            Assert.Equal(1, reader.LineNumber);
+            Assert.Equal(1, reader.BytePositionInLine);
+
+            reader.Read(); // Read the value string (cursor is now at the end of the string token)
+            Assert.Equal(1, reader.LineNumber);
+            Assert.Equal(8, reader.BytePositionInLine);
+
+            str = "  [  1 , 2  ]";
+            reader = new Utf8JsonReader(Encoding.UTF8.GetBytes(str));
+
+            //Generally speaking, white space after a token is not eagerly consumed (only what's before)
+            reader.Read(); // Read the start array token
+            Assert.Equal(0, reader.LineNumber);
+            Assert.Equal(3, reader.BytePositionInLine);
+
+            reader.Read(); // Read the first value, we don't read the comma, end right at the end of the number token
+            Assert.Equal(0, reader.LineNumber);
+            Assert.Equal(6, reader.BytePositionInLine);
+
+            reader.Read(); // Read the second value (cursor is now at the end of the 2nd number token)
+            Assert.Equal(0, reader.LineNumber);
+            Assert.Equal(10, reader.BytePositionInLine);
+
+            str = "  [  1/*.\r\n.*/ , 2  ]";
+            reader = new Utf8JsonReader(Encoding.UTF8.GetBytes(str), new JsonReaderOptions { CommentHandling = JsonCommentHandling.Skip });
+
+            //Generally speaking, white space after a token is not eagerly consumed (only what's before)
+            reader.Read(); // Read the start array token
+            Assert.Equal(0, reader.LineNumber);
+            Assert.Equal(3, reader.BytePositionInLine);
+
+            reader.Read(); // Read the first value, we don't read the comment in any mode, end right at the end of the number token
+            Assert.Equal(0, reader.LineNumber);
+            Assert.Equal(6, reader.BytePositionInLine);
+
+            reader.Read(); // Read the second value, skipping comments (cursor is now at the end of the 2nd number token)
+            Assert.Equal(1, reader.LineNumber);
+            Assert.Equal(7, reader.BytePositionInLine);
+
+            str = "  [  1/*.\r\n.*/ , 2  ]";
+            reader = new Utf8JsonReader(Encoding.UTF8.GetBytes(str), new JsonReaderOptions { CommentHandling = JsonCommentHandling.Allow });
+
+            //Generally speaking, white space after a token is not eagerly consumed (only what's before)
+            reader.Read(); // Read the start array token
+            Assert.Equal(0, reader.LineNumber);
+            Assert.Equal(3, reader.BytePositionInLine);
+
+            reader.Read(); // Read the first value, we don't read the comment in any mode, end right at the end of the number token
+            Assert.Equal(0, reader.LineNumber);
+            Assert.Equal(6, reader.BytePositionInLine);
+
+            reader.Read(); // Read the comment (cursor is now at the end of the comment token)
+            Assert.Equal(1, reader.LineNumber);
+            Assert.Equal(3, reader.BytePositionInLine);
+        }
+
+        [Fact]
         public static void DefaultUtf8JsonReader()
         {
             Utf8JsonReader json = default;
