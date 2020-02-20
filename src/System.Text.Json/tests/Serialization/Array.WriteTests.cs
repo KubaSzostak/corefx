@@ -18,6 +18,44 @@ namespace System.Text.Json.Serialization.Tests
         }
 
         [Fact]
+        public static void WritePocoArray()
+        {
+            var input = new MyPoco[] { null, new MyPoco { Foo = "foo" } };
+
+            // On 5.0/master, this fails with InvalidOperationException since the MyPocoConverter.Write gets called with null.
+            string json = JsonSerializer.Serialize(input, new JsonSerializerOptions { Converters = { new MyPocoConverter() } });
+
+            // On 3.1, correctly outputs the expected value:
+            Assert.Equal("[null,{\"Foo\":\"foo\"}]", json);
+        }
+
+        public class MyPoco
+        {
+            public string Foo { get; set; }
+        }
+
+        public class MyPocoConverter : JsonConverter<MyPoco>
+        {
+            public override MyPoco Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+            {
+                throw new NotImplementedException();
+            }
+
+            public override void Write(Utf8JsonWriter writer, MyPoco value, JsonSerializerOptions options)
+            {
+                // Debug.Assert(value != null);
+                if (value == null)
+                {
+                    throw new InvalidOperationException("The custom converter should never get called with null value.");
+                }
+
+                writer.WriteStartObject();
+                writer.WriteString(nameof(value.Foo), value.Foo);
+                writer.WriteEndObject();
+            }
+        }
+
+        [Fact]
         public static void WriteArrayWithEnums()
         {
             var input = new SampleEnum[] { SampleEnum.One, SampleEnum.Two };

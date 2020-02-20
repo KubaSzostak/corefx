@@ -2,6 +2,8 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+#nullable enable
+
 using System;
 using System.Buffers;
 using System.Buffers.Text;
@@ -9,6 +11,7 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using System.Diagnostics.CodeAnalysis;
 
 namespace System.Text.Json
 {
@@ -25,8 +28,8 @@ namespace System.Text.Json
     {
         private ReadOnlyMemory<byte> _utf8Json;
         private MetadataDb _parsedData;
-        private byte[] _extraRentedBytes;
-        private (int, string) _lastIndexAndString = (-1, null);
+        private byte[]? _extraRentedBytes;
+        private (int, string?) _lastIndexAndString = (-1, null);
 
         internal bool IsDisposable { get; }
 
@@ -38,7 +41,7 @@ namespace System.Text.Json
         private JsonDocument(
             ReadOnlyMemory<byte> utf8Json,
             MetadataDb parsedData,
-            byte[] extraRentedBytes,
+            byte[]? extraRentedBytes,
             bool isDisposable = true)
         {
             Debug.Assert(!utf8Json.IsEmpty);
@@ -67,7 +70,7 @@ namespace System.Text.Json
 
             // When "extra rented bytes exist" they contain the document,
             // and thus need to be cleared before being returned.
-            byte[] extraRentedBytes = Interlocked.Exchange(ref _extraRentedBytes, null);
+            byte[]? extraRentedBytes = Interlocked.Exchange(ref _extraRentedBytes, null);
 
             if (extraRentedBytes != null)
             {
@@ -243,14 +246,15 @@ namespace System.Text.Json
             return _utf8Json.Slice(start, end - start);
         }
 
-        internal string GetString(int index, JsonTokenType expectedType)
+        internal string? GetString(int index, JsonTokenType expectedType)
         {
             CheckNotDisposed();
 
-            (int lastIdx, string lastString) = _lastIndexAndString;
+            (int lastIdx, string? lastString) = _lastIndexAndString;
 
             if (lastIdx == index)
             {
+                Debug.Assert(lastString != null);
                 return lastString;
             }
 
@@ -278,6 +282,8 @@ namespace System.Text.Json
                 lastString = JsonReaderHelper.TranscodeHelper(segment);
             }
 
+            Debug.Assert(lastString != null);
+
             _lastIndexAndString = (index, lastString);
             return lastString;
         }
@@ -288,14 +294,14 @@ namespace System.Text.Json
 
             int matchIndex = isPropertyName ? index - DbRow.Size : index;
 
-            (int lastIdx, string lastString) = _lastIndexAndString;
+            (int lastIdx, string? lastString) = _lastIndexAndString;
 
             if (lastIdx == matchIndex)
             {
                 return otherText.SequenceEqual(lastString.AsSpan());
             }
 
-            byte[] otherUtf8TextArray = null;
+            byte[]? otherUtf8TextArray = null;
 
             int length = checked(otherText.Length * JsonConstants.MaxExpansionFactorWhileTranscoding);
             Span<byte> otherUtf8Text = length <= JsonConstants.StackallocThreshold ?
@@ -371,10 +377,10 @@ namespace System.Text.Json
         internal string GetNameOfPropertyValue(int index)
         {
             // The property name is one row before the property value
-            return GetString(index - DbRow.Size, JsonTokenType.PropertyName);
+            return GetString(index - DbRow.Size, JsonTokenType.PropertyName)!;
         }
 
-        internal bool TryGetValue(int index, out byte[] value)
+        internal bool TryGetValue(int index, [NotNullWhen(true)] out byte[]? value)
         {
             CheckNotDisposed();
 

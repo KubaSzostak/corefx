@@ -2,8 +2,11 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+#nullable enable
+
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 
 namespace System.Text.Json
 {
@@ -13,10 +16,10 @@ namespace System.Text.Json
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
     public readonly partial struct JsonElement
     {
-        internal readonly object _parent;
+        internal readonly object? _parent;
         private readonly int _idx;
 
-        internal JsonElement(JsonDocument parent, int idx)
+        internal JsonElement(JsonDocument? parent, int idx)
         {
             // parent is usually not null, but the Current property
             // on the enumerators (when initialized as `default`) can
@@ -43,7 +46,7 @@ namespace System.Text.Json
         {
             get
             {
-                JsonDocument document = (JsonDocument)_parent;
+                JsonDocument? document = (JsonDocument?)_parent;
                 return document?.GetJsonTokenType(_idx) ?? JsonTokenType.None;
             }
         }
@@ -62,6 +65,7 @@ namespace System.Text.Json
                     return TokenType.ToValueKind();
                 }
 
+                Debug.Assert(_parent != null);
                 var jsonNode = (JsonNode)_parent;
 
                 return jsonNode.ValueKind;
@@ -85,7 +89,7 @@ namespace System.Text.Json
         {
             get
             {
-                CheckValidInstance();
+                CheckValidInstance_ThrowInvalidOperationExceptionIfNull(_parent == null, _parent);
 
                 if (_parent is JsonDocument document)
                 {
@@ -115,7 +119,7 @@ namespace System.Text.Json
         /// </exception>
         public int GetArrayLength()
         {
-            CheckValidInstance();
+            CheckValidInstance_ThrowInvalidOperationExceptionIfNull(_parent == null, _parent);
 
             if (_parent is JsonDocument document)
             {
@@ -317,7 +321,7 @@ namespace System.Text.Json
         /// </exception>
         public bool TryGetProperty(ReadOnlySpan<char> propertyName, out JsonElement value)
         {
-            CheckValidInstance();
+            CheckValidInstance_ThrowInvalidOperationExceptionIfNull(_parent == null, _parent);
 
             if (_parent is JsonDocument document)
             {
@@ -328,7 +332,7 @@ namespace System.Text.Json
 
             if (jsonNode is JsonObject jsonObject)
             {
-                if (jsonObject.TryGetPropertyValue(propertyName.ToString(), out JsonNode nodeValue))
+                if (jsonObject.TryGetPropertyValue(propertyName.ToString(), out JsonNode? nodeValue))
                 {
                     value = nodeValue.AsJsonElement();
                     return true;
@@ -372,7 +376,7 @@ namespace System.Text.Json
         /// </exception>
         public bool TryGetProperty(ReadOnlySpan<byte> utf8PropertyName, out JsonElement value)
         {
-            CheckValidInstance();
+            CheckValidInstance_ThrowInvalidOperationExceptionIfNull(_parent == null, _parent);
 
             if (_parent is JsonDocument document)
             {
@@ -383,7 +387,7 @@ namespace System.Text.Json
 
             if (jsonNode is JsonObject jsonObject)
             {
-                if (jsonObject.TryGetPropertyValue(JsonHelpers.Utf8GetString(utf8PropertyName), out JsonNode nodeValue))
+                if (jsonObject.TryGetPropertyValue(JsonHelpers.Utf8GetString(utf8PropertyName), out JsonNode? nodeValue))
                 {
                     value = nodeValue.AsJsonElement();
                     return true;
@@ -412,7 +416,7 @@ namespace System.Text.Json
         /// </exception>
         public bool GetBoolean()
         {
-            CheckValidInstance();
+            CheckValidInstance_ThrowInvalidOperationExceptionIfNull(_parent == null, _parent);
 
             if (_parent is JsonDocument document)
             {
@@ -448,9 +452,9 @@ namespace System.Text.Json
         ///   The parent <see cref="JsonDocument"/> has been disposed.
         /// </exception>
         /// <seealso cref="ToString"/>
-        public string GetString()
+        public string? GetString()
         {
-            CheckValidInstance();
+            CheckValidInstance_ThrowInvalidOperationExceptionIfNull(_parent == null, _parent);
 
             if (_parent is JsonDocument document)
             {
@@ -484,9 +488,9 @@ namespace System.Text.Json
         /// <exception cref="ObjectDisposedException">
         ///   The parent <see cref="JsonDocument"/> has been disposed.
         /// </exception>
-        public bool TryGetBytesFromBase64(out byte[] value)
+        public bool TryGetBytesFromBase64([NotNullWhen(true)] out byte[]? value)
         {
-            CheckValidInstance();
+            CheckValidInstance_ThrowInvalidOperationExceptionIfNull(_parent == null, _parent);
 
             if (_parent is JsonDocument document)
             {
@@ -522,7 +526,7 @@ namespace System.Text.Json
         /// <seealso cref="ToString"/>
         public byte[] GetBytesFromBase64()
         {
-            if (TryGetBytesFromBase64(out byte[] value))
+            if (TryGetBytesFromBase64(out byte[]? value))
             {
                 return value;
             }
@@ -550,7 +554,7 @@ namespace System.Text.Json
         [CLSCompliant(false)]
         public bool TryGetSByte(out sbyte value)
         {
-            CheckValidInstance();
+            CheckValidInstance_ThrowInvalidOperationExceptionIfNull(_parent == null, _parent);
 
             if (_parent is JsonDocument document)
             {
@@ -610,7 +614,7 @@ namespace System.Text.Json
         /// </exception>
         public bool TryGetByte(out byte value)
         {
-            CheckValidInstance();
+            CheckValidInstance_ThrowInvalidOperationExceptionIfNull(_parent == null, _parent);
 
             if (_parent is JsonDocument document)
             {
@@ -672,7 +676,7 @@ namespace System.Text.Json
         /// </exception>
         public bool TryGetInt16(out short value)
         {
-            CheckValidInstance();
+            CheckValidInstance_ThrowInvalidOperationExceptionIfNull(_parent == null, _parent);
 
             if (_parent is JsonDocument document)
             {
@@ -732,7 +736,7 @@ namespace System.Text.Json
         [CLSCompliant(false)]
         public bool TryGetUInt16(out ushort value)
         {
-            CheckValidInstance();
+            CheckValidInstance_ThrowInvalidOperationExceptionIfNull(_parent == null, _parent);
 
             if (_parent is JsonDocument document)
             {
@@ -795,7 +799,7 @@ namespace System.Text.Json
         /// </exception>
         public bool TryGetInt32(out int value)
         {
-            CheckValidInstance();
+            CheckValidInstance_ThrowInvalidOperationExceptionIfNull(_parent == null, _parent);
 
             if (_parent is JsonDocument document)
             {
@@ -855,7 +859,7 @@ namespace System.Text.Json
         [CLSCompliant(false)]
         public bool TryGetUInt32(out uint value)
         {
-            CheckValidInstance();
+            CheckValidInstance_ThrowInvalidOperationExceptionIfNull(_parent == null, _parent);
 
             if (_parent is JsonDocument document)
             {
@@ -918,7 +922,7 @@ namespace System.Text.Json
         /// </exception>
         public bool TryGetInt64(out long value)
         {
-            CheckValidInstance();
+            CheckValidInstance_ThrowInvalidOperationExceptionIfNull(_parent == null, _parent);
 
             if (_parent is JsonDocument document)
             {
@@ -981,7 +985,7 @@ namespace System.Text.Json
         [CLSCompliant(false)]
         public bool TryGetUInt64(out ulong value)
         {
-            CheckValidInstance();
+            CheckValidInstance_ThrowInvalidOperationExceptionIfNull(_parent == null, _parent);
 
             if (_parent is JsonDocument document)
             {
@@ -1053,7 +1057,7 @@ namespace System.Text.Json
         /// </exception>
         public bool TryGetDouble(out double value)
         {
-            CheckValidInstance();
+            CheckValidInstance_ThrowInvalidOperationExceptionIfNull(_parent == null, _parent);
 
             if (_parent is JsonDocument document)
             {
@@ -1132,7 +1136,7 @@ namespace System.Text.Json
         /// </exception>
         public bool TryGetSingle(out float value)
         {
-            CheckValidInstance();
+            CheckValidInstance_ThrowInvalidOperationExceptionIfNull(_parent == null, _parent);
 
             if (_parent is JsonDocument document)
             {
@@ -1203,7 +1207,7 @@ namespace System.Text.Json
         /// <seealso cref="GetRawText"/>
         public bool TryGetDecimal(out decimal value)
         {
-            CheckValidInstance();
+            CheckValidInstance_ThrowInvalidOperationExceptionIfNull(_parent == null, _parent);
 
             if (_parent is JsonDocument document)
             {
@@ -1266,7 +1270,7 @@ namespace System.Text.Json
         /// </exception>
         public bool TryGetDateTime(out DateTime value)
         {
-            CheckValidInstance();
+            CheckValidInstance_ThrowInvalidOperationExceptionIfNull(_parent == null, _parent);
 
             if (_parent is JsonDocument document)
             {
@@ -1329,7 +1333,7 @@ namespace System.Text.Json
         /// </exception>
         public bool TryGetDateTimeOffset(out DateTimeOffset value)
         {
-            CheckValidInstance();
+            CheckValidInstance_ThrowInvalidOperationExceptionIfNull(_parent == null, _parent);
 
             if (_parent is JsonDocument document)
             {
@@ -1392,7 +1396,7 @@ namespace System.Text.Json
         /// </exception>
         public bool TryGetGuid(out Guid value)
         {
-            CheckValidInstance();
+            CheckValidInstance_ThrowInvalidOperationExceptionIfNull(_parent == null, _parent);
 
             if (_parent is JsonDocument document)
             {
@@ -1438,7 +1442,7 @@ namespace System.Text.Json
 
         internal string GetPropertyName()
         {
-            CheckValidInstance();
+            CheckValidInstance_ThrowInvalidOperationExceptionIfNull(_parent == null, _parent);
 
             var document = (JsonDocument)_parent;
             return document.GetNameOfPropertyValue(_idx);
@@ -1458,7 +1462,7 @@ namespace System.Text.Json
         /// </exception>
         public string GetRawText()
         {
-            CheckValidInstance();
+            CheckValidInstance_ThrowInvalidOperationExceptionIfNull(_parent == null, _parent);
 
             if (_parent is JsonDocument document)
             {
@@ -1471,7 +1475,7 @@ namespace System.Text.Json
 
         internal string GetPropertyRawText()
         {
-            CheckValidInstance();
+            CheckValidInstance_ThrowInvalidOperationExceptionIfNull(_parent == null, _parent);
 
             var document = (JsonDocument)_parent;
             return document.GetPropertyRawValueAsString(_idx);
@@ -1492,7 +1496,7 @@ namespace System.Text.Json
         ///   This method is functionally equal to doing an ordinal comparison of <paramref name="text" /> and
         ///   the result of calling <see cref="GetString" />, but avoids creating the string instance.
         /// </remarks>
-        public bool ValueEquals(string text)
+        public bool ValueEquals(string? text)
         {
             // CheckValidInstance is done in the helper
 
@@ -1563,7 +1567,7 @@ namespace System.Text.Json
 
         internal bool TextEqualsHelper(ReadOnlySpan<byte> utf8Text, bool isPropertyName)
         {
-            CheckValidInstance();
+            CheckValidInstance_ThrowInvalidOperationExceptionIfNull(_parent == null, _parent);
 
             var document = (JsonDocument)_parent;
             return document.TextEquals(_idx, utf8Text, isPropertyName);
@@ -1571,7 +1575,7 @@ namespace System.Text.Json
 
         internal bool TextEqualsHelper(ReadOnlySpan<char> text, bool isPropertyName)
         {
-            CheckValidInstance();
+            CheckValidInstance_ThrowInvalidOperationExceptionIfNull(_parent == null, _parent);
 
             var document = (JsonDocument)_parent;
             return document.TextEquals(_idx, text, isPropertyName);
@@ -1597,7 +1601,7 @@ namespace System.Text.Json
                 throw new ArgumentNullException(nameof(writer));
             }
 
-            CheckValidInstance();
+            CheckValidInstance_ThrowInvalidOperationExceptionIfNull(_parent == null, _parent);
 
             if (_parent is JsonDocument document)
             {
@@ -1624,7 +1628,7 @@ namespace System.Text.Json
         /// </exception>
         public ArrayEnumerator EnumerateArray()
         {
-            CheckValidInstance();
+            CheckValidInstance_ThrowInvalidOperationExceptionIfNull(_parent == null, _parent);
 
             if (_parent is JsonDocument)
             {
@@ -1660,7 +1664,7 @@ namespace System.Text.Json
         /// </exception>
         public ObjectEnumerator EnumerateObject()
         {
-            CheckValidInstance();
+            CheckValidInstance_ThrowInvalidOperationExceptionIfNull(_parent == null, _parent);
 
             if (_parent is JsonDocument)
             {
@@ -1720,7 +1724,7 @@ namespace System.Text.Json
         /// <exception cref="ObjectDisposedException">
         ///   The parent <see cref="JsonDocument"/> has been disposed.
         /// </exception>
-        public override string ToString()
+        public override string? ToString()
         {
             if (_parent is JsonNode jsonNode)
             {
@@ -1775,7 +1779,7 @@ namespace System.Text.Json
         /// </remarks>
         public JsonElement Clone()
         {
-            CheckValidInstance();
+            CheckValidInstance_ThrowInvalidOperationExceptionIfNull(_parent == null, _parent);
 
             if (_parent is JsonDocument document)
             {
@@ -1791,17 +1795,16 @@ namespace System.Text.Json
             return jsonNode.Clone().AsJsonElement();
         }
 
-        private void CheckValidInstance()
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private string DebuggerDisplay => $"ValueKind = {ValueKind} : \"{ToString()}\"";
+
+        private static void CheckValidInstance_ThrowInvalidOperationExceptionIfNull([DoesNotReturnIf(true)] bool parentIsNull, object? parent)
         {
-            if (_parent == null)
+            if (parentIsNull)
             {
                 throw new InvalidOperationException();
             }
-
-            Debug.Assert(_parent is JsonDocument || _parent is JsonNode);
+            Debug.Assert(parent is JsonDocument || parent is JsonNode);
         }
-
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private string DebuggerDisplay => $"ValueKind = {ValueKind} : \"{ToString()}\"";
     }
 }

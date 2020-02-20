@@ -2,6 +2,8 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+#nullable enable
+
 using System.Buffers;
 using System.Diagnostics;
 using System.IO;
@@ -86,7 +88,7 @@ namespace System.Text.Json
 
             ClearHelper();
             ArrayPool<byte>.Shared.Return(_rentedBuffer);
-            _rentedBuffer = null;
+            _rentedBuffer = null!;
         }
 
         public void Advance(int count)
@@ -138,7 +140,16 @@ namespace System.Text.Json
             {
                 int growBy = Math.Max(sizeHint, _rentedBuffer.Length);
 
-                int newSize = checked(_rentedBuffer.Length + growBy);
+                int newSize = _rentedBuffer.Length + growBy;
+
+                if ((uint)newSize > int.MaxValue)
+                {
+                    newSize = _rentedBuffer.Length + sizeHint;
+                    if ((uint)newSize > int.MaxValue)
+                    {
+                        newSize = int.MaxValue;
+                    }
+                }
 
                 byte[] oldBuffer = _rentedBuffer;
 

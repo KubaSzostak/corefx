@@ -2,6 +2,8 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+#nullable enable
+
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization.Converters;
@@ -16,7 +18,7 @@ namespace System.Text.Json.Serialization
     /// </remarks>
     public sealed class JsonStringEnumConverter : JsonConverterFactory
     {
-        private readonly JsonNamingPolicy _namingPolicy;
+        private readonly JsonNamingPolicy? _namingPolicy;
         private readonly EnumConverterOptions _converterOptions;
 
         /// <summary>
@@ -39,7 +41,7 @@ namespace System.Text.Json.Serialization
         /// True to allow undefined enum values. When true, if an enum value isn't
         /// defined it will output as a number rather than a string.
         /// </param>
-        public JsonStringEnumConverter(JsonNamingPolicy namingPolicy = null, bool allowIntegerValues = true)
+        public JsonStringEnumConverter(JsonNamingPolicy? namingPolicy = null, bool allowIntegerValues = true)
         {
             _namingPolicy = namingPolicy;
             _converterOptions = allowIntegerValues
@@ -63,8 +65,8 @@ namespace System.Text.Json.Serialization
                 typeof(JsonConverterEnum<>).MakeGenericType(typeToConvert),
                 BindingFlags.Instance | BindingFlags.Public,
                 binder: null,
-                new object[] { _converterOptions, _namingPolicy },
-                culture: null);
+                new object?[] { _converterOptions, _namingPolicy },
+                culture: null)!;
 
             return converter;
         }

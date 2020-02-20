@@ -2,10 +2,13 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+#nullable enable
+
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Text.Json.Serialization;
 using System.Text.Encodings.Web;
+using System.Diagnostics.CodeAnalysis;
 
 namespace System.Text.Json
 {
@@ -20,11 +23,11 @@ namespace System.Text.Json
 
         private readonly ConcurrentDictionary<Type, JsonClassInfo> _classes = new ConcurrentDictionary<Type, JsonClassInfo>();
         private static readonly ConcurrentDictionary<string, ImmutableCollectionCreator> s_createRangeDelegates = new ConcurrentDictionary<string, ImmutableCollectionCreator>();
-        private MemberAccessor _memberAccessorStrategy;
-        private JsonNamingPolicy _dictionayKeyPolicy;
-        private JsonNamingPolicy _jsonPropertyNamingPolicy;
+        private MemberAccessor? _memberAccessorStrategy;
+        private JsonNamingPolicy? _dictionayKeyPolicy;
+        private JsonNamingPolicy? _jsonPropertyNamingPolicy;
         private JsonCommentHandling _readCommentHandling;
-        private JavaScriptEncoder _encoder;
+        private JavaScriptEncoder? _encoder;
         private int _defaultBufferSize = BufferSizeDefault;
         private int _maxDepth;
         private bool _allowTrailingCommas;
@@ -95,7 +98,7 @@ namespace System.Text.Json
         /// <summary>
         /// The encoder to use when escaping strings, or <see langword="null" /> to use the default encoder.
         /// </summary>
-        public JavaScriptEncoder Encoder
+        public JavaScriptEncoder? Encoder
         {
             get
             {
@@ -116,7 +119,7 @@ namespace System.Text.Json
         /// This property can be set to <see cref="JsonNamingPolicy.CamelCase"/> to specify a camel-casing policy.
         /// It is not used when deserializing.
         /// </remarks>
-        public JsonNamingPolicy DictionaryKeyPolicy
+        public JsonNamingPolicy? DictionaryKeyPolicy
         {
             get
             {
@@ -214,7 +217,7 @@ namespace System.Text.Json
         /// The policy is not used for properties that have a <see cref="JsonPropertyNameAttribute"/> applied.
         /// This property can be set to <see cref="JsonNamingPolicy.CamelCase"/> to specify a camel-casing policy.
         /// </remarks>
-        public JsonNamingPolicy PropertyNamingPolicy
+        public JsonNamingPolicy? PropertyNamingPolicy
         {
             get
             {
@@ -302,7 +305,7 @@ namespace System.Text.Json
             {
                 if (_memberAccessorStrategy == null)
                 {
-#if BUILDING_INBOX_LIBRARY
+#if !BUILDING_INBOX_LIBRARY
                     _memberAccessorStrategy = new ReflectionEmitMemberAccessor();
 #else
                     // todo: should we attempt to detect here, or at least have a #define like #SUPPORTS_IL_EMIT
@@ -319,11 +322,12 @@ namespace System.Text.Json
             _haveTypesBeenCreated = true;
 
             // todo: for performance and reduced instances, consider using the converters and JsonClassInfo from s_defaultOptions by cloning (or reference directly if no changes).
-            if (!_classes.TryGetValue(classType, out JsonClassInfo result))
+            if (!_classes.TryGetValue(classType, out JsonClassInfo? result))
             {
                 result = _classes.GetOrAdd(classType, new JsonClassInfo(classType, this));
             }
 
+            Debug.Assert(result != null);
             return result;
         }
 
@@ -354,7 +358,7 @@ namespace System.Text.Json
             return s_createRangeDelegates.ContainsKey(key);
         }
 
-        internal bool TryGetCreateRangeDelegate(string delegateKey, out ImmutableCollectionCreator createRangeDelegate)
+        internal bool TryGetCreateRangeDelegate(string delegateKey, [NotNullWhen(true)] out ImmutableCollectionCreator? createRangeDelegate)
         {
             return s_createRangeDelegates.TryGetValue(delegateKey, out createRangeDelegate) && createRangeDelegate != null;
         }

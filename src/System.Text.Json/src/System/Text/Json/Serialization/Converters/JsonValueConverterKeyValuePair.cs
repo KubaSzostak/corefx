@@ -2,6 +2,8 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+#nullable enable
+
 using System.Collections.Generic;
 
 namespace System.Text.Json.Serialization.Converters
@@ -24,10 +26,10 @@ namespace System.Text.Json.Serialization.Converters
                 ThrowHelper.ThrowJsonException();
             }
 
-            TKey k = default;
+            TKey k = default!;
             bool keySet = false;
 
-            TValue v = default;
+            TValue v = default!;
             bool valueSet = false;
 
             // Get the first property.
@@ -37,7 +39,7 @@ namespace System.Text.Json.Serialization.Converters
                 ThrowHelper.ThrowJsonException();
             }
 
-            string propertyName = reader.GetString();
+            string propertyName = reader.GetString()!;
             if (propertyName == KeyName)
             {
                 k = ReadProperty<TKey>(ref reader, typeToConvert, options);
@@ -60,7 +62,7 @@ namespace System.Text.Json.Serialization.Converters
                 ThrowHelper.ThrowJsonException();
             }
 
-            propertyName = reader.GetString();
+            propertyName = reader.GetString()!;
             if (propertyName == ValueName)
             {
                 v = ReadProperty<TValue>(ref reader, typeToConvert, options);
@@ -100,7 +102,7 @@ namespace System.Text.Json.Serialization.Converters
             if (typeToConvert != typeof(object) && (options?.GetConverter(typeToConvert) is JsonConverter<T> keyConverter))
             {
                 reader.Read();
-                k = keyConverter.Read(ref reader, typeToConvert, options);
+                k = keyConverter.Read(ref reader, typeToConvert, options)!;
             }
             else
             {

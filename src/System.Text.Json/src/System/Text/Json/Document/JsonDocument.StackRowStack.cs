@@ -2,6 +2,8 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+#nullable enable
+
 using System.Buffers;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
@@ -24,7 +26,7 @@ namespace System.Text.Json
             public void Dispose()
             {
                 byte[] toReturn = _rentedBuffer;
-                _rentedBuffer = null;
+                _rentedBuffer = null!;
                 _topOfStack = 0;
 
                 if (toReturn != null)

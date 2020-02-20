@@ -2,6 +2,8 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+#nullable enable
+
 using System.Collections;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
@@ -12,14 +14,14 @@ namespace System.Text.Json
     internal struct WriteStackFrame
     {
         // The object (POCO or IEnumerable) that is being populated.
-        public object CurrentValue;
+        public object? CurrentValue;
         public JsonClassInfo JsonClassInfo;
 
         // Support Dictionary keys.
-        public string KeyName;
+        public string? KeyName;
 
         // The current IEnumerable or IDictionary.
-        public IEnumerator CollectionEnumerator;
+        public IEnumerator? CollectionEnumerator;
         // Note all bools are kept together for packing:
         public bool PopStackOnEndCollection;
 
@@ -31,7 +33,7 @@ namespace System.Text.Json
         // The current property.
         public int PropertyEnumeratorIndex;
         public ExtensionDataWriteStatus ExtensionDataStatus;
-        public JsonPropertyInfo JsonPropertyInfo;
+        public JsonPropertyInfo? JsonPropertyInfo;
 
         public void Initialize(Type type, JsonSerializerOptions options)
         {
@@ -46,7 +48,7 @@ namespace System.Text.Json
         {
             if (JsonPropertyInfo?.EscapedName.HasValue == true)
             {
-                WriteObjectOrArrayStart(classType, JsonPropertyInfo.EscapedName.Value, writer, writeNull);
+                WriteObjectOrArrayStart(classType, JsonPropertyInfo.EscapedName!.Value, writer, writeNull);
             }
             else if (KeyName != null)
             {
@@ -94,7 +96,7 @@ namespace System.Text.Json
             CurrentValue = null;
             CollectionEnumerator = null;
             ExtensionDataStatus = ExtensionDataWriteStatus.NotStarted;
-            JsonClassInfo = null;
+            JsonClassInfo = null!;
             PropertyEnumeratorIndex = 0;
             PopStackOnEndCollection = false;
             PopStackOnEndObject = false;
@@ -129,7 +131,8 @@ namespace System.Text.Json
         {
             EndProperty();
 
-            int maxPropertyIndex = JsonClassInfo.PropertyCacheArray.Length;
+            Debug.Assert(JsonClassInfo != null && JsonClassInfo.PropertyCacheArray != null);
+            int maxPropertyIndex = JsonClassInfo!.PropertyCacheArray!.Length;
 
             ++PropertyEnumeratorIndex;
             if (PropertyEnumeratorIndex >= maxPropertyIndex)

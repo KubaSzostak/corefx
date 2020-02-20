@@ -2,6 +2,8 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+#nullable enable
+
 namespace System.Text.Json
 {
     /// <summary>
@@ -11,18 +13,18 @@ namespace System.Text.Json
     {
         private readonly struct RecursionStackFrame
         {
-            public string PropertyName { get; }
-            public JsonNode PropertyValue { get; }
+            public string? PropertyName { get; }
+            public JsonNode? PropertyValue { get; }
             public JsonValueKind ValueKind { get; } // to retrieve ValueKind when PropertyValue is null
 
-            public RecursionStackFrame(string propertyName, JsonNode propertyValue, JsonValueKind valueKind)
+            public RecursionStackFrame(string? propertyName, JsonNode? propertyValue, JsonValueKind valueKind)
             {
                 PropertyName = propertyName;
                 PropertyValue = propertyValue;
                 ValueKind = valueKind;
             }
 
-            public RecursionStackFrame(string propertyName, JsonNode propertyValue) : this(propertyName, propertyValue, propertyValue.ValueKind)
+            public RecursionStackFrame(string? propertyName, JsonNode propertyValue) : this(propertyName, propertyValue, propertyValue.ValueKind)
             {
             }
         }

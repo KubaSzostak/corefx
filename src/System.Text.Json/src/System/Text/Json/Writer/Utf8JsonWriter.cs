@@ -2,6 +2,8 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+#nullable enable
+
 using System.Buffers;
 using System.Diagnostics;
 using System.IO;
@@ -41,9 +43,9 @@ namespace System.Text.Json
         private const int DefaultGrowthSize = 4096;
         private const int InitialGrowthSize = 256;
 
-        private IBufferWriter<byte> _output;
-        private Stream _stream;
-        private ArrayBufferWriter<byte> _arrayBufferWriter;
+        private IBufferWriter<byte>? _output;
+        private Stream? _stream;
+        private ArrayBufferWriter<byte>? _arrayBufferWriter;
 
         private Memory<byte> _memory;
 
@@ -298,7 +300,7 @@ namespace System.Text.Json
                     Debug.Assert(result);
                     Debug.Assert(underlyingBuffer.Offset == 0);
                     Debug.Assert(_arrayBufferWriter.WrittenCount == underlyingBuffer.Count);
-                    _stream.Write(underlyingBuffer.Array, underlyingBuffer.Offset, underlyingBuffer.Count);
+                    _stream.Write(underlyingBuffer.Array!, underlyingBuffer.Offset, underlyingBuffer.Count);
 #endif
 
                     BytesCommitted += _arrayBufferWriter.WrittenCount;
@@ -412,7 +414,7 @@ namespace System.Text.Json
                     Debug.Assert(result);
                     Debug.Assert(underlyingBuffer.Offset == 0);
                     Debug.Assert(_arrayBufferWriter.WrittenCount == underlyingBuffer.Count);
-                    await _stream.WriteAsync(underlyingBuffer.Array, underlyingBuffer.Offset, underlyingBuffer.Count, cancellationToken).ConfigureAwait(false);
+                    await _stream.WriteAsync(underlyingBuffer.Array!, underlyingBuffer.Offset, underlyingBuffer.Count, cancellationToken).ConfigureAwait(false);
 #endif
 
                     BytesCommitted += _arrayBufferWriter.WrittenCount;
@@ -694,7 +696,7 @@ namespace System.Text.Json
             Debug.Assert(int.MaxValue / JsonConstants.MaxExpansionFactorWhileEscaping >= utf8PropertyName.Length);
             Debug.Assert(firstEscapeIndexProp >= 0 && firstEscapeIndexProp < utf8PropertyName.Length);
 
-            byte[] propertyArray = null;
+            byte[]? propertyArray = null;
 
             int length = JsonWriterHelper.GetMaxEscapedLength(utf8PropertyName.Length, firstEscapeIndexProp);
 
@@ -837,7 +839,7 @@ namespace System.Text.Json
             Debug.Assert(int.MaxValue / JsonConstants.MaxExpansionFactorWhileEscaping >= propertyName.Length);
             Debug.Assert(firstEscapeIndexProp >= 0 && firstEscapeIndexProp < propertyName.Length);
 
-            char[] propertyArray = null;
+            char[]? propertyArray = null;
 
             int length = JsonWriterHelper.GetMaxEscapedLength(propertyName.Length, firstEscapeIndexProp);
 

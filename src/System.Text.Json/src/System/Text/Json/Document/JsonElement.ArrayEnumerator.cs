@@ -2,6 +2,8 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+#nullable enable
+
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -33,6 +35,7 @@ namespace System.Text.Json
                 }
                 else
                 {
+                    Debug.Assert(target._parent != null);
                     var jsonArray = (JsonArray)target._parent;
                     _endIdxOrVersion = jsonArray._version;
                 }
@@ -58,7 +61,7 @@ namespace System.Text.Json
                         return jsonArray[_curIdx].AsJsonElement();
                     }
 
-                    var document = (JsonDocument)_target._parent;
+                    var document = (JsonDocument?)_target._parent;
                     return new JsonElement(document, _curIdx);
                 }
             }
@@ -128,6 +131,7 @@ namespace System.Text.Json
                 }
                 else
                 {
+                    Debug.Assert(_target._parent != null);
                     var document = (JsonDocument)_target._parent;
                     _curIdx = document.GetEndIndex(_curIdx, includeEndElement: true);
                 }

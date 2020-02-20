@@ -2,12 +2,15 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+#nullable enable
+
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Converters;
+using System.Threading;
 
 namespace System.Text.Json
 {
@@ -23,7 +26,7 @@ namespace System.Text.Json
         private static readonly List<JsonConverter> s_defaultFactoryConverters = GetDefaultConverters();
 
         // The cached converters (custom or built-in).
-        private readonly ConcurrentDictionary<Type, JsonConverter> _converters = new ConcurrentDictionary<Type, JsonConverter>();
+        private readonly ConcurrentDictionary<Type, JsonConverter?> _converters = new ConcurrentDictionary<Type, JsonConverter?>();
 
         private static Dictionary<Type, JsonConverter> GetDefaultSimpleConverters()
         {
@@ -32,7 +35,7 @@ namespace System.Text.Json
             // Use a dictionary for simple converters.
             foreach (JsonConverter converter in DefaultSimpleConverters)
             {
-                converters.Add(converter.TypeToConvert, converter);
+                converters.Add(converter.TypeToConvert!, converter);
             }
 
             Debug.Assert(NumberOfSimpleConverters == converters.Count);
@@ -65,14 +68,14 @@ namespace System.Text.Json
         /// </remarks>
         public IList<JsonConverter> Converters { get; }
 
-        internal JsonConverter DetermineConverterForProperty(Type parentClassType, Type runtimePropertyType, PropertyInfo propertyInfo)
+        internal JsonConverter? DetermineConverterForProperty(Type parentClassType, Type runtimePropertyType, PropertyInfo? propertyInfo)
         {
-            JsonConverter converter = null;
+            JsonConverter? converter = null;
 
             // Priority 1: attempt to get converter from JsonConverterAttribute on property.
             if (propertyInfo != null)
             {
-                JsonConverterAttribute converterAttribute = (JsonConverterAttribute)
+                JsonConverterAttribute? converterAttribute = (JsonConverterAttribute?)
                     GetAttributeThatCanHaveMultiple(parentClassType, typeof(JsonConverterAttribute), propertyInfo);
 
                 if (converterAttribute != null)
@@ -94,6 +97,9 @@ namespace System.Text.Json
             return converter;
         }
 
+        //[ThreadStatic]
+        //private static int s_counter = 0;
+
         /// <summary>
         /// Returns the converter for the specified type.
         /// </summary>
@@ -101,9 +107,23 @@ namespace System.Text.Json
         /// <returns>
         /// The first converter that supports the given type, or null if there is no converter.
         /// </returns>
-        public JsonConverter GetConverter(Type typeToConvert)
+        /// <exception cref="ArgumentNullException">
+        ///  <paramref name="typeToConvert"/> is <see langword="null"/>.
+        /// </exception>
+        public JsonConverter? GetConverter(Type typeToConvert)
         {
-            if (_converters.TryGetValue(typeToConvert, out JsonConverter converter))
+            //Interlocked.Increment(ref s_counter);
+            //if (s_counter > 1)
+            //{
+            //    throw new InvalidOperationException();
+            //}
+
+            //if (typeToConvert == null)
+            //{
+            //    throw new ArgumentNullException(nameof(typeToConvert));
+            //}
+
+            if (_converters.TryGetValue(typeToConvert, out JsonConverter? converter))
             {
                 return converter;
             }
@@ -122,7 +142,7 @@ namespace System.Text.Json
             // Priority 3: Attempt to get converter from [JsonConverter] on the type being converted.
             if (converter == null)
             {
-                JsonConverterAttribute converterAttribute = (JsonConverterAttribute)
+                JsonConverterAttribute? converterAttribute = (JsonConverterAttribute?)
                     GetAttributeThatCanHaveMultiple(typeToConvert, typeof(JsonConverterAttribute));
 
                 if (converterAttribute != null)
@@ -134,9 +154,15 @@ namespace System.Text.Json
             // Priority 4: Attempt to get built-in converter.
             if (converter == null)
             {
-                if (s_defaultSimpleConverters.TryGetValue(typeToConvert, out JsonConverter foundConverter))
+                if (s_defaultSimpleConverters.TryGetValue(typeToConvert, out JsonConverter? foundConverter))
                 {
                     converter = foundConverter;
+
+                    Debug.Assert(converter != null && converter.TypeToConvert != null);
+                    Debug.Assert(converter.TypeToConvert.IsAssignableFrom(typeToConvert) ||
+                        typeToConvert.IsAssignableFrom(converter.TypeToConvert));
+
+                    goto Done;
                 }
                 else
                 {
@@ -144,8 +170,11 @@ namespace System.Text.Json
                     {
                         if (item.CanConvert(typeToConvert))
                         {
-                            converter = item;
-                            break;
+                            converter = ((JsonConverterFactory)item).GetConverterInternal(typeToConvert, this);
+                            Debug.Assert(converter != null && converter.TypeToConvert != null);
+                            Debug.Assert(converter.TypeToConvert.IsAssignableFrom(typeToConvert) ||
+                                typeToConvert.IsAssignableFrom(converter.TypeToConvert));
+                            goto Done;
                         }
                     }
                 }
@@ -172,6 +201,7 @@ namespace System.Text.Json
                 }
             }
 
+            Done:
             // Only cache the value once (de)serialization has occurred since new converters can be added that may change the result.
             if (_haveTypesBeenCreated)
             {
@@ -181,19 +211,15 @@ namespace System.Text.Json
                 _converters.TryAdd(typeToConvert, converter);
             }
 
+            //Interlocked.Decrement(ref s_counter);
             return converter;
         }
 
-        internal bool HasConverter(Type typeToConvert)
+        private JsonConverter GetConverterFromAttribute(JsonConverterAttribute converterAttribute, Type typeToConvert, Type classTypeAttributeIsOn, PropertyInfo? propertyInfo)
         {
-            return GetConverter(typeToConvert) != null;
-        }
+            JsonConverter? converter;
 
-        private JsonConverter GetConverterFromAttribute(JsonConverterAttribute converterAttribute, Type typeToConvert, Type classTypeAttributeIsOn, PropertyInfo propertyInfo)
-        {
-            JsonConverter converter;
-
-            Type type = converterAttribute.ConverterType;
+            Type? type = converterAttribute.ConverterType;
             if (type == null)
             {
                 // Allow the attribute to create the converter.
@@ -205,15 +231,16 @@ namespace System.Text.Json
             }
             else
             {
-                ConstructorInfo ctor = type.GetConstructor(Type.EmptyTypes);
-                if (!typeof(JsonConverter).IsAssignableFrom(type) || !ctor.IsPublic)
+                ConstructorInfo? ctor = type.GetConstructor(Type.EmptyTypes);
+                if (!typeof(JsonConverter).IsAssignableFrom(type) || ctor == null || !ctor.IsPublic)
                 {
                     ThrowHelper.ThrowInvalidOperationException_SerializationConverterOnAttributeInvalid(classTypeAttributeIsOn, propertyInfo);
                 }
 
-                converter = (JsonConverter)Activator.CreateInstance(type);
+                converter = (JsonConverter)Activator.CreateInstance(type)!;
             }
 
+            Debug.Assert(converter != null);
             if (!converter.CanConvert(typeToConvert))
             {
                 ThrowHelper.ThrowInvalidOperationException_SerializationConverterOnAttributeNotCompatible(classTypeAttributeIsOn, propertyInfo, typeToConvert);
@@ -222,19 +249,19 @@ namespace System.Text.Json
             return converter;
         }
 
-        private static Attribute GetAttributeThatCanHaveMultiple(Type classType, Type attributeType, PropertyInfo propertyInfo)
+        private static Attribute? GetAttributeThatCanHaveMultiple(Type classType, Type attributeType, PropertyInfo propertyInfo)
         {
-            object[] attributes = propertyInfo?.GetCustomAttributes(attributeType, inherit: false);
+            object[] attributes = propertyInfo.GetCustomAttributes(attributeType, inherit: false);
             return GetAttributeThatCanHaveMultiple(attributeType, classType, propertyInfo, attributes);
         }
 
-        private static Attribute GetAttributeThatCanHaveMultiple(Type classType, Type attributeType)
+        private static Attribute? GetAttributeThatCanHaveMultiple(Type classType, Type attributeType)
         {
             object[] attributes = classType.GetCustomAttributes(attributeType, inherit: false);
             return GetAttributeThatCanHaveMultiple(attributeType, classType, null, attributes);
         }
 
-        private static Attribute GetAttributeThatCanHaveMultiple(Type attributeType, Type classType, PropertyInfo propertyInfo, object[] attributes)
+        private static Attribute? GetAttributeThatCanHaveMultiple(Type attributeType, Type classType, PropertyInfo? propertyInfo, object[] attributes)
         {
             if (attributes.Length == 0)
             {

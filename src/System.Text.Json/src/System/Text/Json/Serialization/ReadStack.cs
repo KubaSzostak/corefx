@@ -2,6 +2,8 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+#nullable enable
+
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -11,7 +13,7 @@ namespace System.Text.Json
     [DebuggerDisplay("Path:{JsonPath()} Current: ClassType.{Current.JsonClassInfo.ClassType}, {Current.JsonClassInfo.Type.Name}")]
     internal struct ReadStack
     {
-        internal static readonly char[] SpecialCharacters = { '.', ' ', '\'', '/', '"', '[', ']', '(', ')', '\t', '\n', '\r', '\f', '\b', '\\', '\u0085', '\u2028', '\u2029' };
+        internal static readonly char[] s_specialCharacters = { '.', ' ', '\'', '/', '"', '[', ']', '(', ')', '\t', '\n', '\r', '\f', '\b', '\\', '\u0085', '\u2028', '\u2029' };
 
         // A field is used instead of a property to avoid value semantics.
         public ReadStackFrame Current;
@@ -39,7 +41,8 @@ namespace System.Text.Json
                 _previous[_index] = Current;
             }
 
-            Current.Reset();
+            //Current.Reset();
+            Current = default;
             _index++;
         }
 
@@ -70,7 +73,7 @@ namespace System.Text.Json
         private void AppendStackFrame(StringBuilder sb, in ReadStackFrame frame)
         {
             // Append the property name.
-            string propertyName = GetPropertyName(frame);
+            string? propertyName = GetPropertyName(frame);
             AppendPropertyName(sb, propertyName);
 
             if (frame.JsonClassInfo != null)
@@ -82,11 +85,11 @@ namespace System.Text.Json
                 }
                 else if (frame.IsProcessingEnumerable())
                 {
-                    IList list = frame.TempEnumerableValues;
+                    IList? list = frame.TempEnumerableValues;
                     if (list == null && frame.ReturnValue != null)
                     {
 
-                        list = (IList)frame.JsonPropertyInfo?.GetValueAsObject(frame.ReturnValue);
+                        list = (IList?)frame.JsonPropertyInfo?.GetValueAsObject(frame.ReturnValue);
                     }
                     if (list != null)
                     {
@@ -98,11 +101,11 @@ namespace System.Text.Json
             }
         }
 
-        private void AppendPropertyName(StringBuilder sb, string propertyName)
+        private void AppendPropertyName(StringBuilder sb, string? propertyName)
         {
             if (propertyName != null)
             {
-                if (propertyName.IndexOfAny(SpecialCharacters) != -1)
+                if (propertyName.IndexOfAny(s_specialCharacters) != -1)
                 {
                     sb.Append(@"['");
                     sb.Append(propertyName);
@@ -116,17 +119,17 @@ namespace System.Text.Json
             }
         }
 
-        private string GetPropertyName(in ReadStackFrame frame)
+        private string? GetPropertyName(in ReadStackFrame frame)
         {
             // Attempt to get the JSON property name from the frame.
-            byte[] utf8PropertyName = frame.JsonPropertyName;
+            byte[]? utf8PropertyName = frame.JsonPropertyName;
             if (utf8PropertyName == null)
             {
                 // Attempt to get the JSON property name from the JsonPropertyInfo.
                 utf8PropertyName = frame.JsonPropertyInfo?.JsonPropertyName;
             }
 
-            string propertyName;
+            string? propertyName;
             if (utf8PropertyName != null)
             {
                 propertyName = JsonHelpers.Utf8GetString(utf8PropertyName);
@@ -147,6 +150,6 @@ namespace System.Text.Json
         /// <summary>
         /// Internal flag to let us know that we need to read ahead in the inner read loop.
         /// </summary>
-        internal bool ReadAhead;
+        internal bool _readAhead;
     }
 }

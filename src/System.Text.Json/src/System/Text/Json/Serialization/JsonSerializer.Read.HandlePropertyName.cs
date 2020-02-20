@@ -2,6 +2,8 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+#nullable enable
+
 using System.Buffers;
 using System.Collections;
 using System.Diagnostics;
@@ -54,7 +56,7 @@ namespace System.Text.Json
                 JsonPropertyInfo jsonPropertyInfo = state.Current.JsonClassInfo.GetProperty(propertyName, ref state.Current);
                 if (jsonPropertyInfo == JsonPropertyInfo.s_missingProperty)
                 {
-                    JsonPropertyInfo dataExtProperty = state.Current.JsonClassInfo.DataExtensionProperty;
+                    JsonPropertyInfo? dataExtProperty = state.Current.JsonClassInfo!.DataExtensionProperty;
                     if (dataExtProperty == null)
                     {
                         state.Current.JsonPropertyInfo = JsonPropertyInfo.s_missingProperty;
@@ -85,7 +87,7 @@ namespace System.Text.Json
                         if (options.PropertyNameCaseInsensitive)
                         {
                             // Each payload can have a different name here; remember the value on the temporary stack.
-                            state.Current.JsonPropertyName = propertyNameArray;
+                            state.Current.JsonPropertyInfo.JsonPropertyName = propertyNameArray;
                         }
                         else
                         {
@@ -108,7 +110,7 @@ namespace System.Text.Json
             Debug.Assert(jsonPropertyInfo != null);
             Debug.Assert(state.Current.ReturnValue != null);
 
-            IDictionary extensionData = (IDictionary)jsonPropertyInfo.GetValueAsObject(state.Current.ReturnValue);
+            IDictionary? extensionData = (IDictionary?)jsonPropertyInfo.GetValueAsObject(state.Current.ReturnValue);
             if (extensionData == null)
             {
                 // Create the appropriate dictionary type. We already verified the types.
@@ -119,9 +121,13 @@ namespace System.Text.Json
                     jsonPropertyInfo.DeclaredPropertyType.GetGenericArguments()[1].UnderlyingSystemType == typeof(object) ||
                     jsonPropertyInfo.DeclaredPropertyType.GetGenericArguments()[1].UnderlyingSystemType == typeof(JsonElement));
 
-                extensionData = (IDictionary)jsonPropertyInfo.RuntimeClassInfo.CreateObject();
+                extensionData = (IDictionary?)jsonPropertyInfo.RuntimeClassInfo.CreateObject!();
                 jsonPropertyInfo.SetValueAsObject(state.Current.ReturnValue, extensionData);
             }
+
+            object value = state.Current.IsProcessingProperty(ClassType.Dictionary) ?
+                state.Current.JsonPropertyInfo!.GetValueAsObject(state.Current.ReturnValue)! :
+                state.Current.ReturnValue!;
 
             // We don't add the value to the dictionary here because we need to support the read-ahead functionality for Streams.
         }

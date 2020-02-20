@@ -2,6 +2,8 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+#nullable enable
+
 using System.Buffers;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
@@ -16,8 +18,8 @@ namespace System.Text.Json
     {
         private static void ReadCore(
             JsonSerializerOptions options,
-            ref Utf8JsonReader reader,
-            ref ReadStack readStack)
+            ref ReadStack readStack,
+            ref Utf8JsonReader reader)
         {
             try
             {
@@ -26,7 +28,7 @@ namespace System.Text.Json
 
                 while (true)
                 {
-                    if (readStack.ReadAhead)
+                    if (readStack._readAhead)
                     {
                         // When we're reading ahead we always have to save the state
                         // as we don't know if the next token is an opening object or
@@ -149,7 +151,7 @@ namespace System.Text.Json
             ref JsonReaderState initialState,
             long initialBytesConsumed)
         {
-            if (readStack.ReadAhead)
+            if (readStack._readAhead)
             {
                 // Attempt to skip to make sure we have all the data we need.
                 bool complete = reader.TrySkip();
@@ -184,7 +186,7 @@ namespace System.Text.Json
         {
             // The escaped name is always longer than the unescaped, so it is safe to use escaped name for the buffer length.
             int length = utf8Source.Length;
-            byte[] pooledName = null;
+            byte[]? pooledName = null;
 
             Span<byte> unescapedName = length <= JsonConstants.StackallocThreshold ?
                 stackalloc byte[length] :

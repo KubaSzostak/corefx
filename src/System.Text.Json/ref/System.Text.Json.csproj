@@ -14,8 +14,8 @@
     <Reference Include="mscorlib" />
     <Reference Include="netstandard" />
     <Reference Include="System.Memory" />
+    <Reference Include="System.Text.Encodings.Web" />
     <Reference Include="System.Threading.Tasks.Extensions" />
     <Reference Include="Microsoft.Bcl.AsyncInterfaces" />
-    <ProjectReference Include="..\..\System.Text.Encodings.Web\ref\System.Text.Encodings.Web.csproj" />
   </ItemGroup>
 </Project>

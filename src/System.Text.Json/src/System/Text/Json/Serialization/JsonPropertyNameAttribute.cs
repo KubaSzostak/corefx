@@ -2,6 +2,8 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+#nullable enable
+
 namespace System.Text.Json.Serialization
 {
     /// <summary>
@@ -17,7 +19,7 @@ namespace System.Text.Json.Serialization
         /// <param name="name">The name of the property.</param>
         public JsonPropertyNameAttribute(string name)
         {
-            Name = name;
+            Name = name ?? throw new ArgumentNullException(nameof(name));
         }
 
         /// <summary>

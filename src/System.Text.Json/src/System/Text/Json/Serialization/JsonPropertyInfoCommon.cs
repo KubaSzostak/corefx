@@ -2,9 +2,12 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+#nullable enable
+
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Text.Json.Serialization;
 
@@ -13,23 +16,21 @@ namespace System.Text.Json
     /// <summary>
     /// Represents a strongly-typed property to prevent boxing and to create a direct delegate to the getter\setter.
     /// </summary>
-    internal abstract class JsonPropertyInfoCommon<TClass, TDeclaredProperty, TRuntimeProperty, TConverter> : JsonPropertyInfo
+    internal abstract class JsonPropertyInfoCommon<TClass, TDeclaredProperty, TConverter> : JsonPropertyInfo
     {
-        public Func<object, TDeclaredProperty> Get { get; private set; }
-        public Action<object, TDeclaredProperty> Set { get; private set; }
+        public Func<object?, TDeclaredProperty>? Get { get; private set; } = null!;
+        public Action<object?, TDeclaredProperty>? Set { get; private set; } = null!;
 
-        public Action<TDeclaredProperty> AddItemToEnumerable { get; private set; }
-
-        public JsonConverter<TConverter> Converter { get; internal set; }
+        public JsonConverter<TConverter>? Converter { get; internal set; }
 
         public override void Initialize(
             Type parentClassType,
             Type declaredPropertyType,
             Type runtimePropertyType,
             ClassType runtimeClassType,
-            PropertyInfo propertyInfo,
-            Type elementType,
-            JsonConverter converter,
+            PropertyInfo? propertyInfo,
+            Type? elementType,
+            JsonConverter? converter,
             bool treatAsNullable,
             JsonSerializerOptions options)
         {
@@ -60,6 +61,7 @@ namespace System.Text.Json
             }
             else
             {
+                // Root object or things nested within collections
                 IsPropertyPolicy = true;
                 HasGetter = true;
                 HasSetter = true;
@@ -68,7 +70,8 @@ namespace System.Text.Json
             GetPolicies();
         }
 
-        public override JsonConverter ConverterBase
+        [DisallowNull]
+        public override JsonConverter? ConverterBase
         {
             get
             {
@@ -83,48 +86,50 @@ namespace System.Text.Json
             }
         }
 
-        public override object GetValueAsObject(object obj)
+        public override object? GetValueAsObject(object obj)
         {
             if (IsPropertyPolicy)
             {
                 return obj;
             }
 
+            // obj is a POCO
             Debug.Assert(HasGetter);
-            return Get(obj);
+            return Get!(obj);
         }
 
-        public override void SetValueAsObject(object obj, object value)
+        public override void SetValueAsObject(object? obj, object? value)
         {
             Debug.Assert(HasSetter);
-            TDeclaredProperty typedValue = (TDeclaredProperty)value;
+            TDeclaredProperty typedValue = (TDeclaredProperty)value!;
 
             if (typedValue != null || !IgnoreNullValues)
             {
-                Set(obj, typedValue);
+                Set!(obj, typedValue);
             }
         }
 
-        private JsonPropertyInfo _elementPropertyInfo;
+        private JsonPropertyInfo? _elementPropertyInfo;
 
         private void SetPropertyInfoForObjectElement()
         {
-            if (_elementPropertyInfo == null && ElementClassInfo.PolicyProperty == null)
+            if (_elementPropertyInfo == null && ElementClassInfoOfEnumerableOrDictionary.PolicyProperty == null)
             {
-                _elementPropertyInfo = ElementClassInfo.CreateRootProperty(Options);
+                Debug.Assert(ElementClassInfoOfEnumerableOrDictionary.ClassType == ClassType.Object);
+                _elementPropertyInfo = ElementClassInfoOfEnumerableOrDictionary.CreateRootProperty(Options);
             }
         }
 
-        public override bool TryCreateEnumerableAddMethod(object target, out object addMethodDelegate)
+        public override bool TryCreateEnumerableAddMethod(object target, [NotNullWhen(true)] out object? addMethodDelegate)
         {
             SetPropertyInfoForObjectElement();
-            Debug.Assert((_elementPropertyInfo ?? ElementClassInfo.PolicyProperty) != null);
+            Debug.Assert((_elementPropertyInfo ?? ElementClassInfoOfEnumerableOrDictionary.PolicyProperty) != null);
 
-            addMethodDelegate = (_elementPropertyInfo ?? ElementClassInfo.PolicyProperty).CreateEnumerableAddMethod(RuntimeClassInfo.AddItemToObject, target);
+            addMethodDelegate = (_elementPropertyInfo ?? ElementClassInfoOfEnumerableOrDictionary.PolicyProperty!).CreateEnumerableAddMethod(RuntimeClassInfo.AddItemToObject!, target);
             return addMethodDelegate != null;
         }
 
-        public override object CreateEnumerableAddMethod(MethodInfo addMethod, object target)
+        public override object? CreateEnumerableAddMethod(MethodInfo addMethod, object target)
         {
             if (target is ICollection<TDeclaredProperty> collection && collection.IsReadOnly)
             {
@@ -134,29 +139,29 @@ namespace System.Text.Json
             return Options.MemberAccessorStrategy.CreateAddDelegate<TDeclaredProperty>(addMethod, target);
         }
 
-        public override void AddObjectToEnumerableWithReflection(object addMethodDelegate, object value)
+        public override void AddObjectToEnumerableWithReflection(object addMethodDelegate, object? value)
         {
-            Debug.Assert((_elementPropertyInfo ?? ElementClassInfo.PolicyProperty) != null);
-            (_elementPropertyInfo ?? ElementClassInfo.PolicyProperty).AddObjectToParentEnumerable(addMethodDelegate, value);
+            Debug.Assert((_elementPropertyInfo ?? ElementClassInfoOfEnumerableOrDictionary.PolicyProperty) != null);
+            (_elementPropertyInfo ?? ElementClassInfoOfEnumerableOrDictionary.PolicyProperty!).AddObjectToParentEnumerable(addMethodDelegate, value);
         }
 
-        public override void AddObjectToParentEnumerable(object addMethodDelegate, object value)
+        public override void AddObjectToParentEnumerable(object addMethodDelegate, object? value)
         {
-            ((Action<TDeclaredProperty>)addMethodDelegate)((TDeclaredProperty)value);
+            ((Action<TDeclaredProperty>)addMethodDelegate)((TDeclaredProperty)value!);
         }
 
-        public override void AddObjectToDictionary(object target, string key, object value)
+        public override void AddObjectToDictionary(object target, string key, object? value)
         {
-            Debug.Assert((_elementPropertyInfo ?? ElementClassInfo.PolicyProperty) != null);
-            (_elementPropertyInfo ?? ElementClassInfo.PolicyProperty).AddObjectToParentDictionary(target, key, value);
+            Debug.Assert((_elementPropertyInfo ?? ElementClassInfoOfEnumerableOrDictionary.PolicyProperty) != null);
+            (_elementPropertyInfo ?? ElementClassInfoOfEnumerableOrDictionary.PolicyProperty!).AddObjectToParentDictionary(target, key, value);
         }
 
-        public override void AddObjectToParentDictionary(object target, string key, object value)
+        public override void AddObjectToParentDictionary(object target, string key, object? value)
         {
             if (target is IDictionary<string, TDeclaredProperty> genericDict)
             {
                 Debug.Assert(!genericDict.IsReadOnly);
-                genericDict[key] = (TDeclaredProperty)value;
+                genericDict[key] = (TDeclaredProperty)value!;
             }
             else
             {
@@ -167,8 +172,8 @@ namespace System.Text.Json
         public override bool CanPopulateDictionary(object target)
         {
             SetPropertyInfoForObjectElement();
-            Debug.Assert((_elementPropertyInfo ?? ElementClassInfo.PolicyProperty) != null);
-            return (_elementPropertyInfo ?? ElementClassInfo.PolicyProperty).ParentDictionaryCanBePopulated(target);
+            Debug.Assert((_elementPropertyInfo ?? ElementClassInfoOfEnumerableOrDictionary.PolicyProperty) != null);
+            return (_elementPropertyInfo ?? ElementClassInfoOfEnumerableOrDictionary.PolicyProperty!).ParentDictionaryCanBePopulated(target);
         }
 
         public override bool ParentDictionaryCanBePopulated(object target)
@@ -179,7 +184,7 @@ namespace System.Text.Json
             }
             else if (target is IDictionary dict && !dict.IsReadOnly)
             {
-                Type genericDictType = target.GetType().GetInterface("System.Collections.Generic.IDictionary`2") ??
+                Type? genericDictType = target.GetType().GetInterface("System.Collections.Generic.IDictionary`2") ??
                     target.GetType().GetInterface("System.Collections.Generic.IReadOnlyDictionary`2");
 
                 if (genericDictType != null && genericDictType.GetGenericArguments()[0] != typeof(string))
@@ -208,15 +213,15 @@ namespace System.Text.Json
         // CreateRange<TDeclaredPropertyType> method to create and return the desired immutable collection type.
         public override IEnumerable CreateImmutableCollectionInstance(ref ReadStack state, Type collectionType, string delegateKey, IList sourceList, JsonSerializerOptions options)
         {
-            IEnumerable collection = null;
+            IEnumerable? collection = null;
 
-            if (!options.TryGetCreateRangeDelegate(delegateKey, out ImmutableCollectionCreator creator) ||
+            if (!options.TryGetCreateRangeDelegate(delegateKey, out ImmutableCollectionCreator? creator) ||
                 !creator.CreateImmutableEnumerable(sourceList, out collection))
             {
                 ThrowHelper.ThrowJsonException_DeserializeUnableToConvertValue(collectionType, state.JsonPath());
             }
 
-            return collection;
+            return collection!;
         }
 
         // Creates an IEnumerable<TDeclaredPropertyType> and populates it with the items in the
@@ -224,15 +229,15 @@ namespace System.Text.Json
         // CreateRange<TDeclaredPropertyType> method to create and return the desired immutable collection type.
         public override IDictionary CreateImmutableDictionaryInstance(ref ReadStack state, Type collectionType, string delegateKey, IDictionary sourceDictionary, JsonSerializerOptions options)
         {
-            IDictionary collection = null;
+            IDictionary? collection = null;
 
-            if (!options.TryGetCreateRangeDelegate(delegateKey, out ImmutableCollectionCreator creator) ||
+            if (!options.TryGetCreateRangeDelegate(delegateKey, out ImmutableCollectionCreator? creator) ||
                 !creator.CreateImmutableDictionary(sourceDictionary, out collection))
             {
                 ThrowHelper.ThrowJsonException_DeserializeUnableToConvertValue(collectionType, state.JsonPath());
             }
 
-            return collection;
+            return collection!;
         }
     }
 }

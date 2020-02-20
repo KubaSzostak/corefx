@@ -1,4 +1,10 @@
-﻿using System.Collections;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
+#nullable enable
+
+using System.Collections;
 using System.Collections.Generic;
 
 namespace System.Text.Json
@@ -14,7 +20,15 @@ namespace System.Text.Json
         ///   Initializes a new instance of the <see cref="JsonArrayEnumerator"/> class supporting an interation over provided JSON array.
         /// </summary>
         /// <param name="jsonArray">JSON array to iterate over.</param>
-        public JsonArrayEnumerator(JsonArray jsonArray) => _enumerator = jsonArray._list.GetEnumerator();
+        public JsonArrayEnumerator(JsonArray jsonArray)
+        {
+            if (jsonArray == null)
+            {
+                throw new ArgumentNullException(nameof(jsonArray));
+            }
+
+            _enumerator = jsonArray._list.GetEnumerator();
+        }
 
         /// <summary>
         ///   Gets the property in the JSON array at the current position of the enumerator.

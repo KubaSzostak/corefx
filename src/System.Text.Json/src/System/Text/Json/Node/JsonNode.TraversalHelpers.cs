@@ -2,6 +2,8 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+#nullable enable
+
 using System.Collections.Generic;
 using System.Diagnostics;
 
@@ -13,12 +15,12 @@ namespace System.Text.Json
     public abstract partial class JsonNode
     {
         private static void AddToParent(
-            KeyValuePair<string, JsonNode> nodePair,
-            ref Stack<KeyValuePair<string, JsonNode>> currentNodes,
-            ref JsonNode toReturn,
+            KeyValuePair<string?, JsonNode?> nodePair,
+            ref Stack<KeyValuePair<string?, JsonNode?>> currentNodes,
+            ref JsonNode? toReturn,
             DuplicatePropertyNameHandlingStrategy duplicatePropertyNameHandling = DuplicatePropertyNameHandlingStrategy.Replace)
         {
-            if (currentNodes.TryPeek(out KeyValuePair<string, JsonNode> parentPair))
+            if (currentNodes.TryPeek(out KeyValuePair<string?, JsonNode?> parentPair))
             {
                 // Parent needs to be JsonObject or JsonArray
                 Debug.Assert(parentPair.Value is JsonObject || parentPair.Value is JsonArray);
@@ -42,7 +44,7 @@ namespace System.Text.Json
                     }
                     else
                     {
-                        jsonObject.Add(nodePair);
+                        jsonObject.Add(nodePair!);
                     }
                 }
                 else if (parentPair.Value is JsonArray jsonArray)

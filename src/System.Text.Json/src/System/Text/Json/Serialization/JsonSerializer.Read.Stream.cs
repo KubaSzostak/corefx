@@ -2,6 +2,8 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+#nullable enable
+
 using System.Buffers;
 using System.Diagnostics;
 using System.IO;
@@ -29,11 +31,77 @@ namespace System.Text.Json
         /// </exception>
         public static ValueTask<TValue> DeserializeAsync<TValue>(
             Stream utf8Json,
-            JsonSerializerOptions options = null,
+            JsonSerializerOptions? options = null,
             CancellationToken cancellationToken = default)
         {
             if (utf8Json == null)
                 throw new ArgumentNullException(nameof(utf8Json));
+
+            //if (utf8Json.CanSeek && utf8Json.Length - utf8Json.Position <= 999_999)
+            //{
+            //    int written = 0;
+            //    byte[]? rented = null;
+
+            //    ReadOnlySpan<byte> utf8Bom = JsonConstants.Utf8Bom;
+
+            //    try
+            //    {
+            //        long expectedLength = Math.Max(utf8Bom.Length, utf8Json.Length - utf8Json.Position);
+            //        rented = ArrayPool<byte>.Shared.Rent(checked((int)expectedLength));
+
+
+            //        int lastRead;
+
+            //        // Read up to 3 bytes to see if it's the UTF-8 BOM
+            //        do
+            //        {
+            //            // No need for checking for growth, the minimal rent sizes both guarantee it'll fit.
+            //            Debug.Assert(rented.Length >= utf8Bom.Length);
+
+            //            lastRead = utf8Json.Read(
+            //                rented,
+            //                written,
+            //                utf8Bom.Length - written);
+
+            //            written += lastRead;
+            //        } while (lastRead > 0 && written < utf8Bom.Length);
+
+            //        // If we have 3 bytes, and they're the BOM, reset the write position to 0.
+            //        if (written == utf8Bom.Length &&
+            //            utf8Bom.SequenceEqual(rented.AsSpan(0, utf8Bom.Length)))
+            //        {
+            //            written = 0;
+            //        }
+
+            //        do
+            //        {
+            //            if (rented.Length == written)
+            //            {
+            //                byte[] toReturn = rented;
+            //                rented = ArrayPool<byte>.Shared.Rent(checked(toReturn.Length * 2));
+            //                Buffer.BlockCopy(toReturn, 0, rented, 0, toReturn.Length);
+            //                // Holds document content, clear it.
+            //                ArrayPool<byte>.Shared.Return(toReturn, clearArray: true);
+            //            }
+
+            //            lastRead = utf8Json.Read(rented, written, rented.Length - written);
+            //            written += lastRead;
+            //        } while (lastRead > 0);
+
+            //        return ReadCore
+            //    }
+            //    finally
+            //    {
+            //        if (rented != null)
+            //        {
+            //            // Holds document content, clear it before returning it.
+            //            rented.AsSpan(0, written).Clear();
+            //            ArrayPool<byte>.Shared.Return(rented);
+            //        }
+            //    }
+            //}
+
+
 
             return ReadAsync<TValue>(utf8Json, typeof(TValue), options, cancellationToken);
         }
@@ -57,10 +125,10 @@ namespace System.Text.Json
         /// the <paramref name="returnType"/> is not compatible with the JSON,
         /// or when there is remaining data in the Stream.
         /// </exception>
-        public static ValueTask<object> DeserializeAsync(
+        public static ValueTask<object?> DeserializeAsync(
             Stream utf8Json,
             Type returnType,
-            JsonSerializerOptions options = null,
+            JsonSerializerOptions? options = null,
             CancellationToken cancellationToken = default)
         {
             if (utf8Json == null)
@@ -69,13 +137,13 @@ namespace System.Text.Json
             if (returnType == null)
                 throw new ArgumentNullException(nameof(returnType));
 
-            return ReadAsync<object>(utf8Json, returnType, options, cancellationToken);
+            return ReadAsync<object?>(utf8Json, returnType, options, cancellationToken);
         }
 
         private static async ValueTask<TValue> ReadAsync<TValue>(
             Stream utf8Json,
             Type returnType,
-            JsonSerializerOptions options = null,
+            JsonSerializerOptions? options = null,
             CancellationToken cancellationToken = default)
         {
             if (options == null)
@@ -92,7 +160,6 @@ namespace System.Text.Json
             int utf8BomLength = JsonConstants.Utf8Bom.Length;
             byte[] buffer = ArrayPool<byte>.Shared.Rent(Math.Max(options.DefaultBufferSize, utf8BomLength));
             int bytesInBuffer = 0;
-            long totalBytesRead = 0;
             int clearMax = 0;
             bool firstIteration = true;
 
@@ -120,7 +187,6 @@ namespace System.Text.Json
                             break;
                         }
 
-                        totalBytesRead += bytesRead;
                         bytesInBuffer += bytesRead;
 
                         if (bytesInBuffer == buffer.Length)
@@ -149,21 +215,28 @@ namespace System.Text.Json
 
                     // Process the data available
                     ReadCore(
-                        ref readerState,
-                        isFinalBlock,
-                        new ReadOnlySpan<byte>(buffer, start, bytesInBuffer),
                         options,
-                        ref readStack);
+                        ref readStack,
+                        new ReadOnlySpan<byte>(buffer, start, bytesInBuffer),
+                        isFinalBlock,
+                        ref readerState);
+
+                    if (isFinalBlock)
+                    {
+                        // The reader should have thrown if we have remaining bytes.
+                        Debug.Assert(bytesInBuffer == checked((int)readStack.BytesConsumed));
+                        break;
+                    }
+
+                    if (readStack.BytesConsumed > bytesInBuffer)
+                    {
+                        throw new InvalidOperationException($"{bytesInBuffer},{readStack.BytesConsumed}");
+                    }
 
                     Debug.Assert(readStack.BytesConsumed <= bytesInBuffer);
                     int bytesConsumed = checked((int)readStack.BytesConsumed);
 
                     bytesInBuffer -= bytesConsumed;
-
-                    if (isFinalBlock)
-                    {
-                        break;
-                    }
 
                     // Check if we need to shift or expand the buffer because there wasn't enough data to complete deserialization.
                     if ((uint)bytesInBuffer > ((uint)buffer.Length / 2))
@@ -194,34 +267,34 @@ namespace System.Text.Json
                 ArrayPool<byte>.Shared.Return(buffer);
             }
 
-            // The reader should have thrown if we have remaining bytes.
-            Debug.Assert(bytesInBuffer == 0);
-
-            return (TValue)readStack.Current.ReturnValue;
+            return (TValue)readStack.Current.ReturnValue!;
         }
 
         private static void ReadCore(
-            ref JsonReaderState readerState,
-            bool isFinalBlock,
-            ReadOnlySpan<byte> buffer,
             JsonSerializerOptions options,
-            ref ReadStack readStack)
+            ref ReadStack readStack,
+            ReadOnlySpan<byte> buffer,
+            bool isFinalBlock,
+            ref JsonReaderState readerState)
         {
-            var reader = new Utf8JsonReader(buffer, isFinalBlock, readerState);
-
             // If we haven't read in the entire stream's payload we'll need to signify that we want
             // to enable read ahead behaviors to ensure we have complete json objects and arrays
             // ({}, []) when needed. (Notably to successfully parse JsonElement via JsonDocument
             // to assign to object and JsonElement properties in the constructed .NET object.)
-            readStack.ReadAhead = !isFinalBlock;
+            readStack._readAhead = !isFinalBlock;
             readStack.BytesConsumed = 0;
+
+            var reader = new Utf8JsonReader(buffer, isFinalBlock, readerState);
 
             ReadCore(
                 options,
-                ref reader,
-                ref readStack);
+                ref readStack,
+                ref reader);
 
-            readerState = reader.CurrentState;
+            if (!isFinalBlock)
+            {
+                readerState = reader.CurrentState;
+            }
         }
     }
 }

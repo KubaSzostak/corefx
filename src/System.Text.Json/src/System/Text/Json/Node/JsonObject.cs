@@ -2,8 +2,11 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+#nullable enable
+
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace System.Text.Json
 {
@@ -13,8 +16,8 @@ namespace System.Text.Json
     public sealed class JsonObject : JsonNode, IEnumerable<KeyValuePair<string, JsonNode>>
     {
         internal readonly Dictionary<string, JsonObjectProperty> _dictionary;
-        internal JsonObjectProperty _first;
-        internal JsonObjectProperty _last;
+        internal JsonObjectProperty? _first;
+        internal JsonObjectProperty? _last;
         internal int _version;
 
         /// <summary>
@@ -29,7 +32,7 @@ namespace System.Text.Json
         ///   Initializes a new instance of the <see cref="JsonObject"/> class representing provided set of JSON properties.
         /// </summary>
         /// <param name="jsonProperties">>Properties to represent as a JSON object.</param>
-        public JsonObject(IEnumerable<KeyValuePair<string, JsonNode>> jsonProperties)
+        public JsonObject(IEnumerable<KeyValuePair<string, JsonNode?>> jsonProperties)
             : this()
             => AddRange(jsonProperties);
 
@@ -40,6 +43,7 @@ namespace System.Text.Json
         /// <exception cref="ArgumentNullException">
         ///   Provided property name is null.
         /// </exception>
+        [AllowNull]
         public JsonNode this[string propertyName]
         {
             get => propertyName != null ? GetPropertyValue(propertyName) : throw new ArgumentNullException(nameof(propertyName));
@@ -70,7 +74,7 @@ namespace System.Text.Json
         /// <exception cref="ArgumentException">
         ///   Property name to add already exists.
         /// </exception>
-        public void Add(KeyValuePair<string, JsonNode> jsonProperty) => Add(jsonProperty.Key, jsonProperty.Value);
+        public void Add(KeyValuePair<string, JsonNode?> jsonProperty) => Add(jsonProperty.Key, jsonProperty.Value);
 
         /// <summary>
         ///   Adds the specified <see cref="JsonNode"/> property to the JSON object.
@@ -84,7 +88,7 @@ namespace System.Text.Json
         ///   Property name to add already exists.
         /// </exception>
         /// <remarks>Null value is allowed and will be converted to the <see cref="JsonNull"/> instance.</remarks>
-        public void Add(string propertyName, JsonNode propertyValue)
+        public void Add(string propertyName, JsonNode? propertyValue)
         {
             if (propertyName == null)
             {
@@ -127,9 +131,9 @@ namespace System.Text.Json
         /// <exception cref="ArgumentNullException">
         ///   Some of the property names are null.
         /// </exception>
-        public void AddRange(IEnumerable<KeyValuePair<string, JsonNode>> jsonProperties)
+        public void AddRange(IEnumerable<KeyValuePair<string, JsonNode?>> jsonProperties)
         {
-            foreach (KeyValuePair<string, JsonNode> property in jsonProperties)
+            foreach (KeyValuePair<string, JsonNode?> property in jsonProperties)
             {
                 Add(property);
             }
@@ -154,7 +158,7 @@ namespace System.Text.Json
             }
 
 #if BUILDING_INBOX_LIBRARY
-            if (_dictionary.Remove(propertyName, out JsonObjectProperty value))
+            if (_dictionary.Remove(propertyName, out JsonObjectProperty? value))
             {
                 AdjustLinkedListPointers(value);
                 _version++;
@@ -202,7 +206,7 @@ namespace System.Text.Json
                 throw new ArgumentNullException(nameof(propertyName));
             }
 
-            JsonObjectProperty _current = _first;
+            JsonObjectProperty? _current = _first;
 
             while (_current != null && !string.Equals(_current.Name, propertyName, stringComparison))
             {
@@ -272,6 +276,11 @@ namespace System.Text.Json
         /// </remarks>
         public bool ContainsProperty(string propertyName, StringComparison stringComparison)
         {
+            if (propertyName == null)
+            {
+                throw new ArgumentNullException(nameof(propertyName));
+            }
+
             if (stringComparison == StringComparison.Ordinal)
             {
                 return ContainsProperty(propertyName);
@@ -296,9 +305,12 @@ namespace System.Text.Json
         /// <exception cref="KeyNotFoundException">
         ///   A property with the specified name is not found in this JSON object.
         /// </exception>
+        /// <exception cref="ArgumentNullException">
+        ///   Provided property name is null.
+        /// </exception>
         public JsonNode GetPropertyValue(string propertyName)
         {
-            if (!TryGetPropertyValue(propertyName, out JsonNode jsonNode))
+            if (!TryGetPropertyValue(propertyName, out JsonNode? jsonNode))
             {
                 throw new KeyNotFoundException(SR.Format(SR.PropertyNotFound, propertyName));
             }
@@ -315,12 +327,15 @@ namespace System.Text.Json
         /// <exception cref="KeyNotFoundException">
         ///   A property with the specified name is not found in this JSON object.
         /// </exception>
+        /// <exception cref="ArgumentNullException">
+        ///   Provided property name is null.
+        /// </exception>
         /// <remarks>
         ///   If <paramref name="stringComparison"/> is set to <see cref="StringComparison.Ordinal"/>, calling this method is equivalent to calling <see cref="GetPropertyValue(string)"/>.
         /// </remarks>
         public JsonNode GetPropertyValue(string propertyName, StringComparison stringComparison)
         {
-            if (!TryGetPropertyValue(propertyName, stringComparison, out JsonNode jsonNode))
+            if (!TryGetPropertyValue(propertyName, stringComparison, out JsonNode? jsonNode))
             {
                 throw new KeyNotFoundException(SR.Format(SR.PropertyNotFound, propertyName));
             }
@@ -337,12 +352,20 @@ namespace System.Text.Json
         ///  <see langword="true"/> if a property with the specified name was found;
         ///  otherwise, <see langword="false"/>
         /// </returns>
+        /// <exception cref="ArgumentNullException">
+        ///   Provided property name is null.
+        /// </exception>
         /// <remarks>
         ///   When this method returns <see langword="false"/>, the value of <paramref name="jsonNode"/> is meaningless.
         /// </remarks>
-        public bool TryGetPropertyValue(string propertyName, out JsonNode jsonNode)
+        public bool TryGetPropertyValue(string propertyName, [NotNullWhen(true)] out JsonNode? jsonNode)
         {
-            if (_dictionary.TryGetValue(propertyName, out JsonObjectProperty jsonObjectProperty))
+            if (propertyName == null)
+            {
+                throw new ArgumentNullException(nameof(propertyName));
+            }
+
+            if (_dictionary.TryGetValue(propertyName, out JsonObjectProperty? jsonObjectProperty))
             {
                 jsonNode = jsonObjectProperty.Value;
                 return true;
@@ -362,17 +385,25 @@ namespace System.Text.Json
         ///  <see langword="true"/> if property with specified name was found;
         ///  otherwise, <see langword="false"/>
         /// </returns>
+        /// <exception cref="ArgumentNullException">
+        ///   Provided property name is null.
+        /// </exception>
         /// <remarks>
         ///   When this method returns <see langword="false"/>, the value of <paramref name="jsonNode"/> is meaningless.
         /// </remarks>
         /// <remarks>
         ///   If <paramref name="stringComparison"/> is set to <see cref="StringComparison.Ordinal"/>, calling this method is equivalent to calling <see cref="TryGetPropertyValue(string, out JsonNode)"/>.
         /// </remarks>
-        public bool TryGetPropertyValue(string propertyName, StringComparison stringComparison, out JsonNode jsonNode)
+        public bool TryGetPropertyValue(string propertyName, StringComparison stringComparison, [NotNullWhen(true)] out JsonNode? jsonNode)
         {
             if (stringComparison == StringComparison.Ordinal)
             {
                 return TryGetPropertyValue(propertyName, out jsonNode);
+            }
+
+            if (propertyName == null)
+            {
+                throw new ArgumentNullException(nameof(propertyName));
             }
 
             foreach (KeyValuePair<string, JsonNode> property in this)
@@ -399,6 +430,9 @@ namespace System.Text.Json
         /// <exception cref="ArgumentException">
         ///   The property with the specified name is not a JSON object.
         /// </exception>
+        /// <exception cref="ArgumentNullException">
+        ///   Provided property name is null.
+        /// </exception>
         public JsonObject GetJsonObjectPropertyValue(string propertyName)
         {
             if (GetPropertyValue(propertyName) is JsonObject jsonObject)
@@ -420,6 +454,9 @@ namespace System.Text.Json
         /// </exception>
         /// <exception cref="ArgumentException">
         ///   The property with the specified name is not a JSON object.
+        /// </exception>
+        /// <exception cref="ArgumentNullException">
+        ///   Provided property name is null.
         /// </exception>
         /// <remarks>
         ///   If <paramref name="stringComparison"/> is set to <see cref="StringComparison.Ordinal"/>, calling this method is equivalent to calling <see cref="GetJsonObjectPropertyValue(string)"/>.
@@ -443,9 +480,12 @@ namespace System.Text.Json
         ///  <see langword="true"/> if JSON object property with specified name was found;
         ///  otherwise, <see langword="false"/>
         /// </returns>
-        public bool TryGetJsonObjectPropertyValue(string propertyName, out JsonObject jsonObject)
+        /// <exception cref="ArgumentNullException">
+        ///   Provided property name is null.
+        /// </exception>
+        public bool TryGetJsonObjectPropertyValue(string propertyName, [NotNullWhen(true)] out JsonObject? jsonObject)
         {
-            if (TryGetPropertyValue(propertyName, out JsonNode jsonNode))
+            if (TryGetPropertyValue(propertyName, out JsonNode? jsonNode))
             {
                 jsonObject = jsonNode as JsonObject;
                 return jsonObject != null;
@@ -468,9 +508,12 @@ namespace System.Text.Json
         /// <remarks>
         ///   If <paramref name="stringComparison"/> is set to <see cref="StringComparison.Ordinal"/>, calling this method is equivalent to calling <see cref="TryGetJsonObjectPropertyValue(string, out JsonObject)"/>.
         /// </remarks>
-        public bool TryGetJsonObjectPropertyValue(string propertyName, StringComparison stringComparison, out JsonObject jsonObject)
+        /// <exception cref="ArgumentNullException">
+        ///   Provided property name is null.
+        /// </exception>
+        public bool TryGetJsonObjectPropertyValue(string propertyName, StringComparison stringComparison, [NotNullWhen(true)] out JsonObject? jsonObject)
         {
-            if (TryGetPropertyValue(propertyName, stringComparison, out JsonNode jsonNode))
+            if (TryGetPropertyValue(propertyName, stringComparison, out JsonNode? jsonNode))
             {
                 jsonObject = jsonNode as JsonObject;
                 return jsonObject != null;
@@ -490,6 +533,9 @@ namespace System.Text.Json
         /// </exception>
         /// <exception cref="ArgumentException">
         ///   The property with the specified name is not a JSON array.
+        /// </exception>
+        /// <exception cref="ArgumentNullException">
+        ///   Provided property name is null.
         /// </exception>
         public JsonArray GetJsonArrayPropertyValue(string propertyName)
         {
@@ -513,6 +559,9 @@ namespace System.Text.Json
         /// <exception cref="ArgumentException">
         ///   The property with the specified name is not a JSON array.
         /// </exception>
+        /// <exception cref="ArgumentNullException">
+        ///   Provided property name is null.
+        /// </exception>
         /// <remarks>
         ///   If <paramref name="stringComparison"/> is set to <see cref="StringComparison.Ordinal"/>, calling this method is equivalent to calling <see cref="GetJsonArrayPropertyValue(string)"/>.
         /// </remarks>
@@ -535,9 +584,12 @@ namespace System.Text.Json
         ///  <see langword="true"/> if JSON array property with specified name was found;
         ///  otherwise, <see langword="false"/>
         /// </returns>
-        public bool TryGetJsonArrayPropertyValue(string propertyName, out JsonArray jsonArray)
+        /// <exception cref="ArgumentNullException">
+        ///   Provided property name is null.
+        /// </exception>
+        public bool TryGetJsonArrayPropertyValue(string propertyName, [NotNullWhen(true)] out JsonArray? jsonArray)
         {
-            if (TryGetPropertyValue(propertyName, out JsonNode jsonNode))
+            if (TryGetPropertyValue(propertyName, out JsonNode? jsonNode))
             {
                 jsonArray = jsonNode as JsonArray;
                 return jsonArray != null;
@@ -560,9 +612,12 @@ namespace System.Text.Json
         /// <remarks>
         ///   If <paramref name="stringComparison"/> is set to <see cref="StringComparison.Ordinal"/>, calling this method is equivalent to calling <see cref="TryGetJsonArrayPropertyValue(string, out JsonArray)"/>.
         /// </remarks>
-        public bool TryGetJsonArrayPropertyValue(string propertyName, StringComparison stringComparison, out JsonArray jsonArray)
+        /// <exception cref="ArgumentNullException">
+        ///   Provided property name is null.
+        /// </exception>
+        public bool TryGetJsonArrayPropertyValue(string propertyName, StringComparison stringComparison, [NotNullWhen(true)] out JsonArray? jsonArray)
         {
-            if (TryGetPropertyValue(propertyName, stringComparison, out JsonNode jsonNode))
+            if (TryGetPropertyValue(propertyName, stringComparison, out JsonNode? jsonNode))
             {
                 jsonArray = jsonNode as JsonArray;
                 return jsonArray != null;

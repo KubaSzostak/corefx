@@ -2,8 +2,11 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+#nullable enable
+
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace System.Text.Json
 {
@@ -30,6 +33,13 @@ namespace System.Text.Json
         /// <param name="values">Collection to represent.</param>
         public JsonArray(IEnumerable<JsonNode> values)
         {
+            foreach (JsonNode value in values)
+            {
+                if (value == null)
+                {
+                    throw new ArgumentNullException(nameof(values));
+                }
+            }
             _list = new List<JsonNode>(values);
             _version = 0;
         }
@@ -76,6 +86,10 @@ namespace System.Text.Json
         /// <param name="values">Collection to represent.</param>
         public JsonArray(IEnumerable<short> values) : this()
         {
+            if (values == null)
+            {
+                throw new ArgumentNullException(nameof(values));
+            }
             foreach (short value in values)
             {
                 _list.Add(value);
@@ -88,6 +102,10 @@ namespace System.Text.Json
         /// <param name="values">Collection to represent.</param>
         public JsonArray(IEnumerable<int> values) : this()
         {
+            if (values == null)
+            {
+                throw new ArgumentNullException(nameof(values));
+            }
             foreach (int value in values)
             {
                 _list.Add(value);
@@ -208,6 +226,7 @@ namespace System.Text.Json
         ///   Index is less than 0.
         /// </exception>
         /// <remarks>Null value is allowed and will be converted to the <see cref="JsonNull"/> instance.</remarks>
+        [AllowNull]
         public JsonNode this[int idx]
         {
             get => _list[idx];
@@ -223,7 +242,7 @@ namespace System.Text.Json
         /// </summary>
         /// <param name="value">The value to add.</param>
         /// <remarks>Null value is allowed and will be converted to the <see cref="JsonNull"/> instance.</remarks>
-        public void Add(JsonNode value)
+        public void Add(JsonNode? value)
         {
             _list.Add(value ?? JsonNull.Instance);
             _version++;
@@ -235,7 +254,7 @@ namespace System.Text.Json
         /// <param name="index">The zero-based index at which <paramref name="item"/> should be inserted.</param>
         /// <param name="item">The item to add.</param>
         /// <remarks>Null value is allowed and will be converted to the <see cref="JsonNull"/> instance.</remarks>
-        public void Insert(int index, JsonNode item)
+        public void Insert(int index, JsonNode? item)
         {
             _list.Insert(index, item ?? JsonNull.Instance);
             _version++;
@@ -250,7 +269,7 @@ namespace System.Text.Json
         ///   <see langword="false"/> otherwise.
         /// </returns>
         /// <remarks>Null value is allowed and will be converted to the <see cref="JsonNull"/> instance.</remarks>
-        public bool Contains(JsonNode value) => _list.Contains(value ?? JsonNull.Instance);
+        public bool Contains(JsonNode? value) => _list.Contains(value ?? JsonNull.Instance);
 
         /// <summary>
         ///   Gets the number of elements contained in the collection.
@@ -268,7 +287,7 @@ namespace System.Text.Json
         /// <param name="item">Item to find.</param>
         /// <returns>The zero-based starting index of the search. 0 (zero) is valid in an empty collection.</returns>
         /// <remarks>Null value is allowed and will be converted to the <see cref="JsonNull"/> instance.</remarks>
-        public int IndexOf(JsonNode item) => _list.IndexOf(item ?? JsonNull.Instance);
+        public int IndexOf(JsonNode? item) => _list.IndexOf(item ?? JsonNull.Instance);
 
         /// <summary>
         ///   Returns the zero-based index of the last occurrence of a specified item in the collection.
@@ -276,7 +295,7 @@ namespace System.Text.Json
         /// <param name="item">Item to find.</param>
         /// <returns>The zero-based starting index of the search. 0 (zero) is valid in an empty collection.</returns>
         /// <remarks>Null value is allowed and will be converted to the <see cref="JsonNull"/> instance.</remarks>
-        public int LastIndexOf(JsonNode item) => _list.LastIndexOf(item ?? JsonNull.Instance);
+        public int LastIndexOf(JsonNode? item) => _list.LastIndexOf(item ?? JsonNull.Instance);
 
         /// <summary>
         ///   Removes all elements from the JSON array.
@@ -298,7 +317,7 @@ namespace System.Text.Json
         ///   <see langword="false"/> otherwise.
         /// </returns>
         /// <remarks>Null value is allowed and will be converted to the <see cref="JsonNull"/> instance.</remarks>
-        public bool Remove(JsonNode item)
+        public bool Remove(JsonNode? item)
         {
             _version++;
             return _list.Remove(item ?? JsonNull.Instance);
@@ -308,7 +327,7 @@ namespace System.Text.Json
         ///   Removes all the elements that match the conditions defined by the specified predicate.
         /// </summary>
         /// <param name="match">
-        ///   Thepredicate delegate that defines the conditions of the elements to remove.
+        ///   The predicate delegate that defines the conditions of the elements to remove.
         /// </param>
         /// <returns>The number of elements removed from the collection.</returns>
         public int RemoveAll(Predicate<JsonNode> match)
@@ -336,7 +355,14 @@ namespace System.Text.Json
         ///   The array must have zero-based indexing.
         /// </param>
         /// <param name="arrayIndex">The zero-based index in array at which copying begins.</param>
-        void ICollection<JsonNode>.CopyTo(JsonNode[] array, int arrayIndex) => _list.CopyTo(array, arrayIndex);
+        void ICollection<JsonNode>.CopyTo(JsonNode[] array, int arrayIndex)
+        {
+            if (array == null)
+            {
+                throw new ArgumentNullException(nameof(array));
+            }
+            _list.CopyTo(array, arrayIndex);
+        }
 
         /// <summary>
         ///   Returns an enumerator that iterates through the collection values.

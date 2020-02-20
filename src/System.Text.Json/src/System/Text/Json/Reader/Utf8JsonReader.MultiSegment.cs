@@ -6,6 +6,8 @@ using System.Buffers;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
+#nullable enable
+
 namespace System.Text.Json
 {
     public ref partial struct Utf8JsonReader
@@ -298,7 +300,7 @@ namespace System.Text.Json
 
         private bool GetNextSpan()
         {
-            ReadOnlyMemory<byte> memory = default;
+            ReadOnlyMemory<byte> memory;
             while (true)
             {
                 Debug.Assert(!_isMultiSegment || _currentPosition.GetObject() != null);
@@ -631,9 +633,6 @@ namespace System.Text.Json
         private int FindMismatch(ReadOnlySpan<byte> span, ReadOnlySpan<byte> literal)
         {
             Debug.Assert(span.Length > 0);
-
-            int indexOfFirstMismatch = 0;
-
             int minLength = Math.Min(span.Length, literal.Length);
 
             int i = 0;
@@ -644,8 +643,7 @@ namespace System.Text.Json
                     break;
                 }
             }
-            indexOfFirstMismatch = i;
-
+            int indexOfFirstMismatch = i;
             Debug.Assert(indexOfFirstMismatch >= 0 && indexOfFirstMismatch < literal.Length);
 
             return indexOfFirstMismatch;

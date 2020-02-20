@@ -2,6 +2,8 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+#nullable enable
+
 using System.Diagnostics;
 
 namespace System.Text.Json
@@ -19,7 +21,7 @@ namespace System.Text.Json
                 return false;
             }
 
-            JsonPropertyInfo jsonPropertyInfo = state.Current.JsonPropertyInfo;
+            JsonPropertyInfo? jsonPropertyInfo = state.Current.JsonPropertyInfo;
 
             if (jsonPropertyInfo == null || (reader.CurrentDepth == 0 && jsonPropertyInfo.CanBeNull))
             {
@@ -71,7 +73,7 @@ namespace System.Text.Json
 
             if (!jsonPropertyInfo.IgnoreNullValues)
             {
-                state.Current.JsonPropertyInfo.SetValueAsObject(state.Current.ReturnValue, value: null);
+                state.Current.JsonPropertyInfo!.SetValueAsObject(state.Current.ReturnValue, value: null);
             }
 
             return false;
@@ -79,7 +81,7 @@ namespace System.Text.Json
 
         private static void AddNullToCollection(JsonPropertyInfo jsonPropertyInfo, ref Utf8JsonReader reader, ref ReadStack state)
         {
-            JsonPropertyInfo elementPropertyInfo = jsonPropertyInfo.ElementClassInfo.PolicyProperty;
+            JsonPropertyInfo? elementPropertyInfo = jsonPropertyInfo.ElementClassInfoOfEnumerableOrDictionary.PolicyProperty;
 
             // if elementPropertyInfo == null then this element doesn't need a converter (an object).
             if (elementPropertyInfo?.CanBeNull == false)

@@ -2,6 +2,8 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+#nullable enable
+
 using System.Buffers;
 using System.Diagnostics;
 
@@ -47,9 +49,9 @@ namespace System.Text.Json
         ///     Hence, <see cref="JsonReaderOptions.AllowTrailingCommas"/>, <see cref="JsonReaderOptions.MaxDepth"/>, <see cref="JsonReaderOptions.CommentHandling"/> are used while reading.
         ///   </para>
         /// </remarks>
-        public static TValue Deserialize<TValue>(ref Utf8JsonReader reader, JsonSerializerOptions options = null)
+        public static TValue Deserialize<TValue>(ref Utf8JsonReader reader, JsonSerializerOptions? options = null)
         {
-            return (TValue)ReadValueCore(ref reader, typeof(TValue), options);
+            return (TValue)ReadValueCore(ref reader, typeof(TValue), options)!;
         }
 
         /// <summary>
@@ -93,7 +95,7 @@ namespace System.Text.Json
         ///     Hence, <see cref="JsonReaderOptions.AllowTrailingCommas"/>, <see cref="JsonReaderOptions.MaxDepth"/>, <see cref="JsonReaderOptions.CommentHandling"/> are used while reading.
         ///   </para>
         /// </remarks>
-        public static object Deserialize(ref Utf8JsonReader reader, Type returnType, JsonSerializerOptions options = null)
+        public static object? Deserialize(ref Utf8JsonReader reader, Type returnType, JsonSerializerOptions? options = null)
         {
             if (returnType == null)
                 throw new ArgumentNullException(nameof(returnType));
@@ -101,7 +103,7 @@ namespace System.Text.Json
             return ReadValueCore(ref reader, returnType, options);
         }
 
-        private static object ReadValueCore(ref Utf8JsonReader reader, Type returnType, JsonSerializerOptions options)
+        private static object? ReadValueCore(ref Utf8JsonReader reader, Type returnType, JsonSerializerOptions? options)
         {
             if (options == null)
             {
@@ -111,7 +113,7 @@ namespace System.Text.Json
             ReadStack readStack = default;
             readStack.Current.Initialize(returnType, options);
 
-            ReadValueCore(options, ref reader, ref readStack);
+            ReadValueCore(options, ref readStack, ref reader);
 
             return readStack.Current.ReturnValue;
         }
@@ -124,7 +126,7 @@ namespace System.Text.Json
             }
         }
 
-        private static void ReadValueCore(JsonSerializerOptions options, ref Utf8JsonReader reader, ref ReadStack readStack)
+        private static void ReadValueCore(JsonSerializerOptions options, ref ReadStack readStack, ref Utf8JsonReader reader)
         {
             JsonReaderState state = reader.CurrentState;
             CheckSupportedOptions(state.Options, nameof(reader));
@@ -299,9 +301,11 @@ namespace System.Text.Json
                     valueSpan.CopyTo(rentedSpan);
                 }
 
-                var newReader = new Utf8JsonReader(rentedSpan, isFinalBlock: true, state: default);
+                JsonReaderOptions originalReaderOptions = state.Options;
 
-                ReadCore(options, ref newReader, ref readStack);
+                var newReader = new Utf8JsonReader(rentedSpan, originalReaderOptions);
+
+                ReadCore(options, ref readStack, ref newReader);
 
                 // The reader should have thrown if we have remaining bytes.
                 Debug.Assert(newReader.BytesConsumed == length);

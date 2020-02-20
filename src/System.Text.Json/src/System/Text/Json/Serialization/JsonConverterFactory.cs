@@ -2,6 +2,8 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+#nullable enable
+
 using System.Diagnostics;
 
 namespace System.Text.Json.Serialization
@@ -19,8 +21,9 @@ namespace System.Text.Json.Serialization
         /// </summary>
         protected JsonConverterFactory() { }
 
-        internal JsonConverter GetConverterInternal(Type typeToConvert, JsonSerializerOptions options)
+        internal JsonConverter? GetConverterInternal(Type typeToConvert, JsonSerializerOptions options)
         {
+            Debug.Assert(typeToConvert != null);
             Debug.Assert(CanConvert(typeToConvert));
             return CreateConverter(typeToConvert, options);
         }

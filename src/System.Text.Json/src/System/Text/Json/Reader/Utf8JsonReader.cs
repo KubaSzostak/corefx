@@ -7,6 +7,8 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
+#nullable enable
+
 namespace System.Text.Json
 {
     /// <summary>
@@ -458,7 +460,7 @@ namespace System.Text.Json
         ///     if required. The look up text is matched as is, without any modifications to it.
         ///   </para>
         /// </remarks>
-        public bool ValueTextEquals(string text)
+        public bool ValueTextEquals(string? text)
         {
             return ValueTextEquals(text.AsSpan());
         }
@@ -511,7 +513,7 @@ namespace System.Text.Json
                 return false;
             }
 
-            byte[] otherUtf8TextArray = null;
+            byte[]? otherUtf8TextArray = null;
 
             Span<byte> otherUtf8Text;
 

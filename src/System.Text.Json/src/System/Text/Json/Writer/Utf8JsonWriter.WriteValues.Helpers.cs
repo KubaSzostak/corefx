@@ -2,6 +2,8 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+#nullable enable
+
 using System.Buffers;
 using System.Buffers.Text;
 using System.Diagnostics;
@@ -39,7 +41,7 @@ namespace System.Text.Json
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void Base64EncodeAndWrite(ReadOnlySpan<byte> bytes, Span<byte> output, int encodingLength)
         {
-            byte[] outputText = null;
+            byte[]? outputText = null;
 
             Span<byte> encodedBytes = encodingLength <= JsonConstants.StackallocThreshold ?
                 stackalloc byte[encodingLength] :

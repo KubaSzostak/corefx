@@ -2,6 +2,8 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+#nullable enable
+
 using System.Diagnostics;
 using System.Reflection;
 
@@ -9,7 +11,7 @@ namespace System.Text.Json
 {
     internal abstract class MemberAccessor
     {
-        public abstract JsonClassInfo.ConstructorDelegate CreateConstructor(Type classType);
+        public abstract JsonClassInfo.ConstructorDelegate? CreateConstructor(Type classType);
 
         public abstract Action<TProperty> CreateAddDelegate<TProperty>(MethodInfo addMethod, object target);
 
@@ -21,22 +23,12 @@ namespace System.Text.Json
         {
             MethodInfo createRangeMethod = FindImmutableCreateRangeMethod(constructingType);
 
-            if (createRangeMethod == null)
-            {
-                return null;
-            }
-
             return createRangeMethod.MakeGenericMethod(elementType);
         }
 
         protected MethodInfo ImmutableDictionaryCreateRangeMethod(Type constructingType, Type elementType)
         {
             MethodInfo createRangeMethod = FindImmutableCreateRangeMethod(constructingType);
-
-            if (createRangeMethod == null)
-            {
-                return null;
-            }
 
             return createRangeMethod.MakeGenericMethod(typeof(string), elementType);
         }
@@ -60,8 +52,8 @@ namespace System.Text.Json
             return null;
         }
 
-        public abstract Func<object, TProperty> CreatePropertyGetter<TClass, TProperty>(PropertyInfo propertyInfo);
+        public abstract Func<object?, TProperty> CreatePropertyGetter<TClass, TProperty>(PropertyInfo propertyInfo);
 
-        public abstract Action<object, TProperty> CreatePropertySetter<TClass, TProperty>(PropertyInfo propertyInfo);
+        public abstract Action<object?, TProperty> CreatePropertySetter<TClass, TProperty>(PropertyInfo propertyInfo);
     }
 }

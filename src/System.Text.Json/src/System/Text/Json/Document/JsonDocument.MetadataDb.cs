@@ -2,6 +2,8 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+#nullable enable
+
 using System.Buffers;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
@@ -80,6 +82,8 @@ namespace System.Text.Json
         // * Third int
         //   * 4 bits JsonTokenType
         //   * 28 bits for the number of rows until the next value (never 0)
+        [DebuggerDisplay("{DebuggerDisplay,nq}")]
+        [DebuggerTypeProxy(typeof(MetadataDbDebugView))]
         private struct MetadataDb : IDisposable
         {
             private const int SizeOrLengthOffset = 4;
@@ -99,6 +103,57 @@ namespace System.Text.Json
 #if DEBUG
                 _isLocked = true;
 #endif
+            }
+
+            private string DebuggerDisplay => $"Array length: {_data.Length}, Data length: {Length}";
+
+            public override string ToString()
+            {
+                var builder = new StringBuilder();
+                builder.Append($"Array length: {_data.Length}, Data length: {Length}\r\n");
+                builder.Append("TokenType \t SizeOrLength \t NumberOfRows \t Location \t IsUnknownSize \t IsSimpleValue \t HasComplexChildren\r\n");
+                for (int i = 0; i < Length; i+= DbRow.Size)
+                {
+                    DbRow row = Get(i);
+                    builder.Append($"{_data[i + 11] >> 4} (most significant nibble of {_data[i + 11]}) \t {_data[i + 4]} {_data[i + 5]} {_data[i + 6]} {_data[i + 7]} \t {_data[i + 8]} {_data[i + 9]} {_data[i + 10]} {_data[i + 11] & 0x0F} (least significant nibble of  {_data[i + 11]}) \t {_data[i]} {_data[i+1]} {_data[i+2]} {_data[i+3]}\r\n");
+                    builder.Append($"{row.TokenType} \t {row.SizeOrLength} \t {row.NumberOfRows} \t {row.Location} \t {row.IsUnknownSize} \t {row.IsSimpleValue} \t {row.HasComplexChildren}\r\n");
+                }
+                return builder.ToString();
+            }
+
+            internal class MetadataDbDebugView
+            {
+                private readonly byte[] _data;
+                private int _length;
+
+                public MetadataDbDebugView(MetadataDb metadataDb)
+                {
+                    _data = new byte[metadataDb._data.Length];
+
+                    metadataDb._data.AsSpan().CopyTo(_data);
+                    _length = metadataDb.Length;
+                }
+
+                [DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
+                public string[] Keys
+                {
+                    get
+                    {
+                        var rows = new string[(2 * _length / DbRow.Size) + 1];
+                        rows[0] = "TokenType \t SizeOrLength \t NumberOfRows \t Location \t IsUnknownSize \t IsSimpleValue \t HasComplexChildren";
+
+                        int rowCounter = 1;
+                        for (int i = 0; i < _length; i += DbRow.Size)
+                        {
+                            DbRow row = MemoryMarshal.Read<DbRow>(_data.AsSpan(i));
+
+                            rows[rowCounter++] = $"{_data[i + 11] >> 4} (most significant nibble of {_data[i + 11]}) \t {_data[i + 4]} {_data[i + 5]} {_data[i + 6]} {_data[i + 7]} \t {_data[i + 8]} {_data[i + 9]} {_data[i + 10]} {_data[i + 11] & 0x0F} (least significant nibble of  {_data[i + 11]}) \t {_data[i]} {_data[i + 1]} {_data[i + 2]} {_data[i + 3]}\r\n";
+                            rows[rowCounter++] = $"{row.TokenType} \t {row.SizeOrLength} \t {row.NumberOfRows} \t {row.Location} \t {row.IsUnknownSize} \t {row.IsSimpleValue} \t {row.HasComplexChildren}\r\n";
+                        }
+
+                        return rows;
+                    }
+                }
             }
 
             internal MetadataDb(int payloadLength)
@@ -149,7 +204,7 @@ namespace System.Text.Json
 
             public void Dispose()
             {
-                byte[] data = Interlocked.Exchange(ref _data, null);
+                byte[]? data = Interlocked.Exchange(ref _data, null!);
                 if (data == null)
                 {
                     return;

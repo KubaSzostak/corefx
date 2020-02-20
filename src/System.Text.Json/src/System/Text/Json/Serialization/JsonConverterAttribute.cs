@@ -2,6 +2,8 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+#nullable enable
+
 namespace System.Text.Json.Serialization
 {
     /// <summary>
@@ -24,6 +26,7 @@ namespace System.Text.Json.Serialization
         public JsonConverterAttribute(Type converterType)
         {
             ConverterType = converterType;
+            //ConverterType = converterType ?? throw new ArgumentNullException(nameof(converterType));
         }
 
         /// <summary>
@@ -34,7 +37,7 @@ namespace System.Text.Json.Serialization
         /// <summary>
         /// The type of the converter to create, or null if <see cref="CreateConverter(Type)"/> should be used to obtain the converter.
         /// </summary>
-        public Type ConverterType { get; private set; }
+        public Type? ConverterType { get; private set; }
 
         /// <summary>
         /// If overridden and <see cref="ConverterType"/> is null, allows a custom attribute to create the converter in order to pass additional state.
@@ -42,7 +45,10 @@ namespace System.Text.Json.Serialization
         /// <returns>
         /// The custom converter.
         /// </returns>
-        public virtual JsonConverter CreateConverter(Type typeToConvert)
+        /// <remarks>
+        /// If typeToConvert is null, throw.
+        /// </remarks>
+        public virtual JsonConverter? CreateConverter(Type typeToConvert)
         {
             return null;
         }

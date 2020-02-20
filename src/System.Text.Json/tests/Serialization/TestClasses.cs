@@ -9,6 +9,12 @@ using Xunit;
 
 namespace System.Text.Json.Serialization.Tests
 {
+
+    public class Rootobject
+    {
+        public object[][] types { get; set; }
+    }
+
     public interface ITestClass
     {
         void Initialize();
@@ -96,7 +102,7 @@ namespace System.Text.Json.Serialization.Tests
         public double Two { get; set; }
     }
 
-    public struct SimpleStructWithSimpleClass: ITestClass
+    public struct SimpleStructWithSimpleClass : ITestClass
     {
         public short MyInt32 { get; set; }
         public SimpleTestClass MySimpleClass { get; set; }
@@ -164,7 +170,8 @@ namespace System.Text.Json.Serialization.Tests
                 ["key"] = "value"
             }
         };
-        public Dictionary<string, List<object>> MyListDictionary { get; set; } = new Dictionary<string, List<object>> {
+        public Dictionary<string, List<object>> MyListDictionary { get; set; } = new Dictionary<string, List<object>>
+        {
             ["key"] = new List<object> { "value" }
         };
         public Dictionary<string, Dictionary<string, object>> MyObjectDictionaryDictionary { get; set; } = new Dictionary<string, Dictionary<string, object>>

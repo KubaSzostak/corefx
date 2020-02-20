@@ -2,8 +2,11 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+#nullable enable
+
 using System.Buffers;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -118,7 +121,7 @@ namespace System.Text.Json
             }
 
             ArraySegment<byte> drained = ReadToEnd(utf8Json);
-
+            Debug.Assert(drained.Array != null);
             try
             {
                 return Parse(drained.AsMemory(), options.GetReaderOptions(), drained.Array);
@@ -167,7 +170,7 @@ namespace System.Text.Json
             CancellationToken cancellationToken = default)
         {
             ArraySegment<byte> drained = await ReadToEndAsync(utf8Json, cancellationToken).ConfigureAwait(false);
-
+            Debug.Assert(drained.Array != null);
             try
             {
                 return Parse(drained.AsMemory(), options.GetReaderOptions(), drained.Array);
@@ -177,6 +180,7 @@ namespace System.Text.Json
                 // Holds document content, clear it before returning it.
                 drained.AsSpan().Clear();
                 ArrayPool<byte>.Shared.Return(drained.Array);
+
                 throw;
             }
         }
@@ -284,7 +288,7 @@ namespace System.Text.Json
         /// <exception cref="JsonException">
         ///   A value could not be read from the reader.
         /// </exception>
-        public static bool TryParseValue(ref Utf8JsonReader reader, out JsonDocument document)
+        public static bool TryParseValue(ref Utf8JsonReader reader, [NotNullWhen(true)] out JsonDocument? document)
         {
             return TryParseValue(ref reader, out document, shouldThrow: false);
         }
@@ -326,12 +330,13 @@ namespace System.Text.Json
         /// </exception>
         public static JsonDocument ParseValue(ref Utf8JsonReader reader)
         {
-            bool ret = TryParseValue(ref reader, out JsonDocument document, shouldThrow: true);
+            bool ret = TryParseValue(ref reader, out JsonDocument? document, shouldThrow: true);
             Debug.Assert(ret, "TryParseValue returned false with shouldThrow: true.");
+            Debug.Assert(document != null);
             return document;
         }
 
-        private static bool TryParseValue(ref Utf8JsonReader reader, out JsonDocument document, bool shouldThrow)
+        private static bool TryParseValue(ref Utf8JsonReader reader, [NotNullWhen(true)] out JsonDocument? document, bool shouldThrow)
         {
             JsonReaderState state = reader.CurrentState;
             CheckSupportedOptions(state.Options, nameof(reader));
@@ -551,7 +556,7 @@ namespace System.Text.Json
         private static JsonDocument Parse(
             ReadOnlyMemory<byte> utf8Json,
             JsonReaderOptions readerOptions,
-            byte[] extraRentedBytes)
+            byte[]? extraRentedBytes)
         {
             ReadOnlySpan<byte> utf8JsonSpan = utf8Json.Span;
             var database = new MetadataDb(utf8Json.Length);
@@ -571,13 +576,15 @@ namespace System.Text.Json
                 stack.Dispose();
             }
 
+            string output = database.ToString();
+
             return new JsonDocument(utf8Json, database, extraRentedBytes);
         }
 
         private static ArraySegment<byte> ReadToEnd(Stream stream)
         {
             int written = 0;
-            byte[] rented = null;
+            byte[]? rented = null;
 
             ReadOnlySpan<byte> utf8Bom = JsonConstants.Utf8Bom;
 
@@ -659,7 +666,7 @@ namespace System.Text.Json
             CancellationToken cancellationToken)
         {
             int written = 0;
-            byte[] rented = null;
+            byte[]? rented = null;
 
             try
             {

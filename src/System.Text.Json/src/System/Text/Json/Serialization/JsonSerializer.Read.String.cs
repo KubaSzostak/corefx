@@ -2,6 +2,8 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+#nullable enable
+
 using System.Buffers;
 using System.Diagnostics;
 
@@ -26,9 +28,9 @@ namespace System.Text.Json
         /// <remarks>Using a <see cref="string"/> is not as efficient as using the
         /// UTF-8 methods since the implementation natively uses UTF-8.
         /// </remarks>
-        public static TValue Deserialize<TValue>(string json, JsonSerializerOptions options = null)
+        public static TValue Deserialize<TValue>(string json, JsonSerializerOptions? options = null)
         {
-            return (TValue)Deserialize(json, typeof(TValue), options);
+            return (TValue)Deserialize(json, typeof(TValue), options)!;
         }
 
         /// <summary>
@@ -49,7 +51,7 @@ namespace System.Text.Json
         /// <remarks>Using a <see cref="string"/> is not as efficient as using the
         /// UTF-8 methods since the implementation natively uses UTF-8.
         /// </remarks>
-        public static object Deserialize(string json, Type returnType, JsonSerializerOptions options = null)
+        public static object? Deserialize(string json, Type returnType, JsonSerializerOptions? options = null)
         {
             const long ArrayPoolMaxSizeBeforeUsingNormalAlloc = 1024 * 1024;
 
@@ -68,8 +70,8 @@ namespace System.Text.Json
                 options = JsonSerializerOptions.s_defaultOptions;
             }
 
-            object result;
-            byte[] tempArray = null;
+            object? result;
+            byte[]? tempArray = null;
 
             // For performance, avoid obtaining actual byte count unless memory usage is higher than the threshold.
             Span<byte> utf8 = json.Length <= (ArrayPoolMaxSizeBeforeUsingNormalAlloc / JsonConstants.MaxExpansionFactorWhileTranscoding) ?

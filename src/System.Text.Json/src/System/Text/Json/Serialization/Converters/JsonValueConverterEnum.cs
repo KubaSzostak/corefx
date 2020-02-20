@@ -2,6 +2,8 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+#nullable enable
+
 using System.Collections.Concurrent;
 using System.Globalization;
 using System.Runtime.CompilerServices;
@@ -14,11 +16,11 @@ namespace System.Text.Json.Serialization.Converters
         private static readonly TypeCode s_enumTypeCode = Type.GetTypeCode(typeof(T));
 
         // Odd type codes are conveniently signed types (for enum backing types).
-        private static readonly string s_negativeSign = ((int)s_enumTypeCode % 2) == 0 ? null : NumberFormatInfo.CurrentInfo.NegativeSign;
+        private static readonly string? s_negativeSign = ((int)s_enumTypeCode % 2) == 0 ? null : NumberFormatInfo.CurrentInfo.NegativeSign;
 
         private readonly EnumConverterOptions _converterOptions;
         private readonly JsonNamingPolicy _namingPolicy;
-        private readonly ConcurrentDictionary<string, string> _nameCache;
+        private readonly ConcurrentDictionary<string, string>? _nameCache;
 
         public override bool CanConvert(Type type)
         {
@@ -30,7 +32,7 @@ namespace System.Text.Json.Serialization.Converters
         {
         }
 
-        public JsonConverterEnum(EnumConverterOptions options, JsonNamingPolicy namingPolicy)
+        public JsonConverterEnum(EnumConverterOptions options, JsonNamingPolicy? namingPolicy)
         {
             _converterOptions = options;
             if (namingPolicy != null)
@@ -53,16 +55,16 @@ namespace System.Text.Json.Serialization.Converters
                 if (!_converterOptions.HasFlag(EnumConverterOptions.AllowStrings))
                 {
                     ThrowHelper.ThrowJsonException();
-                    return default;
+                    //return default;
                 }
 
                 // Try parsing case sensitive first
-                string enumString = reader.GetString();
+                string? enumString = reader.GetString();
                 if (!Enum.TryParse(enumString, out T value)
                     && !Enum.TryParse(enumString, ignoreCase: true, out value))
                 {
                     ThrowHelper.ThrowJsonException();
-                    return default;
+                    //return default;
                 }
                 return value;
             }
@@ -70,7 +72,7 @@ namespace System.Text.Json.Serialization.Converters
             if (token != JsonTokenType.Number || !_converterOptions.HasFlag(EnumConverterOptions.AllowNumbers))
             {
                 ThrowHelper.ThrowJsonException();
-                return default;
+                //return default;
             }
 
             switch (s_enumTypeCode)
@@ -158,7 +160,7 @@ namespace System.Text.Json.Serialization.Converters
             if (_converterOptions.HasFlag(EnumConverterOptions.AllowStrings))
             {
                 string original = value.ToString();
-                if (_nameCache != null && _nameCache.TryGetValue(original, out string transformed))
+                if (_nameCache != null && _nameCache.TryGetValue(original, out string? transformed))
                 {
                     writer.WriteStringValue(transformed);
                     return;

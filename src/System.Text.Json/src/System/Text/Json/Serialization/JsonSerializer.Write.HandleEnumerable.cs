@@ -2,6 +2,8 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+#nullable enable
+
 using System.Collections;
 using System.Diagnostics;
 
@@ -15,11 +17,11 @@ namespace System.Text.Json
             Utf8JsonWriter writer,
             ref WriteStack state)
         {
-            Debug.Assert(state.Current.JsonPropertyInfo.ClassType == ClassType.Enumerable);
+            Debug.Assert(state.Current.JsonPropertyInfo!.ClassType == ClassType.Enumerable);
 
             if (state.Current.CollectionEnumerator == null)
             {
-                IEnumerable enumerable = (IEnumerable)state.Current.JsonPropertyInfo.GetValueAsObject(state.Current.CurrentValue);
+                IEnumerable? enumerable = (IEnumerable?)state.Current.JsonPropertyInfo.GetValueAsObject(state.Current.CurrentValue!);
 
                 if (enumerable == null)
                 {
@@ -49,13 +51,13 @@ namespace System.Text.Json
                 // Check for polymorphism.
                 if (elementClassInfo.ClassType == ClassType.Unknown)
                 {
-                    object currentValue = state.Current.CollectionEnumerator.Current;
+                    object? currentValue = state.Current.CollectionEnumerator.Current;
                     GetRuntimeClassInfo(currentValue, ref elementClassInfo, options);
                 }
 
                 if (elementClassInfo.ClassType == ClassType.Value)
                 {
-                    elementClassInfo.PolicyProperty.WriteEnumerable(ref state, writer);
+                    elementClassInfo.PolicyProperty!.WriteEnumerable(ref state, writer);
                 }
                 else if (state.Current.CollectionEnumerator.Current == null)
                 {

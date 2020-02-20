@@ -2,6 +2,10 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+#nullable enable
+
+using System.Diagnostics.CodeAnalysis;
+
 namespace System.Text.Json.Serialization
 {
     /// <summary>
@@ -25,6 +29,10 @@ namespace System.Text.Json.Serialization
         /// <returns>True if the type can be converted, False otherwise.</returns>
         public override bool CanConvert(Type typeToConvert)
         {
+            //if (typeToConvert == null)
+            //{
+            //    throw new ArgumentNullException(nameof(typeToConvert));
+            //}
             return typeToConvert == typeof(T);
         }
 
@@ -38,6 +46,7 @@ namespace System.Text.Json.Serialization
         /// <param name="typeToConvert">The <see cref="Type"/> being converted.</param>
         /// <param name="options">The <see cref="JsonSerializerOptions"/> being used.</param>
         /// <returns>The value that was converted.</returns>
+        [return: MaybeNull]
         public abstract T Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options);
 
         /// <summary>
@@ -50,7 +59,7 @@ namespace System.Text.Json.Serialization
         /// <param name="writer">The <see cref="Utf8JsonWriter"/> to write to.</param>
         /// <param name="value">The value to convert.</param>
         /// <param name="options">The <see cref="JsonSerializerOptions"/> being used.</param>
-        public abstract void Write(Utf8JsonWriter writer, T value, JsonSerializerOptions options);
+        public abstract void Write(Utf8JsonWriter writer, [AllowNull] T value, JsonSerializerOptions options);
 
         internal override Type TypeToConvert => typeof(T);
     }

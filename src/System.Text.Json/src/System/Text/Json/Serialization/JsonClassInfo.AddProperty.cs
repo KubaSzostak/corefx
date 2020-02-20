@@ -2,6 +2,8 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+#nullable enable
+
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Reflection;
@@ -26,10 +28,10 @@ namespace System.Text.Json
                 parentClassType,
                 propertyInfo,
                 out Type runtimeType,
-                out Type elementType,
-                out Type nullableUnderlyingType,
+                out Type? elementType,
+                out Type? nullableUnderlyingType,
                 out _,
-                out JsonConverter converter,
+                out JsonConverter? converter,
                 checkForAddMethod: false,
                 options);
 
@@ -46,15 +48,15 @@ namespace System.Text.Json
         }
 
         [PreserveDependency(".ctor()", "System.Text.Json.JsonPropertyInfoNullable`2")]
-        [PreserveDependency(".ctor()", "System.Text.Json.Serialization.JsonPropertyInfoNotNullableContravariant`4")]
+        [PreserveDependency(".ctor()", "System.Text.Json.Serialization.JsonPropertyInfoNotNullableContravariant`3")]
         internal static JsonPropertyInfo CreateProperty(
             Type declaredPropertyType,
             Type runtimePropertyType,
-            PropertyInfo propertyInfo,
+            PropertyInfo? propertyInfo,
             Type parentClassType,
-            Type collectionElementType,
-            Type nullableUnderlyingType,
-            JsonConverter converter,
+            Type? collectionElementType,
+            Type? nullableUnderlyingType,
+            JsonConverter? converter,
             ClassType classType,
             JsonSerializerOptions options)
         {
@@ -65,11 +67,11 @@ namespace System.Text.Json
 
             if (treatAsNullable && converter != null)
             {
-                propertyInfoClassType = typeof(JsonPropertyInfoNullable<,>).MakeGenericType(parentClassType, nullableUnderlyingType);
+                propertyInfoClassType = typeof(JsonPropertyInfoNullable<,>).MakeGenericType(parentClassType, nullableUnderlyingType!);
             }
             else
             {
-                Type typeToConvert = converter?.TypeToConvert;
+                Type? typeToConvert = converter?.TypeToConvert;
                 if (typeToConvert == null)
                 {
                     typeToConvert = declaredPropertyType;
@@ -78,10 +80,9 @@ namespace System.Text.Json
                 // For the covariant case, create JsonPropertyInfoNotNullable. The generic constraints are "where TConverter : TDeclaredProperty".
                 if (runtimePropertyType.IsAssignableFrom(typeToConvert))
                 {
-                    propertyInfoClassType = typeof(JsonPropertyInfoNotNullable<,,,>).MakeGenericType(
+                    propertyInfoClassType = typeof(JsonPropertyInfoNotNullable<,,>).MakeGenericType(
                         parentClassType,
                         declaredPropertyType,
-                        runtimePropertyType,
                         typeToConvert);
                 }
                 else
@@ -89,10 +90,9 @@ namespace System.Text.Json
                     Debug.Assert(typeToConvert.IsAssignableFrom(runtimePropertyType));
 
                     // For the contravariant case, create JsonPropertyInfoNotNullableContravariant. The generic constraints are "where TDeclaredProperty : TConverter".
-                    propertyInfoClassType = typeof(JsonPropertyInfoNotNullableContravariant<,,,>).MakeGenericType(
+                    propertyInfoClassType = typeof(JsonPropertyInfoNotNullableContravariant<,,>).MakeGenericType(
                         parentClassType,
                         declaredPropertyType,
-                        runtimePropertyType,
                         typeToConvert);
                 }
             }
@@ -103,7 +103,7 @@ namespace System.Text.Json
                 BindingFlags.Instance | BindingFlags.Public,
                 binder: null,
                 args: null,
-                culture: null);
+                culture: null)!;
 
             jsonPropertyInfo.Initialize(
                 parentClassType,
@@ -128,9 +128,9 @@ namespace System.Text.Json
         internal static JsonPropertyInfo CreatePolicyProperty(
             Type declaredPropertyType,
             Type runtimePropertyType,
-            Type elementType,
-            Type nullableUnderlyingType,
-            JsonConverter converter,
+            Type? elementType,
+            Type? nullableUnderlyingType,
+            JsonConverter? converter,
             ClassType classType,
             JsonSerializerOptions options)
         {
@@ -151,7 +151,7 @@ namespace System.Text.Json
         /// </summary>
         internal JsonPropertyInfo CreateRootProperty(JsonSerializerOptions options)
         {
-            JsonConverter converter = options.DetermineConverterForProperty(Type, Type, propertyInfo: null);
+            JsonConverter? converter = options.DetermineConverterForProperty(Type, Type, propertyInfo: null);
 
             return CreateProperty(
                 declaredPropertyType: Type,
@@ -174,10 +174,10 @@ namespace System.Text.Json
                     arg.classType,
                     key.property.PropertyInfo,
                     out _,
-                    out Type elementType,
-                    out Type nullableType,
+                    out Type? elementType,
+                    out Type? nullableType,
                     out _,
-                    out JsonConverter converter,
+                    out JsonConverter? converter,
                     checkForAddMethod: false,
                     arg.options);
 

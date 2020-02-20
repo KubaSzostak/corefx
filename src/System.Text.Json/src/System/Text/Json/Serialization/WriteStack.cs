@@ -2,6 +2,8 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+#nullable enable
+
 using System.Collections.Generic;
 using System.Diagnostics;
 
@@ -15,31 +17,7 @@ namespace System.Text.Json
         private List<WriteStackFrame> _previous;
         private int _index;
 
-        public void Push()
-        {
-            if (_previous == null)
-            {
-                _previous = new List<WriteStackFrame>();
-            }
-
-            if (_index == _previous.Count)
-            {
-                // Need to allocate a new array element.
-                _previous.Add(Current);
-            }
-            else
-            {
-                Debug.Assert(_index < _previous.Count);
-
-                // Use a previously allocated slot.
-                _previous[_index] = Current;
-            }
-
-            Current.Reset();
-            _index++;
-        }
-
-        public void Push(JsonClassInfo nextClassInfo, object nextValue)
+        public void Push(JsonClassInfo nextClassInfo, object? nextValue)
         {
             Push();
             Current.JsonClassInfo = nextClassInfo;
@@ -59,10 +37,37 @@ namespace System.Text.Json
             }
         }
 
+        private void Push()
+        {
+            if (_previous == null)
+            {
+                _previous = new List<WriteStackFrame>();
+            }
+
+            if (_index == _previous.Count)
+            {
+                Debug.Assert(Current.JsonClassInfo != null);
+                // Need to allocate a new array element.
+                _previous.Add(Current);
+            }
+            else
+            {
+                Debug.Assert(_index < _previous.Count);
+
+                // Use a previously allocated slot.
+                _previous[_index] = Current;
+            }
+
+            Current.Reset();
+            //Current = default;
+            _index++;
+        }
+
         public void Pop()
         {
             Debug.Assert(_index > 0);
             Current = _previous[--_index];
+            Debug.Assert(Current.JsonClassInfo != null);
         }
 
         // Return a property path as a simple JSONPath using dot-notation when possible. When special characters are present, bracket-notation is used:
@@ -70,7 +75,7 @@ namespace System.Text.Json
         // $['PropertyName.With.Special.Chars']
         public string PropertyPath()
         {
-            StringBuilder sb = new StringBuilder("$");
+            var sb = new StringBuilder("$");
 
             for (int i = 0; i < _index; i++)
             {
@@ -84,15 +89,15 @@ namespace System.Text.Json
         private void AppendStackFrame(StringBuilder sb, in WriteStackFrame frame)
         {
             // Append the property name.
-            string propertyName = frame.JsonPropertyInfo?.PropertyInfo?.Name;
+            string? propertyName = frame.JsonPropertyInfo?.PropertyInfo?.Name;
             AppendPropertyName(sb, propertyName);
         }
 
-        private void AppendPropertyName(StringBuilder sb, string propertyName)
+        private void AppendPropertyName(StringBuilder sb, string? propertyName)
         {
             if (propertyName != null)
             {
-                if (propertyName.IndexOfAny(ReadStack.SpecialCharacters) != -1)
+                if (propertyName.IndexOfAny(ReadStack.s_specialCharacters) != -1)
                 {
                     sb.Append(@"['");
                     sb.Append(propertyName);

@@ -2,6 +2,8 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+#nullable enable
+
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
@@ -43,7 +45,7 @@ namespace System.Text.Json
                 // If ClassType.Unknown at this point, we are typeof(object) which should not have any properties.
                 Debug.Assert(state.Current.JsonClassInfo.ClassType != ClassType.Unknown);
 
-                JsonPropertyInfo jsonPropertyInfo = state.Current.JsonClassInfo.PropertyCacheArray[state.Current.PropertyEnumeratorIndex - 1];
+                JsonPropertyInfo jsonPropertyInfo = state.Current.JsonClassInfo.PropertyCacheArray![state.Current.PropertyEnumeratorIndex - 1];
                 HandleObject(jsonPropertyInfo, options, writer, ref state);
 
                 return false;
@@ -82,12 +84,12 @@ namespace System.Text.Json
             }
 
             bool obtainedValue = false;
-            object currentValue = null;
+            object? currentValue = null;
 
             // Check for polymorphism.
             if (jsonPropertyInfo.ClassType == ClassType.Unknown)
             {
-                currentValue = jsonPropertyInfo.GetValueAsObject(state.Current.CurrentValue);
+                currentValue = jsonPropertyInfo.GetValueAsObject(state.Current.CurrentValue!);
                 obtainedValue = true;
                 GetRuntimePropertyInfo(currentValue, state.Current.JsonClassInfo, ref jsonPropertyInfo, options);
             }
@@ -104,7 +106,7 @@ namespace System.Text.Json
             // A property that returns an enumerator keeps the same stack frame.
             if (jsonPropertyInfo.ClassType == ClassType.Enumerable)
             {
-                bool endOfEnumerable = HandleEnumerable(jsonPropertyInfo.ElementClassInfo, options, writer, ref state);
+                bool endOfEnumerable = HandleEnumerable(jsonPropertyInfo.ElementClassInfoOfEnumerableOrDictionary, options, writer, ref state);
                 if (endOfEnumerable)
                 {
                     state.Current.MoveToNextProperty = true;
@@ -116,7 +118,7 @@ namespace System.Text.Json
             // A property that returns a dictionary keeps the same stack frame.
             if (jsonPropertyInfo.ClassType == ClassType.Dictionary)
             {
-                bool endOfEnumerable = HandleDictionary(jsonPropertyInfo.ElementClassInfo, options, writer, ref state);
+                bool endOfEnumerable = HandleDictionary(jsonPropertyInfo.ElementClassInfoOfEnumerableOrDictionary, options, writer, ref state);
                 if (endOfEnumerable)
                 {
                     state.Current.MoveToNextProperty = true;
@@ -128,7 +130,8 @@ namespace System.Text.Json
             // A property that returns an object.
             if (!obtainedValue)
             {
-                currentValue = jsonPropertyInfo.GetValueAsObject(state.Current.CurrentValue);
+                Debug.Assert(jsonPropertyInfo.ClassType == ClassType.Object);
+                currentValue = jsonPropertyInfo.GetValueAsObject(state.Current.CurrentValue!);
             }
 
             if (currentValue != null)
@@ -147,7 +150,7 @@ namespace System.Text.Json
             {
                 if (!jsonPropertyInfo.IgnoreNullValues)
                 {
-                    writer.WriteNull(jsonPropertyInfo.EscapedName.Value);
+                    writer.WriteNull(jsonPropertyInfo.EscapedName!.Value);
                 }
 
                 state.Current.MoveToNextProperty = true;

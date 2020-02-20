@@ -2,6 +2,8 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+#nullable enable
+
 using System.Collections;
 using System.Diagnostics;
 
@@ -28,11 +30,10 @@ namespace System.Text.Json.Serialization.Converters
             }
 
             // Get the constructing type.
-            Type constructingType = underlyingType.Assembly.GetType(constructingTypeName);
+            Type? constructingType = underlyingType.Assembly.GetType(constructingTypeName);
 
             // Create a delegate which will point to the CreateRange method.
-            ImmutableCollectionCreator createRangeDelegate;
-            createRangeDelegate = options.MemberAccessorStrategy.ImmutableDictionaryCreateRange(constructingType, immutableCollectionType, elementType);
+            ImmutableCollectionCreator createRangeDelegate = options.MemberAccessorStrategy.ImmutableDictionaryCreateRange(constructingType!, immutableCollectionType, elementType);
 
             // Cache the delegate
             options.TryAddCreateRangeDelegate(delegateKey, createRangeDelegate);
@@ -58,9 +59,9 @@ namespace System.Text.Json.Serialization.Converters
 
         public override object CreateFromDictionary(ref ReadStack state, IDictionary sourceDictionary, JsonSerializerOptions options)
         {
-            Type immutableCollectionType = state.Current.JsonPropertyInfo.RuntimePropertyType;
+            Type immutableCollectionType = state.Current.JsonPropertyInfo!.RuntimePropertyType;
 
-            JsonClassInfo elementClassInfo = state.Current.JsonPropertyInfo.ElementClassInfo;
+            JsonClassInfo elementClassInfo = state.Current.JsonPropertyInfo.ElementClassInfoOfEnumerableOrDictionary;
             Type elementType = elementClassInfo.Type;
 
             string delegateKey = DefaultImmutableEnumerableConverter.GetDelegateKey(immutableCollectionType, elementType, out _, out _);

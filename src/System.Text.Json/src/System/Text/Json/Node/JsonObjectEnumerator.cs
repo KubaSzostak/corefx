@@ -1,4 +1,10 @@
-﻿using System.Collections;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
+#nullable enable
+
+using System.Collections;
 using System.Collections.Generic;
 
 namespace System.Text.Json
@@ -8,8 +14,8 @@ namespace System.Text.Json
     /// </summary>
     public struct JsonObjectEnumerator : IEnumerator<KeyValuePair<string, JsonNode>>
     {
-        private JsonObjectProperty _first;
-        private JsonObjectProperty _current;
+        private JsonObjectProperty? _first;
+        private JsonObjectProperty? _current;
 
         /// <summary>
         ///   Initializes a new instance of the <see cref="JsonObjectEnumerator"/> class supporting an interation over provided JSON object.
@@ -17,6 +23,10 @@ namespace System.Text.Json
         /// <param name="jsonObject">JSON object to iterate over.</param>
         public JsonObjectEnumerator(JsonObject jsonObject)
         {
+            if (jsonObject == null)
+            {
+                throw new ArgumentNullException(nameof(jsonObject));
+            }
             _first = jsonObject._first;
             _current = null;
         }

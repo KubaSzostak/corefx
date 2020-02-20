@@ -4,6 +4,8 @@
 
 using System.Runtime.Serialization;
 
+#nullable enable
+
 namespace System.Text.Json
 {
     // This class exists because the serializer needs to catch reader-originated exceptions in order to throw JsonException which has Path information.

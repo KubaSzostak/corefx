@@ -2,6 +2,8 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+#nullable enable
+
 using System.Buffers;
 using System.Diagnostics;
 
@@ -47,7 +49,7 @@ namespace System.Text.Json
         /// as if <see cref="WriteNullValue"/> was called.
         /// </para>
         /// </remarks>
-        public void WriteStringValue(string value)
+        public void WriteStringValue(string? value)
         {
             if (value == null)
             {
@@ -184,7 +186,7 @@ namespace System.Text.Json
             Debug.Assert(int.MaxValue / JsonConstants.MaxExpansionFactorWhileEscaping >= value.Length);
             Debug.Assert(firstEscapeIndexVal >= 0 && firstEscapeIndexVal < value.Length);
 
-            char[] valueArray = null;
+            char[]? valueArray = null;
 
             int length = JsonWriterHelper.GetMaxEscapedLength(value.Length, firstEscapeIndexVal);
 
@@ -327,7 +329,7 @@ namespace System.Text.Json
             Debug.Assert(int.MaxValue / JsonConstants.MaxExpansionFactorWhileEscaping >= utf8Value.Length);
             Debug.Assert(firstEscapeIndexVal >= 0 && firstEscapeIndexVal < utf8Value.Length);
 
-            byte[] valueArray = null;
+            byte[]? valueArray = null;
 
             int length = JsonWriterHelper.GetMaxEscapedLength(utf8Value.Length, firstEscapeIndexVal);
 

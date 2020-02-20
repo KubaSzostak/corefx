@@ -2,6 +2,8 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+#nullable enable
+
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -11,8 +13,8 @@ namespace System.Text.Json
     /// <summary>
     /// Represents a strongly-typed property that is not a <see cref="Nullable{T}"/>.
     /// </summary>
-    internal sealed class JsonPropertyInfoNotNullable<TClass, TDeclaredProperty, TRuntimeProperty, TConverter> :
-        JsonPropertyInfoCommon<TClass, TDeclaredProperty, TRuntimeProperty, TConverter>
+    internal sealed class JsonPropertyInfoNotNullable<TClass, TDeclaredProperty, TConverter> :
+        JsonPropertyInfoCommon<TClass, TDeclaredProperty, TConverter>
         where TConverter : TDeclaredProperty
     {
         protected override void OnRead(ref ReadStack state, ref Utf8JsonReader reader)
@@ -22,7 +24,7 @@ namespace System.Text.Json
                 ThrowHelper.ThrowJsonException_DeserializeUnableToConvertValue(RuntimePropertyType);
             }
 
-            TConverter value = Converter.Read(ref reader, RuntimePropertyType, Options);
+            TConverter value = Converter.Read(ref reader, RuntimePropertyType, Options)!;
 
             if (state.Current.ReturnValue == null)
             {
@@ -30,7 +32,7 @@ namespace System.Text.Json
             }
             else
             {
-                Set(state.Current.ReturnValue, value);
+                Set!(state.Current.ReturnValue, value);
             }
         }
 
@@ -54,7 +56,7 @@ namespace System.Text.Json
                 return;
             }
 
-            TConverter value = Converter.Read(ref reader, RuntimePropertyType, Options);
+            TConverter value = Converter.Read(ref reader, RuntimePropertyType, Options)!;
             JsonSerializer.ApplyValueToEnumerable(ref value, ref state);
         }
 
@@ -63,11 +65,11 @@ namespace System.Text.Json
             TConverter value;
             if (IsPropertyPolicy)
             {
-                value = (TConverter)current.CurrentValue;
+                value = (TConverter)current.CurrentValue!;
             }
             else
             {
-                value = (TConverter)Get(current.CurrentValue);
+                value = (TConverter)Get!(current.CurrentValue)!;
             }
 
             if (value == null)
@@ -92,7 +94,7 @@ namespace System.Text.Json
 
         protected override void OnWriteDictionary(ref WriteStackFrame current, Utf8JsonWriter writer)
         {
-            JsonSerializer.WriteDictionary(Converter, Options, ref current, writer);
+            JsonSerializer.WriteDictionary(Converter!, Options, ref current, writer);
         }
 
         protected override void OnWriteEnumerable(ref WriteStackFrame current, Utf8JsonWriter writer)
@@ -110,7 +112,7 @@ namespace System.Text.Json
                 }
                 else
                 {
-                    value = (TConverter)current.CollectionEnumerator.Current;
+                    value = (TConverter)current.CollectionEnumerator.Current!;
                 }
 
                 if (value == null)
@@ -124,14 +126,9 @@ namespace System.Text.Json
             }
         }
 
-        public override Type GetDictionaryConcreteType()
+        public override void GetDictionaryKeyAndValueFromGenericDictionary(ref WriteStackFrame writeStackFrame, out string key, out object? value)
         {
-            return typeof(Dictionary<string, TRuntimeProperty>);
-        }
-
-        public override void GetDictionaryKeyAndValueFromGenericDictionary(ref WriteStackFrame writeStackFrame, out string key, out object value)
-        {
-            if (writeStackFrame.CollectionEnumerator is IEnumerator<KeyValuePair<string, TRuntimeProperty>> genericEnumerator)
+            if (writeStackFrame.CollectionEnumerator is IEnumerator<KeyValuePair<string, TDeclaredProperty>> genericEnumerator)
             {
                 key = genericEnumerator.Current.Key;
                 value = genericEnumerator.Current.Value;
@@ -139,7 +136,7 @@ namespace System.Text.Json
             else
             {
                 throw ThrowHelper.GetNotSupportedException_SerializationNotSupportedCollection(
-                    writeStackFrame.JsonPropertyInfo.DeclaredPropertyType,
+                    writeStackFrame.JsonPropertyInfo!.DeclaredPropertyType,
                     writeStackFrame.JsonPropertyInfo.ParentClassType,
                     writeStackFrame.JsonPropertyInfo.PropertyInfo);
             }

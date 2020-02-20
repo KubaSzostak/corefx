@@ -2,6 +2,8 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+#nullable enable
+
 namespace System.Text.Json
 {
     /// <summary>
@@ -38,7 +40,7 @@ namespace System.Text.Json
         ///   <see langword="true"/> if the boolean value of this instance matches <paramref name="obj"/>,
         ///   <see langword="false"/> otherwise.
         /// </returns>
-        public override bool Equals(object obj) => obj is JsonBoolean jsonBoolean && Equals(jsonBoolean);
+        public override bool Equals(object? obj) => obj is JsonBoolean jsonBoolean && Equals(jsonBoolean);
 
         /// <summary>
         ///   Calculates a hash code of this instance.
@@ -54,7 +56,7 @@ namespace System.Text.Json
         ///   <see langword="true"/> if the boolean value of this instance matches <paramref name="other"/>,
         ///   <see langword="false"/> otherwise.
         /// </returns>
-        public bool Equals(JsonBoolean other) => !(other is null) && Value == other.Value;
+        public bool Equals(JsonBoolean? other) => !(other is null) && Value == other.Value;
 
         /// <summary>
         ///   Compares values of two JSON booleans.
@@ -65,7 +67,7 @@ namespace System.Text.Json
         ///   <see langword="true"/> if values of instances match,
         ///   <see langword="false"/> otherwise.
         /// </returns>
-        public static bool operator ==(JsonBoolean left, JsonBoolean right)
+        public static bool operator ==(JsonBoolean? left, JsonBoolean? right)
         {
             // Test "right" first to allow branch elimination when inlined for null checks (== null)
             // so it can become a simple test
@@ -87,7 +89,7 @@ namespace System.Text.Json
         ///   <see langword="true"/> if values of instances do not match,
         ///   <see langword="false"/> otherwise.
         /// </returns>
-        public static bool operator !=(JsonBoolean left, JsonBoolean right) => !(left == right);
+        public static bool operator !=(JsonBoolean? left, JsonBoolean? right) => !(left == right);
 
         /// <summary>
         ///   Creates a new JSON boolean that is a copy of the current instance.
